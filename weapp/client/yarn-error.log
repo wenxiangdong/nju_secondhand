@@ -1,0 +1,98 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\文向东\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add taro-ui/dist/style/index --silent --no-progress
+
+PATH: 
+  C:\Program Files\nodejs\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;C:\projects\nju_secondhand\weapp\client\node_modules\.bin;C:\projects\nju_secondhand\weapp\node_modules\.bin;C:\Program Files (x86)\NetSarang\Xftp 6\;C:\Program Files (x86)\NetSarang\Xshell 6\;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Docker\Docker\Resources\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\AndroidSdk\platform-tools\;C:\AndroidSdk\platforms\;C:\chromedriver\;C:\MinGW\bin\;C:\Program Files\Java\jdk1.8.0_211\bin\;C:\Users\文向东\AppData\Local\Programs\Python\Python37\Scripts\;C:\Users\文向东\AppData\Local\Programs\Python\Python37\;C:\Users\文向东\AppData\Local\Microsoft\WindowsApps;C:\Users\文向东\AppData\Roaming\npm;C:\Users\文向东\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\JetBrains\WebStorm 2019.1.3\bin;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1.3\bin;C:\Program Files\JetBrains\PyCharm Community Edition 2019.1.3\bin;;C:\flutter\bin\;
+
+Yarn version: 
+  1.16.0
+
+Node version: 
+  10.16.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: https://registry.npmjs.org/typescript: ESOCKETTIMEDOUT
+      at ClientRequest.<anonymous> (C:\Users\文向东\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:130217:19)
+      at Object.onceWrapper (events.js:286:20)
+      at ClientRequest.emit (events.js:198:13)
+      at TLSSocket.emitRequestTimeout (_http_client.js:662:40)
+      at Object.onceWrapper (events.js:286:20)
+      at TLSSocket.emit (events.js:198:13)
+      at TLSSocket.Socket._onTimeout (net.js:442:8)
+      at ontimeout (timers.js:436:11)
+      at tryOnTimeout (timers.js:300:5)
+      at listOnTimeout (timers.js:263:5)
+
+npm manifest: 
+  {
+    "name": "weapp",
+    "version": "1.0.0",
+    "private": true,
+    "description": "南大小书童",
+    "templateInfo": {
+      "name": "wxcloud",
+      "typescript": true,
+      "css": "sass"
+    },
+    "scripts": {
+      "build": "taro build --type weapp",
+      "build:weapp": "taro build --type weapp",
+      "build:swan": "taro build --type swan",
+      "build:alipay": "taro build --type alipay",
+      "build:tt": "taro build --type tt",
+      "build:h5": "taro build --type h5",
+      "build:rn": "taro build --type rn",
+      "dev": "npm run build:weapp -- --watch",
+      "dev:weapp": "npm run build:weapp -- --watch",
+      "dev:swan": "npm run build:swan -- --watch",
+      "dev:alipay": "npm run build:alipay -- --watch",
+      "dev:tt": "npm run build:tt -- --watch",
+      "dev:h5": "npm run build:h5 -- --watch",
+      "dev:rn": "npm run build:rn -- --watch"
+    },
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+      "@tarojs/components": "1.3.10",
+      "@tarojs/router": "1.3.10",
+      "@tarojs/taro": "1.3.10",
+      "@tarojs/taro-alipay": "1.3.10",
+      "@tarojs/taro-h5": "1.3.10",
+      "@tarojs/taro-swan": "1.3.10",
+      "@tarojs/taro-tt": "1.3.10",
+      "@tarojs/taro-weapp": "1.3.10",
+      "nervjs": "^1.4.0",
+      "nerv-devtools": "^1.4.0"
+    },
+    "devDependencies": {
+      "@types/react": "^16.4.6",
+      "@types/webpack-env": "^1.13.6",
+      "@tarojs/plugin-babel": "1.3.10",
+      "@tarojs/plugin-csso": "1.3.10",
+      "@tarojs/plugin-sass": "1.3.10",
+      "@tarojs/plugin-uglifyjs": "1.3.10",
+      "@tarojs/webpack-runner": "1.3.10",
+      "babel-plugin-transform-class-properties": "^6.24.1",
+      "babel-plugin-transform-decorators-legacy": "^1.3.4",
+      "babel-plugin-transform-jsx-stylesheet": "^0.6.5",
+      "babel-plugin-transform-object-rest-spread": "^6.26.0",
+      "babel-preset-env": "^1.6.1",
+      "babel-eslint": "^8.2.3",
+      "eslint": "^4.19.1",
+      "eslint-config-taro": "1.3.10",
+      "eslint-plugin-react": "^7.8.2",
+      "eslint-plugin-import": "^2.12.0",
+      "eslint-plugin-taro": "1.3.10",
+      "@typescript-eslint/parser": "^1.6.0",
+      "typescript": "^3.0.1"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
