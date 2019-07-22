@@ -1,0 +1,29 @@
+.Home__main {
+    padding: 16px;
+    display: flex;
+
+}
+
+.Home__tile {
+    margin: 16px;
+    width: 150px;
+    height: 150px;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: white;
+    opacity: 0.7;
+    cursor: pointer;
+
+    position: relative;
+}
+
+.Home__tile-icon {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    font-size: 24px;
+}
+
+.Home__tile:hover {
+    opacity: 1;
+}
