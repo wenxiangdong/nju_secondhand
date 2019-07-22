@@ -11,6 +11,7 @@ import './app.scss'
 
 class App extends Component {
 
+
   /**
    * 指定config的类型声明为: Taro.Config
    *
@@ -20,9 +21,8 @@ class App extends Component {
    */
   config: Config = {
     pages: [
-      'pages/dev/index',
       'pages/index/index',
-
+      'pages/dev/index'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -31,7 +31,7 @@ class App extends Component {
       navigationBarTextStyle: 'black'
     },
     cloud: true
-  }
+  };
 
   componentDidMount () {
     if (process.env.TARO_ENV === 'weapp') {
@@ -54,4 +54,4 @@ class App extends Component {
   }
 }
 
-Taro.render(<App />, document.getElementById('app'))
+Taro.render(<App />, document.getElementById('app'));

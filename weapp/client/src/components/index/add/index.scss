@@ -1,0 +1,34 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+
+  padding-bottom: 50px;
+
+  background-color: rgba(255,255,255, 0.9);
+
+  z-index: 100000000;
+}
+
+.menu-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 30px;
+
+  .menu-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 12Px;
+  }
+}
