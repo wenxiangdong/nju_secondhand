@@ -1,3 +1,4 @@
+// @ts-ignore
 import {AtButton, AtMessage} from "taro-ui";
 import Taro from '@tarojs/taro';
 import {View} from "@tarojs/components";
