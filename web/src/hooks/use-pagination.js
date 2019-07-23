@@ -7,22 +7,38 @@ interface IProp<T> {
     onError?: (e: Error) => void;
 }
 
+/**
+ * 分布加载 逻辑
+ * @param props
+ * @returns {*[]}
+ */
 export default function usePagination<T>(props: IProp<T>) {
     // utils
     const logger = Logger.getLogger("use-pagination");
     // states
     const [data, setData] = useState([]);
-    
-    async function loadMore() {
+
+    const COUNT = 10;
+
+    // 加载更多数据
+    async function loadData({reset = false} = {}) {
+        logger.info("load more");
         const {dataSource, onSuccess, onError} = props;
         try {
-            const res = await dataSource();
-            setData([...data, ...res]);
+            const res = await dataSource(data.length, COUNT);
+            reset ? setData(res) : setData([...data, ...res]);
+            onSuccess && onSuccess(res);
         } catch (e) {
             logger.error(e);
             onError && onError(e);
         }
     }
 
-    return [data, loadMore];
+    // 清空
+    function reset() {
+        logger.info("reset");
+        setData([]);
+    }
+
+    return [data, loadData, reset];
 }
