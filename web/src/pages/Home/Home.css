@@ -1,3 +1,7 @@
+a {
+    text-decoration: none;
+}
+
 .Home__main {
     padding: 16px;
     display: flex;
@@ -15,6 +19,10 @@
     cursor: pointer;
 
     position: relative;
+}
+
+.Home__tile-title {
+    text-decoration: none;
 }
 
 .Home__tile-icon {

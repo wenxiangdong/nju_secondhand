@@ -1,10 +1,7 @@
 import "./Home.css";
 import {Card, Icon} from "antd";
 import React from "react";
-import Logger from "../../utils/logger";
-import {Link, Router} from "react-router-dom";
-
-const logger = Logger.getLogger("Home");
+import {Link} from "react-router-dom";
 
 
 /**
