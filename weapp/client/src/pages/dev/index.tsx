@@ -2,7 +2,7 @@
 import {AtButton} from "taro-ui";
 import Taro from '@tarojs/taro';
 import {View} from "@tarojs/components";
-import NjuTabBar from "../../components/nju-tab-bar";
+// import NjuTabBar from "../../components/nju-tab-bar";
 import WhiteSpace from "../../components/white-space";
 
 function Dev() {
@@ -21,7 +21,7 @@ function Dev() {
           ))
       }
       <WhiteSpace height={50}/>
-      <NjuTabBar/>
+      {/*<NjuTabBar/>*/}
     </View>
   )
 }
