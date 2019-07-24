@@ -1,0 +1,29 @@
+.DTable__table {
+    border-radius: 5px;
+    border: rgba(0,0,0,0.1) 2px solid;
+    width: 100%;
+    text-align: center;
+}
+
+.DTable__head {
+    background-color: rgb(249, 249, 249);
+}
+
+.DTable__head th {
+    padding: 1em;
+    font-weight: bold;
+}
+
+.DTable__row {
+    border-bottom: rgba(0,0,0,0.1) 1px solid;
+}
+
+.DTable__item {
+    padding: 8px;
+}
+
+.DTable__footer {
+    display: flex;
+    padding: 8px;
+    justify-content: center;
+}

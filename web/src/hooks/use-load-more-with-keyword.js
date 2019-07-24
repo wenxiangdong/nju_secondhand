@@ -1,4 +1,4 @@
-import usePagination from "./use-pagination";
+import useLoadMore from "./use-load-more";
 import {useEffect, useState} from "react";
 interface IProp<T> {
     dataSource: (start: number, count: number, keyword: string) => Promise<T>;
@@ -11,7 +11,7 @@ interface IProp<T> {
  * @param props
  * @returns {*[]}
  */
-export default function usePaginationWithKeyword(props: IProp) {
+export default function useLoadMoreWithKeyword(props: IProp) {
 
     const {dataSource, onError, onSuccess} = props;
 
@@ -25,7 +25,7 @@ export default function usePaginationWithKeyword(props: IProp) {
     let dataSourceCurry = curry();
 
     // 使用自定义hook
-    const [data, loadData, reset] = usePagination({
+    const [data, loadData, reset] = useLoadMore({
         onSuccess,
         onError,
         dataSource: dataSourceCurry

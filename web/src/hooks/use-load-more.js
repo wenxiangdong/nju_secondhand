@@ -12,7 +12,7 @@ interface IProp<T> {
  * @param props
  * @returns {*[]}
  */
-export default function usePagination<T>(props: IProp<T>) {
+export default function useLoadMore<T>(props: IProp<T>) {
     // utils
     const logger = Logger.getLogger("use-pagination");
     // states
