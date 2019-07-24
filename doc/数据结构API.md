@@ -7,8 +7,11 @@
 // 后端返前端 -> XXXVO
 // 未涉及数据库对象
 
-// 用户
+interface VO {
+  	_id;
+}
 
+// 用户
 interface UserDTO {
     phone: string;
     nickname: string;
@@ -16,15 +19,7 @@ interface UserDTO {
     email: string;  // 检查唯一性
 }
 
-interface Location {
-    name: string;
-    address: string;
-    latitude: string;
-    longitude: string;
-}
-
-interface UserVO {
-    _id: string; // 用户标识符
+interface UserVO extends VO {
     _openid: string;
 
     phone: string;
@@ -38,8 +33,15 @@ interface UserVO {
     state: UserState;
 }
 
+interface Location {
+    name: string;
+    address: string;
+    latitude: string;
+    longitude: string;
+}
+
 interface Account {
-    balance: string | number;
+    balance: string;
 }
 
 enum UserState {
@@ -49,10 +51,7 @@ enum UserState {
 
 
 // 商品
-
-// 数据库对象
-interface Category {
-    _id: string;
+interface CategoryVO extends VO {
     name: string;
     icon: string;
 }
@@ -60,20 +59,19 @@ interface Category {
 interface GoodsDTO {
     name: string;
     desc: string;
-    price: string | number;
+    price: string;
     pictures: Array<string>;
     categoryID: string; // -> Category._id
 }
 
-interface GoodsVO {
-    _id: string;
+interface GoodsVO extends VO {
     sellerID: string;
 
     name: string;
     desc: string;
-    price: string | number;
+    price: string;
     pictures: Array<string>;
-    category: Category;
+    category: CategoryVO;
 
     publishTime: number;
 
@@ -86,16 +84,13 @@ enum GoodsState {
 }
 
 // 订单
-
 interface OrderDTO {
     buyerID: string;
 
     goodID: string;
 }
 
-interface OrderVO {
-    _id: string;
-
+interface OrderVO extends VO {
     buyerID: string;
     buyerName: string;
 
@@ -104,8 +99,8 @@ interface OrderVO {
 
     goodsID: string;
     goodsName: string;
-    goodsPrice: string | number;
-    total: string | number;
+    goodsPrice: string;
+    total: string;
 
     address: Location;
 
@@ -121,7 +116,6 @@ enum OrderState {
 }
 
 // 投诉
-
 interface ComplaintDTO {
     orderID: string // 订单编号
     desc: string
@@ -129,9 +123,7 @@ interface ComplaintDTO {
     pictures: Array<string>;
 }
 
-interface ComplaintVO {
-    _id: string;
-
+interface ComplaintVO extends VO {
     orderID: string // 订单编号
     desc: string
 
@@ -153,15 +145,14 @@ enum ComplaintState {
 }
 
 // 圈子
-
 interface PostDTO {
     desc: string;
     picture: Array<string>;
 }
 
-interface PostVO {
-    _id: string;
+interface PostVO extends VO {
     ownerID: string;
+  	ownerName: string;
 
     publishTime: number;
 
@@ -177,19 +168,13 @@ interface Comment {
     commentTime: number;
 }
 
-
-// 通过单独的评论 API 取得的 VO
-interface CommentVO {
-    _id: string;
-    postID: string;
-    nickName: string;
+// 通知
+interface NotificationDTO  {
+    userID: string;
     content: string;
-    commentTime: number;
 }
 
-
-// 通知
-interface Notification {
+interface NotificationVO extends VO {
     userID: string;
     content: string;
     time: number;
@@ -201,7 +186,7 @@ interface MessageDTO {
     content: string;   // "image://" "text://" 
 }
 
-interface MessageVO {
+interface MessageVO extends VO {
     senderID: string;
     senderName: string;
 
@@ -215,48 +200,103 @@ interface MessageVO {
 }
 ```
 
-## 用户 API
 
- ```java
-// 用户信息
-void signUp(UserDTO user);
-UserVO login();
-void modifyInfo(UserDTO user);
 
-// 发布闲置物品
-List<Category> getCategorys();
-void publishGoods(GoodsDTO goods);
-List<GoodsVO> getPublishedGoods(int lastIndex, int size);
-void deleteGoods(String goodsID);
+## 用户API
 
-// 购买闲置物品
-List<GoodsVO> searchGoodsByKeyword(String keyword, int lastIndex, int size); // 无需注册
-List<GoodsVO> searchGoodsByCategory(String categoryID, int lastIndex, int size); // 无需注册
-void purchase(String goodsID); // 给卖家发通知
+ ```typescript
+export interface IAccountApi {
+    // 取款
+    withdraw(amount: String): Promise<void>;
+}
 
-// 订单管理
-List<OrderVO> getOngoingOrders(int lastIndex, int size);
-void accept(String OrderID); // 给卖家发通知
+export interface ICircleApi {
+    publishPost(post: PostDTO): Promise<void>;
 
-List<OrderVO> getHistoryOrders(int lastIndex, int size);
+    getPosts(lastIndex: number, size?: number): Promise<PostVO[]>;
 
-// 投诉
-void complain(ComplaintDTO complaint);
+    comment(postID: string, content: string): Promise<void>;
+}
 
-// 圈子
-void publishPost(PostDTO post);
-void comment(String postID, String content); // 给发分享的人发通知？
-List<PostVO> getPosts(int lastIndex, int size);
+export interface IComplaintApi {
+    complain(complaint: ComplaintDTO): Promise<void>;
 
-// 聊天，使用websokcet TODO 全局共用一个 WebSocket
+    getComplaints(lastIndex: number, size?: number): Promise<ComplaintVO[]>;
+}
+
+export interface IFileApi {
+    uploadFile(cloudPath: string, filePath: string): Promise<string>;
+
+    downloadFile(fileID: string): Promise<string>;
+
+    getTempFileURL(fileList: string[]): Promise<GetTempFileURLResultItem[]>;
+
+    deleteFile(fileList: string[]): Promise<DeleteFileResultItem[]>;
+}
+
+export interface IGoodsApi {
+    // 取得商品分类
+    getCategories(): Promise<CategoryVO[]>;
+
+    // 发布闲置物品
+    publishGoods(goods: GoodsDTO): Promise<void>;
+
+    // 查看自己正在卖的物品
+    getOngoingGoods(): Promise<GoodsVO[]>;
+
+    // 下架商品
+    deleteGoods(goodsId: string): Promise<void>;
+
+    // 关键字搜索商品
+    searchGoodsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsVO[]>;
+
+    // 种类搜索商品
+    searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>;
+
+    // 购买商品
+    purchase(goodsID: string): Promise<void>;
+}
+
+export interface INotificationApi {
+    // 取得通知消息
+    getNotifications(): Promise<NotificationVO[]>;
+
+    // 发送通知消息（供其他接口调用）
+    sendNotification(notification: NotificationDTO): Promise<void>;
+}
+
+export interface IOrderApi {
+    getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+
+    accept(orderID: string): Promise<void>;
+
+    getBuyerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+
+    getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+
+    getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+}
+
+export interface IUserApi {
+    // 注册
+    signUp(user: UserDTO): Promise<void>;
+
+    // 登录
+    login(): Promise<UserVO>;
+
+    // 修改个人信息
+    modifyInfo(user: UserDTO): Promise<void>;
+
+    // 根据 ID 取得用户信息
+    getUserInfo(userID: string): Promise<UserVO>;
+}
+
+// 聊天，使用websokcet
 发送使用 MessageDTO 的 JSON 格式
 接收解析 MessageVO 的 JSON 格式
-
-// 提现
-void withdraw(String amount);
  ```
 
-## 管理员 API
+## 管理员API
 
 ```java
 // 投诉管理
@@ -278,4 +318,3 @@ void freezeUser(String userID); // 发通知
 List<UserVO> getForzenUsers(String keyword, int lastIndex, int size);
 void unfreezeUser(String userID); // 发通知
 ```
-
