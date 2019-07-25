@@ -2,7 +2,7 @@ import {View} from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import {AtIcon} from "taro-ui";
 import "./index.scss";
-import WhiteSpace from "../../white-space";
+import WhiteSpace from "../../common/white-space";
 interface IProp {
   onCancel?: () => void
 }

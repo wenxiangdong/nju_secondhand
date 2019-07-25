@@ -2,7 +2,7 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View } from '@tarojs/components'
 import './index.scss';
 import Home from "../../components/index/home";
-import WhiteSpace from "../../components/white-space";
+import WhiteSpace from "../../components/common/white-space";
 import Add from "../../components/index/add";
 import {TabItem} from "taro-ui/@types/tab-bar";
 import {AtTabBar} from "taro-ui";

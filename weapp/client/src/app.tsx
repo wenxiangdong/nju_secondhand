@@ -22,7 +22,30 @@ class App extends Component {
   config: Config = {
     pages: [
       'pages/index/index',
-      'pages/dev/index'
+
+      'pages/chat/index',
+
+      'pages/circle/index',
+      'pages/circle/send-post/index',
+
+      'pages/home/index',
+      'pages/home/goods-info/index',
+
+      'pages/login/index',
+
+      'pages/my/index',
+      'pages/my/my-bought/index',
+      'pages/my/my-publish/index',
+      'pages/my/my-sold/index',
+      'pages/my/my-visited/index',
+      'pages/my/platform-rules/index',
+      'pages/my/privacy-policy/index',
+      'pages/my/software-license-agreement/index',
+      'pages/my/user-info/index',
+
+      'pages/register/index',
+
+      'pages/dev/index',
     ],
     window: {
       backgroundTextStyle: 'light',

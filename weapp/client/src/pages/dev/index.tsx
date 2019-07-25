@@ -3,7 +3,7 @@ import {AtButton} from "taro-ui";
 import Taro from '@tarojs/taro';
 import {View} from "@tarojs/components";
 // import NjuTabBar from "../../components/nju-tab-bar";
-import WhiteSpace from "../../components/white-space";
+import WhiteSpace from "../../components/common/white-space";
 
 function Dev() {
   const handleClick = () => {
