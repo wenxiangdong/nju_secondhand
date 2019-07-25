@@ -4,6 +4,7 @@ import { AtTabBar } from 'taro-ui'
 import { TabItem } from 'taro-ui/@types/tab-bar'
 import SelectPublish from './select-publish'
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
+import WhiteSpace from "../white-space";
 
 interface IProp {
   currentIndex: number
@@ -18,12 +19,12 @@ interface IState {
  * @create 2019/7/25 16:39
  */
 export default class MainTabBar extends Component<IProp, IState> {
-  static defaultProps = {currentIndex: 0};
+  static defaultProps:IProp = {currentIndex: 0};
 
   static TAB_BAR_LIST: (TabItem & {page: string})[] = [
     {
       title: '首页',
-      iconType: 'index',
+      iconType: 'home',
       page: '/pages/index/index'
     },
     {
@@ -90,6 +91,7 @@ export default class MainTabBar extends Component<IProp, IState> {
 
     return (
       <View>
+        <WhiteSpace/>
         {selectingPublish? <SelectPublish previousTitle={title} title={selectPublishTitle} onCancel={this.onCancelSelectingPublish}/>: null}
         <AtTabBar fixed current={currentIndex} tabList={MainTabBar.TAB_BAR_LIST} onClick={this.onTabClicked}/>
       </View>

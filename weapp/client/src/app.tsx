@@ -39,6 +39,7 @@ class App extends Component {
       'pages/my/my-publish/index',
       'pages/my/my-sold/index',
       'pages/my/my-visited/index',
+      'pages/my/platform-account/index',
       'pages/my/platform-rules/index',
       'pages/my/privacy-policy/index',
       'pages/my/software-license-agreement/index',
