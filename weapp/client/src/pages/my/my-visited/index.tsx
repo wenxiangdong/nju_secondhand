@@ -1,11 +1,15 @@
-import Taro, {Component} from '@tarojs/taro'
+import Taro, {Component, Config} from '@tarojs/taro'
 import {View, Text} from '@tarojs/components'
 
 /**
- * @author 张李承
+ * 我的足迹
  * @create 2019/7/25 11:49
  */
 export class index extends Component {
+
+  config: Config = {
+    navigationBarTitleText: '我的足迹'
+  };
 
   componentWillMount() {
   }
@@ -25,7 +29,7 @@ export class index extends Component {
   render() {
     return (
       <View>
-        <Text>index works</Text>
+        <Text>我的足迹 works</Text>
       </View>
     )
   }

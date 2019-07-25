@@ -6,6 +6,9 @@ import {View} from "@tarojs/components";
 import WhiteSpace from "../../components/common/white-space";
 
 function Dev() {
+  // noinspection JSIgnoredPromiseFromCall
+  Taro.setNavigationBarTitle({title: '测试'});
+
   const handleClick = () => {
 
   };

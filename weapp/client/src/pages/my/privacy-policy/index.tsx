@@ -1,11 +1,15 @@
-import Taro, {Component} from '@tarojs/taro'
+import Taro, {Component, Config} from '@tarojs/taro'
 import {View, Text} from '@tarojs/components'
 
 /**
- * @author 张李承
+ * 隐私权条款
  * @create 2019/7/25 11:49
  */
 export class index extends Component {
+
+  config: Config = {
+    navigationBarTitleText: '隐私权条款'
+  };
 
   componentWillMount() {
   }
@@ -25,7 +29,7 @@ export class index extends Component {
   render() {
     return (
       <View>
-        <Text>index works</Text>
+        <Text>隐私权条款 works</Text>
       </View>
     )
   }

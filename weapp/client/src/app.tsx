@@ -21,17 +21,18 @@ class App extends Component {
    */
   config: Config = {
     pages: [
+      // 测试页面
+      // 'pages/dev/index',
       'pages/index/index',
-
-      'pages/chat/index',
 
       'pages/circle/index',
       'pages/circle/send-post/index',
 
-      'pages/home/index',
-      'pages/home/goods-info/index',
+      'pages/index/goods-info/index',
 
       'pages/login/index',
+
+      'pages/message/index',
 
       'pages/my/index',
       'pages/my/my-bought/index',
@@ -44,13 +45,11 @@ class App extends Component {
       'pages/my/user-info/index',
 
       'pages/register/index',
-
-      'pages/dev/index',
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'WeChat',
+      navigationBarTitleText: '南大小书童',
       navigationBarTextStyle: 'black'
     },
     cloud: true

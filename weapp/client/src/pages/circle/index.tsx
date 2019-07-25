@@ -1,11 +1,17 @@
-import Taro, {Component} from '@tarojs/taro'
-import {View, Text} from '@tarojs/components'
+import Taro, {Component, Config} from '@tarojs/taro'
+import {View, Text, Button} from '@tarojs/components'
+import MainTabBar from "../../components/common/main-tab-bar";
+import {createSimpleErrorHandler} from "../../utils/function-factory";
 
 /**
- * @author 张李承
+ * 圈子
  * @create 2019/7/25 11:49
  */
 export class index extends Component {
+
+  config: Config = {
+    navigationBarTitleText: '圈子'
+  };
 
   componentWillMount() {
   }
@@ -22,10 +28,20 @@ export class index extends Component {
   componentDidHide() {
   }
 
+  private onError = createSimpleErrorHandler('circle', this);
+
+  private onSendPostClick = () => {
+    Taro.navigateTo({ url: '/pages/circle/send-post/index'})
+      .catch((e) => this.onError(e));
+  };
+
   render() {
     return (
       <View>
-        <Text>index works</Text>
+        <Text>圈子 works</Text>
+        {/*TODO send post*/}
+        <Button onClick={this.onSendPostClick}>send post</Button>
+        <MainTabBar currentIndex={MainTabBar.CIRCLE_INDEX}/>
       </View>
     )
   }
