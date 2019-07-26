@@ -45,8 +45,9 @@ interface Account {
 }
 
 enum UserState {
+    UnRegistered, // 未注册
     Normal,
-    Frozen, // 被管理员冻结
+    Forzen, // 被管理员冻结
 }
 
 
@@ -198,6 +199,12 @@ interface MessageVO extends VO {
     time: number;
     read: boolean;
 }
+
+export interface HttpResponse<T> {
+    code: HttpCode;
+    data: T;
+    message: string;
+}
 ```
 
 
@@ -205,11 +212,33 @@ interface MessageVO extends VO {
 ## 用户API
 
  ```typescript
+// API 如果成功调用，则返回 Promise 的返回类型，如 GoodsVO；如果失败，抛出异常，异常格式为 HttpResponse
+
+// 部分需要注册且未冻结，不需要的会指明
+export interface IUserApi {
+    // 检查用户状态
+    checkState(): Promise<UserState>; // 不需要
+
+    // 注册
+    signUp(user: UserDTO): Promise<void>; // 不需要
+
+    // 登录
+    login(): Promise<UserVO>;
+
+    // 修改个人信息
+    modifyInfo(user: UserDTO): Promise<void>;
+
+    // 根据 ID 取得用户信息
+    getUserInfo(userID: string): Promise<UserVO>;
+}
+
+// 需要注册且未冻结
 export interface IAccountApi {
     // 取款
     withdraw(amount: String): Promise<void>;
 }
 
+// 需要注册且未冻结
 export interface ICircleApi {
     publishPost(post: PostDTO): Promise<void>;
 
@@ -218,12 +247,14 @@ export interface ICircleApi {
     comment(postID: string, content: string): Promise<void>;
 }
 
+// 需要注册且未冻结
 export interface IComplaintApi {
     complain(complaint: ComplaintDTO): Promise<void>;
 
     getComplaints(lastIndex: number, size?: number): Promise<ComplaintVO[]>;
 }
 
+// 需要注册且未冻结
 export interface IFileApi {
     uploadFile(cloudPath: string, filePath: string): Promise<string>;
 
@@ -234,9 +265,11 @@ export interface IFileApi {
     deleteFile(fileList: string[]): Promise<DeleteFileResultItem[]>;
 }
 
+
+// 部分需要注册且未冻结，不需要的会指明
 export interface IGoodsApi {
     // 取得商品分类
-    getCategories(): Promise<CategoryVO[]>;
+    getCategories(): Promise<CategoryVO[]>; // 不需要
 
     // 发布闲置物品
     publishGoods(goods: GoodsDTO): Promise<void>;
@@ -248,15 +281,16 @@ export interface IGoodsApi {
     deleteGoods(goodsId: string): Promise<void>;
 
     // 关键字搜索商品
-    searchGoodsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsVO[]>;
+    searchGoodsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsVO[]>; // 不需要
 
     // 种类搜索商品
-    searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>;
+    searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>; // 不需要
 
     // 购买商品
     purchase(goodsID: string): Promise<void>;
 }
 
+// 需要注册且未冻结
 export interface INotificationApi {
     // 取得通知消息
     getNotifications(): Promise<NotificationVO[]>;
@@ -265,6 +299,7 @@ export interface INotificationApi {
     sendNotification(notification: NotificationDTO): Promise<void>;
 }
 
+// 需要注册且未冻结
 export interface IOrderApi {
     getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
@@ -275,21 +310,6 @@ export interface IOrderApi {
     getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
     getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
-}
-
-export interface IUserApi {
-  
-    // 注册
-    signUp(user: UserDTO): Promise<void>;
-
-    // 登录
-    login(): Promise<UserVO>;
-
-    // 修改个人信息
-    modifyInfo(user: UserDTO): Promise<void>;
-
-    // 根据 ID 取得用户信息
-    getUserInfo(userID: string): Promise<UserVO>;
 }
 
 // 聊天，使用websokcet
@@ -319,3 +339,4 @@ void freezeUser(String userID); // 发通知
 List<UserVO> getForzenUsers(String keyword, int lastIndex, int size);
 void unfreezeUser(String userID); // 发通知
 ```
+

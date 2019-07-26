@@ -2,7 +2,7 @@ import "@tarojs/async-await";
 import { VO, httpRequest } from "./HttpRequest";
 
 export interface IUserApi {
-    // 判断是否为新用户，如果新用户返回true
+    // 检查用户状态
     checkState(): Promise<UserState>;
 
     // 注册
