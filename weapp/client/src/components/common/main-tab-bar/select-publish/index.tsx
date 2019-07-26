@@ -17,13 +17,13 @@ function SelectPublish(props: IProp) {
 
   if (title) {
     Taro.setNavigationBarTitle({title})
-      .catch((e) => onError(e));
+      .catch(onError);
   }
 
   // handler
   const handleClickCancel = () => {
     Taro.setNavigationBarTitle({title: previousTitle})
-      .catch((e) => onError(e));
+      .catch(onError);
 
     onCancel && onCancel();
   };

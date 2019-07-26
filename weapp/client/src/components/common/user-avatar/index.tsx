@@ -1,7 +1,7 @@
 import Taro, {Component} from '@tarojs/taro'
 import {View, OpenData} from '@tarojs/components'
 
-import './UserAvatar.scss'
+import './index.scss'
 
 interface IProp {
   size: number,

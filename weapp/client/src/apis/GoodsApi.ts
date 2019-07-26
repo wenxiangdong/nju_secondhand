@@ -1,5 +1,5 @@
 import "@tarojs/async-await"
-import { VO } from "./HttpRequest";
+import {mockHttpRequest, VO} from "./HttpRequest";
 
 export interface IGoodsApi {
     // 取得商品分类
@@ -25,8 +25,9 @@ export interface IGoodsApi {
 }
 
 class GoodsApi implements IGoodsApi {
+
     getCategories(): Promise<CategoryVO[]> {
-        throw new Error("Method not implemented.");
+      throw new Error("Method not implemented.");
     }
     publishGoods(goods: GoodsDTO): Promise<void> {
         throw new Error("Method not implemented.");
@@ -50,7 +51,14 @@ class GoodsApi implements IGoodsApi {
 
 class MockGoodsApi implements IGoodsApi {
     getCategories(): Promise<CategoryVO[]> {
-        throw new Error("Method not implemented.");
+      return mockHttpRequest.success([
+        {name: '数码', icon: '', _id: '1'},
+        {name: '二手图书', icon: '', _id: '1'},
+        {name: '服饰鞋包', icon: '', _id: '1'},
+        {name: '美妆', icon: '', _id: '1'},
+        {name: '二手车', icon: '', _id: '1'},
+        {name: '全部分类', icon: '', _id: '1'},
+      ])
     }
     publishGoods(goods: GoodsDTO): Promise<void> {
         throw new Error("Method not implemented.");

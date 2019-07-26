@@ -1,5 +1,5 @@
 import * as Taro from "@tarojs/taro";
-import {getSystemInfoSync} from "@tarojs/taro";
+import {CategoryVO} from "../apis/GoodsApi";
 
 interface WindowSize {
   /**
@@ -15,6 +15,7 @@ interface WindowSize {
 class LocalConfig {
   private KEY = 'nju.weapp.help_config';
   private SYS_INFO = 'nju.weapp.sys_info';
+  private CATEGORY = 'nju.weapp.category';
 
   public isFirstUse(): boolean {
     return !Taro.getStorageSync(this.KEY);
@@ -32,6 +33,14 @@ class LocalConfig {
       Taro.setStorageSync(this.SYS_INFO, result);
     }
     return result;
+  }
+
+  public setGoodsCategory(category): void {
+    Taro.setStorageSync(this.CATEGORY, category);
+  }
+
+  public getGoodsCategory(): CategoryVO {
+    return Taro.getStorageSync(this.CATEGORY);
   }
 }
 

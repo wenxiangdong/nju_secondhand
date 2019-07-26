@@ -1,10 +1,11 @@
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
-import UserInfoBar from "../../components/common/UserInfoBar/UserInfoBar";
+import UserInfoBar from "../../components/common/user-info-bar/index";
 import {createSimpleErrorHandler} from "../../utils/function-factory";
 import {AtList, AtListItem} from "taro-ui";
 import {AtListItemProps} from "taro-ui/@types/list";
+import urlList from "../../utils/url-list";
 
 interface IState {
   mounted: boolean
@@ -14,7 +15,7 @@ interface IState {
  * 个人
  * @create 2019/7/25 11:49
  */
-export class index extends Component<any, IState> {
+export class My extends Component<any, IState> {
 
   config: Config = {
     navigationBarTitleText: '个人'
@@ -22,42 +23,42 @@ export class index extends Component<any, IState> {
 
   private navigatorBarPropArr: (AtListItemProps & {page: string})[] = [
     {
-      page:'/pages/my/my-visited/index',
+      page: urlList.MY_VISITED,
       title: '我的足迹',
       iconInfo: {value: 'bookmark'},
     },
     {
-      page:'/pages/my/my-bought/index',
+      page: urlList.MY_BOUGHT,
       title: '我买到的',
       iconInfo: {value: 'shopping-bag'},
     },
     {
-      page:'/pages/my/my-publish/index',
+      page: urlList.MY_PUBLISH,
       title: '我发布的',
       iconInfo: {value: 'tag'},
     },
     {
-      page:'/pages/my/my-sold/index',
+      page: urlList.MY_SOLD,
       title: '我卖出的',
       iconInfo: {value: 'shopping-bag-2'},
     },
     {
-      page:'/pages/my/platform-account/index',
+      page: urlList.MY_PLATFORM_ACCOUNT,
       title: '平台账户',
       iconInfo: {value: 'credit-card'},
     },
     {
-      page:'/pages/my/software-license-agreement/index',
+      page: urlList.MY_SOFTWARE_LICENSE_AGREEMENT,
       title: '软件许可使用协议',
       iconInfo: {value: 'heart'},
     },
     {
-      page:'/pages/my/privacy-policy/index',
+      page: urlList.MY_PRIVACY_POLICY,
       title: '隐私权条款',
       iconInfo: {value: 'bullet-list'},
     },
     {
-      page:'/pages/my/platform-rules/index',
+      page: urlList.MY_PLATFORM_RULES,
       title: '平台规则',
       iconInfo: {value: 'star'},
     },
@@ -81,15 +82,15 @@ export class index extends Component<any, IState> {
   private onError = createSimpleErrorHandler('my', this);
 
   private onUserInfoClick = () => {
-    Taro.navigateTo({url: '/pages/my/user-info/index'})
-      .catch((e) => this.onError(e));
+    Taro.navigateTo({url: urlList.MY_USER_INFO})
+      .catch(this.onError);
   };
 
   private onNavigatorBarClick = (idx) => {
     const barProp = this.navigatorBarPropArr[idx];
     console.info('my onNavigatorBarClick', barProp);
     Taro.navigateTo({url: barProp.page})
-      .catch((e) => this.onError(e));
+      .catch(this.onError);
   };
 
   render() {

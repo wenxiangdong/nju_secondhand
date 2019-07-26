@@ -5,6 +5,7 @@ import { TabItem } from 'taro-ui/@types/tab-bar'
 import SelectPublish from './select-publish'
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import WhiteSpace from "../white-space";
+import urlList from "../../../utils/url-list";
 
 interface IProp {
   currentIndex: number
@@ -25,27 +26,27 @@ export default class MainTabBar extends Component<IProp, IState> {
     {
       title: '首页',
       iconType: 'home',
-      page: '/pages/index/index'
+      page: urlList.INDEX
     },
     {
       title: '圈子',
       iconType: 'eye',
-      page: '/pages/circle/index'
+      page: urlList.CIRCLE
     },
     {
       title: '发布',
       iconType: 'add-circle',
-      page: ''
+      page: urlList.ERROR
     },
     {
       title: '消息',
       iconType: 'message',
-      page: '/pages/message/index'
+      page: urlList.MESSAGE
     },
     {
       title: '个人',
       iconType: 'user',
-      page: '/pages/my/index'
+      page: urlList.MY
     },
   ];
 
@@ -74,7 +75,7 @@ export default class MainTabBar extends Component<IProp, IState> {
         console.info(`MainTabBar onTabClicked index: ${index} url: `, url);
 
         Taro.reLaunch({url})
-          .catch((e) => this.onError(e));
+          .catch(this.onError);
       }
     }
   };

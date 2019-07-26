@@ -1,8 +1,8 @@
 import Taro, {Component} from '@tarojs/taro'
 import {View, OpenData} from '@tarojs/components'
-import UserAvatar from '../UserAvator/UserAvatar'
+import UserAvatar from '../user-avatar/index'
 
-import './UserInfoBar.scss'
+import './index.scss'
 
 /**
  * 用户信息条组件

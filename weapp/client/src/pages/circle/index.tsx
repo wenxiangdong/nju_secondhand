@@ -2,6 +2,7 @@ import Taro, {Component, Config} from '@tarojs/taro'
 import {View, Text, Button} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
 import {createSimpleErrorHandler} from "../../utils/function-factory";
+import urlList from "../../utils/url-list";
 
 /**
  * 圈子
@@ -31,8 +32,8 @@ export class index extends Component {
   private onError = createSimpleErrorHandler('circle', this);
 
   private onSendPostClick = () => {
-    Taro.navigateTo({ url: '/pages/circle/send-post/index'})
-      .catch((e) => this.onError(e));
+    Taro.navigateTo({ url: urlList.CIRCLE_SEND_POST})
+      .catch(this.onError);
   };
 
   render() {

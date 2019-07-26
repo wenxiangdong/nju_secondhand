@@ -1,19 +1,24 @@
+import "@tarojs/async-await";
 import Taro, {Component, Config} from '@tarojs/taro'
-import {Text, View} from '@tarojs/components'
+import {View} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
 import HomeSwiper from "../../components/index/home-swiper";
-import {AtActivityIndicator, AtGrid, AtSearchBar} from "taro-ui";
+import {AtGrid, AtSearchBar} from "taro-ui";
 import {Item} from "taro-ui/@types/grid";
 import localConfig from '../../utils/local-config'
 import {createSimpleErrorHandler} from "../../utils/function-factory";
 import {CategoryVO} from "../../apis/GoodsApi";
+import {CommonEvent} from "@tarojs/components/types/common";
+import urlList from "../../utils/url-list";
+import LoadingPage from "../../components/common/loading-page";
+import {apiHub} from "../../apis/ApiHub";
 
 interface IState {
   searchValue: string,
   swiperSrcs: Array<string>,
-  categoryData: Array<Item>,
+  categories: Array<CategoryVO>,
   loading: boolean,
-  windowHeight: number
+  errMsg?: string
 }
 
 /**
@@ -31,43 +36,30 @@ export default class index extends Component<any, IState> {
     this.state = {
       searchValue: '',
       swiperSrcs: [],
-      categoryData: [],
-      loading: true,
-      windowHeight: 0
+      categories: [],
+      loading: true
     };
   }
 
   componentWillMount() {
-    try {
-      const swiperSrcs = this.getSwiperSrcs();
-      const categoryData = this.getCategoryData();
-      const windowHeight = localConfig.getSystemSysInfo().windowHeight;
-      this.setState({swiperSrcs, categoryData, windowHeight, loading: false});
-    } catch (e) {
-      this.onError(e);
-    }
+    Promise.all([
+      this.getSwiperSrcs(),
+      this.getCategories()
+    ])
+      .then(value => {
+        console.log('index componentWillMount ', value);
+        this.setState({swiperSrcs: value[0], categories: value[1], loading: false});
+      })
+      .catch(this.onError);
   }
 
-  private getSwiperSrcs = () => {
+  private getSwiperSrcs = async function(): Promise<string[]> {
     //  TODO 优先级 低 获取 swiperSrcs
-    return ['', '', ''];
+    return Promise.resolve(['', '', '']);
   };
 
-  private getCategoryData = () => {
-    //  TODO 优先级 中 获取 categoryData
-    // const categories: Array<CategoryVO> = [];
-
-    // TODO test
-    const categories: Array<CategoryVO> = [
-      {name: '数码', icon: '', _id: '1'},
-      {name: '二手图书', icon: '', _id: '1'},
-      {name: '服饰鞋包', icon: '', _id: '1'},
-      {name: '美妆', icon: '', _id: '1'},
-      {name: '二手车', icon: '', _id: '1'},
-      {name: '全部分类', icon: '', _id: '1'},
-    ];
-
-    return this.transferCategoryDate(categories);
+  private getCategories = async function(): Promise<CategoryVO[]> {
+    return apiHub.goodsApi.getCategories();
   };
 
   private transferCategoryDate = (categories: Array<CategoryVO>) => {
@@ -75,8 +67,10 @@ export default class index extends Component<any, IState> {
   };
 
   private onSearch = (value) => {
-    // TODO 优先级 中 搜索
     console.info('index onSearch', value);
+    Taro.navigateTo({
+      url: encodeURI(`${urlList.INDEX_SEARCH_RESULT}?word=${value}`),
+    }).catch(this.onError);
   };
 
   private onSearchChange = (searchValue) => {
@@ -84,28 +78,33 @@ export default class index extends Component<any, IState> {
     return searchValue;
   };
 
+  private onCategoryClick = (item: Item, index: number, event: CommonEvent) => {
+    console.info('index onCategoryClick', item, index, event);
+    localConfig.setGoodsCategory(this.state.categories[index]);
+    Taro.navigateTo({url: urlList.INDEX_CATEGORY_GOODS})
+      .catch(this.onError);
+  };
+
   private onError = createSimpleErrorHandler('index', this);
 
   render() {
-    const {searchValue, swiperSrcs, categoryData, loading, windowHeight} = this.state;
+    const {searchValue, swiperSrcs, categories, loading, errMsg} = this.state;
+    const categoryData = this.transferCategoryDate(categories);
 
     return loading
       ? (
-        <View style={{position: 'relative', height: `${windowHeight}px`}}>
-          <AtActivityIndicator content='加载中...' size={32} mode='center'/>
-        </View>
+        <LoadingPage errMsg={errMsg}/>
       )
       : (
         <View>
           <AtSearchBar
-            actionName='搜一下'
+            actionName='请输入关键词搜索'
             value={searchValue}
             onChange={this.onSearchChange}
             onActionClick={(value) => this.onSearch(value)}
           />
           <HomeSwiper srcs={swiperSrcs}/>
-          <AtGrid hasBorder={false} data={categoryData}/>
-          <Text>首页 works</Text>
+          <AtGrid hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>
           <MainTabBar currentIndex={MainTabBar.HOME_INDEX}/>
         </View>
       );
