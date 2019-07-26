@@ -4,10 +4,11 @@ import * as Taro from "@tarojs/taro";
 export interface IHttpRequest {
     // 云函数
     callFunction<T>(name: string, data?: object): Promise<T>;
-
-    // 数据库
-    database(): Taro.cloud.DB.Database;
 }
+
+// let db: Taro.cloud.DB.Database = Taro.cloud.database();
+// let command: Taro.cloud.DB.DatabaseCommand = db.command;
+// export { db, command };
 
 class HttpRequest implements IHttpRequest {
     async callFunction<T>(name: string, data: object = {}): Promise<T> {
@@ -27,10 +28,6 @@ class HttpRequest implements IHttpRequest {
         } catch (e) {
             throw e;
         }
-    }
-
-    database(): Taro.cloud.DB.Database {
-        return Taro.cloud.database();
     }
 }
 

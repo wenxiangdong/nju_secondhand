@@ -278,6 +278,7 @@ export interface IOrderApi {
 }
 
 export interface IUserApi {
+  
     // 注册
     signUp(user: UserDTO): Promise<void>;
 

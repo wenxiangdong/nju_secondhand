@@ -1,5 +1,5 @@
 import "@tarojs/async-await"
-import { VO } from "./HttpRequest";
+import { VO, httpRequest } from "./HttpRequest";
 
 export interface IGoodsApi {
     // 取得商品分类
@@ -12,7 +12,7 @@ export interface IGoodsApi {
     getOngoingGoods(): Promise<GoodsVO[]>;
 
     // 下架商品
-    deleteGoods(goodsId: string): Promise<void>;
+    deleteGoods(goodsID: string): Promise<void>;
 
     // 关键字搜索商品
     searchGoodsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsVO[]>;
@@ -25,26 +25,26 @@ export interface IGoodsApi {
 }
 
 class GoodsApi implements IGoodsApi {
-    getCategories(): Promise<CategoryVO[]> {
-        throw new Error("Method not implemented.");
+    async getCategories(): Promise<CategoryVO[]> {
+        return await httpRequest.callFunction<CategoryVO[]>("getCategories");
     }
-    publishGoods(goods: GoodsDTO): Promise<void> {
-        throw new Error("Method not implemented.");
+    async publishGoods(goods: GoodsDTO): Promise<void> {
+        return await httpRequest.callFunction<void>("publishGoods", { goods });
     }
-    getOngoingGoods(): Promise<GoodsVO[]> {
-        throw new Error("Method not implemented.");
+    async getOngoingGoods(): Promise<GoodsVO[]> {
+        return await httpRequest.callFunction<GoodsVO[]>("getOngoingGoods");
     }
-    deleteGoods(goodsId: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async deleteGoods(goodsID: string): Promise<void> {
+        return await httpRequest.callFunction<void>("deleteGoods", { goodsID });
     }
-    searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-        throw new Error("Method not implemented.");
+    async searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
+        return await httpRequest.callFunction<GoodsVO[]>("searchGoodsByKeyword", { keyword, lastIndex, size });
     }
-    searchGoodsByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-        throw new Error("Method not implemented.");
+    async searchGoodsByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
+        return await httpRequest.callFunction<GoodsVO[]>("searchGoodsByCategoryID", { categoryID, lastIndex, size });
     }
-    purchase(goodsID: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async purchase(goodsID: string): Promise<void> {
+        return await httpRequest.callFunction<void>("purchase", { goodsID });
     }
 }
 
@@ -58,7 +58,7 @@ class MockGoodsApi implements IGoodsApi {
     getOngoingGoods(): Promise<GoodsVO[]> {
         throw new Error("Method not implemented.");
     }
-    deleteGoods(goodsId: string): Promise<void> {
+    deleteGoods(goodsID: string): Promise<void> {
         throw new Error("Method not implemented.");
     }
     searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {

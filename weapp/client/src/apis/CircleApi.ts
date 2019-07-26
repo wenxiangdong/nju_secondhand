@@ -1,4 +1,5 @@
-import { VO } from "./HttpRequest";
+import "@tarojs/async-await";
+import { VO, httpRequest } from "./HttpRequest";
 
 export interface ICircleApi {
     publishPost(post: PostDTO): Promise<void>;
@@ -9,14 +10,15 @@ export interface ICircleApi {
 }
 
 class CircleApi implements ICircleApi {
-    publishPost(post: PostDTO): Promise<void> {
-        throw new Error("Method not implemented.");
+    async publishPost(post: PostDTO): Promise<void> {
+        return await httpRequest.callFunction<void>("publishPost", { post });
     }
-    getPosts(lastIndex: number, size: number = 10): Promise<PostVO[]> {
-        throw new Error("Method not implemented.");
+
+    async getPosts(lastIndex: number, size: number = 10): Promise<PostVO[]> {
+        return await httpRequest.callFunction<PostVO[]>("getPosts", { lastIndex, size });
     }
-    comment(postID: string, content: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async comment(postID: string, content: string): Promise<void> {
+        return await httpRequest.callFunction<void>("publishPost", { postID, content });
     }
 }
 
