@@ -1,11 +1,14 @@
+import "@tarojs/async-await";
+import { httpRequest } from "./HttpRequest";
+
 export interface IAccountApi {
     // 取款
     withdraw(amount: String): Promise<void>;
 }
 
 class AccountApi implements IAccountApi {
-    withdraw(amount: String): Promise<void> {
-        throw new Error("Method not implemented.");
+    async withdraw(amount: String): Promise<void> {
+        return await httpRequest.callFunction<void>("withdraw", { amount });
     }
 }
 

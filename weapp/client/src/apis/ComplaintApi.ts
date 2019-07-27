@@ -1,4 +1,4 @@
-import { VO } from "./HttpRequest";
+import { VO, httpRequest } from "./HttpRequest";
 
 export interface IComplaintApi {
     complain(complaint: ComplaintDTO): Promise<void>;
@@ -7,11 +7,11 @@ export interface IComplaintApi {
 }
 
 class ComplaintApi implements IComplaintApi {
-    complain(complaint: ComplaintDTO): Promise<void> {
-        throw new Error("Method not implemented.");
+    async complain(complaint: ComplaintDTO): Promise<void> {
+        return await httpRequest.callFunction<void>("complain", { complaint });
     }
-    getComplaints(lastIndex: number, size: number = 10): Promise<ComplaintVO[]> {
-        throw new Error("Method not implemented.");
+    async getComplaints(lastIndex: number, size: number = 10): Promise<ComplaintVO[]> {
+        return await httpRequest.callFunction<ComplaintVO[]>("complain", { lastIndex, size });
     }
 }
 

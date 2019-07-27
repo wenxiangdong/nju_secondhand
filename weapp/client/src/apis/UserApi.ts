@@ -1,7 +1,10 @@
 import "@tarojs/async-await";
-import { VO } from "./HttpRequest";
+import { VO, httpRequest } from "./HttpRequest";
 
 export interface IUserApi {
+    // 检查用户状态
+    checkState(): Promise<UserState>;
+
     // 注册
     signUp(user: UserDTO): Promise<void>;
 
@@ -16,21 +19,27 @@ export interface IUserApi {
 }
 
 class UserApi implements IUserApi {
-    signUp(user: UserDTO): Promise<void> {
-        throw new Error("Method not implemented.");
+    async checkState(): Promise<UserState> {
+        return await httpRequest.callFunction<UserState>("checkState");
     }
-    login(): Promise<UserVO> {
-        throw new Error("Method not implemented.");
+    async signUp(user: UserDTO): Promise<void> {
+        return await httpRequest.callFunction<void>("signUp", { user });
     }
-    modifyInfo(user: UserDTO): Promise<void> {
-        throw new Error("Method not implemented.");
+    async login(): Promise<UserVO> {
+        return await httpRequest.callFunction<UserVO>("login");
     }
-    getUserInfo(userID: string): Promise<UserVO> {
-        throw new Error("Method not implemented.");
+    async modifyInfo(user: UserDTO): Promise<void> {
+        return await httpRequest.callFunction<void>("modifyInfo", { user });
+    }
+    async getUserInfo(userID: string): Promise<UserVO> {
+        return await httpRequest.callFunction<UserVO>("getUserInfo", { userID });
     }
 }
 
 class MockUserApi implements IUserApi {
+    checkState(): Promise<UserState> {
+        throw new Error("Method not implemented.");
+    }
     signUp(user: UserDTO): Promise<void> {
         throw new Error("Method not implemented.");
     }
@@ -78,6 +87,7 @@ export interface Location {
 }
 
 export enum UserState {
+    UnRegistered, // 未注册
     Normal,
     Forzen, // 被管理员冻结
 }
