@@ -23,6 +23,6 @@ let mockAccountApi: IAccountApi = new MockAccountApi();
 
 export { accountApi, mockAccountApi }
 
-export interface Account {
+export interface AccountVO {
   balance: string;
 }

@@ -1,5 +1,6 @@
 import "@tarojs/async-await";
 import { VO, httpRequest } from "./HttpRequest";
+import {AccountVO} from "./AccountApi";
 
 export interface IUserApi {
   // 检查用户状态
@@ -73,7 +74,7 @@ export interface UserVO extends VO {
   address: Location;
   email: string;
 
-  account: Account;
+  account: AccountVO;
 
   signUpTime: number;
   state: UserState;

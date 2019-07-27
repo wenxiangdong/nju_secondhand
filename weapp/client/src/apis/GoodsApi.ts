@@ -113,8 +113,9 @@ export interface GoodsVO extends VO {
   state: GoodsState;
 }
 
-export interface GoodsWithSellerInfoVO extends GoodsVO {
-  seller: UserVO
+export interface GoodsWithSellerVO {
+  seller: UserVO;
+  goods: GoodsVO
 }
 
 export enum GoodsState {
