@@ -114,36 +114,41 @@ interface OrderVO extends VO {
 }
 
 enum OrderState {
-    OnGoing,
+    Ongoing,
     Finished,
 }
 
 // 投诉
-interface ComplaintDTO {
+export interface ComplaintDTO {
     orderID: string // 订单编号
     desc: string
 
     pictures: Array<string>;
 }
 
-interface ComplaintVO extends VO {
-    orderID: string // 订单编号
-    desc: string
+export interface ComplaintVO extends VO {
+  orderID: string // 订单编号
+  desc: string
 
-    complainantID: string;
-    complainantName: string;
+  complainantID: string;
+  complainantName: string;
 
-    pictures: Array<string>;
+  pictures: Array<string>;
 
-    complainTime: number;
-    handleTime: number;
+  complainTime: number;
   
-    result: string;
-    state: ComplaintState;
+  handling: Handling | null;
+
+  state: ComplaintState;
+}
+
+export interface Handling {
+  time: number,
+  result: string
 }
 
 enum ComplaintState {
-    OnGoing,
+    Ongoing,
     Handled
 }
 

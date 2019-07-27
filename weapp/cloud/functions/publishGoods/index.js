@@ -9,7 +9,7 @@ const db = cloud.database()
 exports.main = async (event, context) => {
   const user = await cloud.callFunction("isNormal");
   let goods = event.goods;
-  // 所有者ID
+  // 卖家ID
   goods.sellerID = user._id;
 
   // 商品分类

@@ -46,13 +46,18 @@ export interface ComplaintVO extends VO {
   pictures: Array<string>;
 
   complainTime: number;
-  handleTime: number;
+  
+  handling: Handling | null;
 
-  result: string;
   state: ComplaintState;
 }
 
+export interface Handling {
+  time: number,
+  result: string
+}
+
 export enum ComplaintState {
-  OnGoing,
+  Ongoing,
   Handled
 }

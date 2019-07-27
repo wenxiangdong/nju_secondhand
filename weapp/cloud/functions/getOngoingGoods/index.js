@@ -15,7 +15,7 @@ exports.main = async (event, context) => {
   const limit = 20;
   while (data = (await db.collection('goods')
     .where({
-      ownerID: user._id,
+      sellerID: user._id,
       state: GoodsState.InSale
     })
     .skip(skip)

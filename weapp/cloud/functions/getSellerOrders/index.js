@@ -9,19 +9,14 @@ const db = cloud.database()
 exports.main = async (event, context) => {
   const user = await cloud.callFunction("isNormal");
 
-  await db.collection("goods")
+  return (await db.collection('order')
     .where({
-      _id: event.goodsID,
       sellerID: user._id,
+      state: event.state
     })
-    .update({
-      data: {
-        state: GoodsState.Deleted
-      }
-    })
-}
-
-const GoodsState = {
-  InSale: 0,
-  Deleted: 1
+    .orderBy('orderTime', 'desc')
+    .skip(event.lastIndex)
+    .limit(event.size)
+    .get())
+    .data
 }
