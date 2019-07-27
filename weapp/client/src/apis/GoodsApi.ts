@@ -1,6 +1,7 @@
 import "@tarojs/async-await"
-import {httpRequest, mockHttpRequest, VO} from "./HttpRequest";
+import {httpRequest, mockHttpRequest, VO, db, command} from "./HttpRequest";
 import {MockUserApi, UserVO} from "./UserApi";
+import { copy } from "./Util";
 
 export interface IGoodsApi {
   // 取得商品分类
@@ -25,9 +26,32 @@ export interface IGoodsApi {
   purchase(goodsID: string): Promise<void>;
 }
 
+let categoryCollection = db.collection("category");
+let goodsCollection = db.collection("goods");
+
 class GoodsApi implements IGoodsApi {
   async getCategories(): Promise<CategoryVO[]> {
-    return await httpRequest.callFunction<CategoryVO[]>("getCategories");
+    let categories: CategoryVO[] = [];
+    let skip = 0;
+    const limit = 20;
+
+    let data: Array<any>;
+    while (data = (await categoryCollection
+      .skip(skip)
+      .limit(limit)
+      .get())
+      .data) {
+
+      categories = categories.concat(data)
+
+      if (data.length < limit) {
+        break;
+      }
+
+      skip += limit;
+    }
+
+    return categories;
   }
   async publishGoods(goods: GoodsDTO): Promise<void> {
     return await httpRequest.callFunction<void>("publishGoods", { goods });
@@ -39,10 +63,39 @@ class GoodsApi implements IGoodsApi {
     return await httpRequest.callFunction<void>("deleteGoods", { goodsID });
   }
   async searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-    return await httpRequest.callFunction<GoodsVO[]>("searchGoodsByKeyword", { keyword, lastIndex, size });
+    return copy<GoodsVO[]>((await goodsCollection
+      .where(
+        command
+          .or([
+            // @ts-ignore
+            { name: db.RegExp({ regexp: keyword, options: 'i', }) },
+            {
+              category: {
+                // @ts-ignore
+                name: db.RegExp({ regexp: keyword, options: 'i' })
+              }
+            }
+          ])
+          .and({ state: GoodsState.InSale })
+      )
+      .skip(lastIndex)
+      .limit(size)
+      .get())
+      .data)
+
   }
   async searchGoodsByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-    return await httpRequest.callFunction<GoodsVO[]>("searchGoodsByCategoryID", { categoryID, lastIndex, size });
+    return copy<GoodsVO[]>((await goodsCollection
+      .where({
+        category: {
+          _id: categoryID
+        },
+        state: GoodsState.InSale
+      })
+      .skip(lastIndex)
+      .limit(size)
+      .get())
+      .data)
   }
   async purchase(goodsID: string): Promise<void> {
     return await httpRequest.callFunction<void>("purchase", { goodsID });

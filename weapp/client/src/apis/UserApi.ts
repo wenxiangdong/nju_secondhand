@@ -1,5 +1,5 @@
 import "@tarojs/async-await";
-import { VO, httpRequest } from "./HttpRequest";
+import { VO, httpRequest, db, Fail, HttpCode } from "./HttpRequest";
 import {AccountVO} from "./AccountApi";
 
 export interface IUserApi {
@@ -19,18 +19,41 @@ export interface IUserApi {
   getUserInfo(userID: string): Promise<UserVO>;
 }
 
+let userCollection = db.collection("user");
+
 class UserApi implements IUserApi {
   async checkState(): Promise<UserState> {
     return await httpRequest.callFunction<UserState>("checkState");
   }
   async signUp(user: UserDTO): Promise<void> {
-    return await httpRequest.callFunction<void>("signUp", { user });
+    if (await this.checkState() !== UserState.UnRegistered) {
+      throw new Fail(HttpCode.Forbidden, "该用户已注册")
+    }
+
+    if ((await userCollection
+      .where({
+        email: user.email
+      })
+      .count()).total) {
+      throw new Fail(HttpCode.Conflict, "该邮箱已被注册")
+    }
+
+    await userCollection
+      .add({ data: user })
   }
   async login(): Promise<UserVO> {
     return await httpRequest.callFunction<UserVO>("login");
   }
   async modifyInfo(user: UserDTO): Promise<void> {
-    return await httpRequest.callFunction<void>("modifyInfo", { user });
+    let userVO: UserVO = await this.login();
+
+    if (userVO.state === UserState.Forzen) {
+      throw new Fail(HttpCode.Forbidden, "你已被冻结，无法修改个人信息");
+    }
+
+    await userCollection
+      .doc(userVO._id)
+      .update({ data: user })
   }
   async getUserInfo(userID: string): Promise<UserVO> {
     return await httpRequest.callFunction<UserVO>("getUserInfo", { userID });
@@ -90,6 +113,7 @@ export { userApi, mockUserApi, MockUserApi }
 
 export interface UserDTO {
   phone: string;
+  avatar: string;
   nickname: string;
   address: Location;
   email: string;  // 检查唯一性
@@ -99,6 +123,7 @@ export interface UserVO extends VO {
   _openid: string;
 
   phone: string;
+  avatar: string;
   nickname: string;
   address: Location;
   email: string;

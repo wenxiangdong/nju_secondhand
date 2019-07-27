@@ -14,20 +14,22 @@ interface VO {
 // 用户
 interface UserDTO {
     phone: string;
+    avatar: string;
     nickname: string;
     address: Location;
     email: string;  // 检查唯一性
 }
 
 interface UserVO extends VO {
-    _openid: string;
+    // _openid: string;  为安全性考虑，不将该属性返回
 
     phone: string;
+    avatar: string;
     nickname: string;
     address: Location;
     email: string;
 
-    account: Account;
+    account: AccountVO;
 
     signUpTime: number;
     state: UserState;
@@ -40,7 +42,7 @@ interface Location {
     longitude: string;
 }
 
-interface Account {
+interface AccountVO {
     balance: string;
 }
 
@@ -200,9 +202,15 @@ interface MessageVO extends VO {
     read: boolean;
 }
 
-export interface HttpResponse<T> {
+export enum HttpCode {
+  Forbidden = 403, // 403
+  Not_Found = 404, // 404
+  Conflict = 409, // 409 冲突
+  Fail = 500 // 
+}
+
+export class Fail {
     code: HttpCode;
-    data: T;
     message: string;
 }
 ```
@@ -212,7 +220,7 @@ export interface HttpResponse<T> {
 ## 用户API
 
  ```typescript
-// API 如果成功调用，则返回 Promise 的返回类型，如 GoodsVO；如果失败，抛出异常，异常格式为 HttpResponse
+// API 如果成功调用，则返回 Promise 的返回类型，如 GoodsVO；如果失败，抛出异常，异常的数据结构为 Fail（数据结构部分最后一个）
 
 // 部分需要注册且未冻结，不需要的会指明
 export interface IUserApi {
