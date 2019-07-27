@@ -4,6 +4,7 @@ const urlList = {
   INDEX:  '/pages/index/index',
   INDEX_SEARCH_RESULT: '/pages/index/search-result/index',
   INDEX_CATEGORY_GOODS: '/pages/index/category-goods/index',
+  INDEX_GOODS_INFO: '/pages/index/goods-info/index',
   MESSAGE: '/pages/message/index',
   MY: '/pages/my/index',
   MY_VISITED:'/pages/my/my-visited/index',
@@ -27,7 +28,7 @@ class IndexSearchUrlConfig {
 
   public getSearchWord(that): string|undefined {
     try {
-      return that.$router.params.word;
+      return that.$router.params[this.WORD];
     } catch (e) {
       console.error('IndexSearchUrlConfig getSearchWord', e);
     }
@@ -36,7 +37,26 @@ class IndexSearchUrlConfig {
 
 const indexSearchUrlConfig = new IndexSearchUrlConfig();
 
+class GoodsInfoUrlConfig {
+  private GOODS_ID = 'goods_id';
+
+  public createIndexSearchUrl(id): string {
+    return encodeURI(`${urlList.INDEX_GOODS_INFO}?${this.GOODS_ID}=${id}`);
+  }
+
+  public getGoodsId(that): string|undefined {
+    try {
+      return that.$router.params[this.GOODS_ID];
+    } catch (e) {
+      console.error('GoodsInfoUrlConfig getGoodsId', e);
+    }
+  }
+}
+
+const goodsInfoUrlConfig = new GoodsInfoUrlConfig();
+
 export default urlList;
 export {
-  indexSearchUrlConfig
+  indexSearchUrlConfig,
+  goodsInfoUrlConfig
 };

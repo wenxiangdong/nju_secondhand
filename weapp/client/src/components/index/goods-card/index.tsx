@@ -4,12 +4,62 @@ import {GoodsWithSellerVO} from "../../../apis/GoodsApi";
 import localConfig from "../../../utils/local-config";
 import {styleHelper} from "../../../utils/style-helper";
 import {AtAvatar, AtDivider} from "taro-ui";
-
-import './index.scss';
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
+import {CSSProperties} from "react";
+import "taro-ui/dist/style/components/flex.scss";
+import {goodsInfoUrlConfig} from "../../../utils/url-list";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO
+}
+
+function createStyles() {
+  const margin = 5;
+  const padding = 5;
+  const borderWidth = 1;
+  const width = Math.floor(localConfig.getSystemSysInfo().windowWidth / 4 - margin - padding - borderWidth) * 2;
+  const imageBorderRadius = 4;
+
+  const numberToPxStr = styleHelper.numberToPxStr;
+  const widthAndHeightPx = numberToPxStr(width);
+  const marginPx = numberToPxStr(margin);
+  const paddingPx = numberToPxStr(padding);
+  const borderWidthPx = numberToPxStr(borderWidth);
+  const imageBorderRadiusPx = numberToPxStr(imageBorderRadius);
+
+  const goodsCardViewStyle: CSSProperties = {
+    width: widthAndHeightPx,
+    margin: marginPx,
+    padding: paddingPx,
+    border: `${borderWidthPx} solid lightgray`,
+    display: 'inline-block'
+  };
+
+  const imageStyle: CSSProperties = {
+    width: widthAndHeightPx,
+    height: widthAndHeightPx,
+    // TODO 优先级 低
+    // 检查样式
+    border: 'thin sold transparent',
+    borderRadius: imageBorderRadiusPx
+  };
+
+  const dividerHeight = 36;
+
+  const goodsNameStyle: CSSProperties = {
+    width: '100%',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    display: 'block'
+  };
+
+  return {
+    goodsCardViewStyle,
+    imageStyle,
+    dividerHeight,
+    goodsNameStyle
+  };
 }
 
 /**
@@ -18,47 +68,48 @@ interface IProp {
  * @create 2019/7/27 10:02
  */
 function GoodsCard(props: IProp) {
-  console.log(props);
-  const {goods, seller} = props.goodsWithSeller;
+  const {goodsWithSeller} = props;
+  let card:any = null;
+  if (goodsWithSeller) {
+    const {goods, seller} = props.goodsWithSeller;
 
-  const picturesCount = goods.pictures.length;
-  const goodsPictureSrc = picturesCount? goods.pictures[0]: '';
-  const sellerImage = '';// TODO
+    const picturesCount = goods.pictures.length;
+    const goodsPictureSrc = picturesCount ? goods.pictures[0] : '';
+    // TODO 优先级 高
+    // 待后端添加头像属性
+    const sellerImage = '';
+    const sellerName = seller.nickname;
+    const goodsName = goods.name;
+    const goodsPrice = goods.price;
 
-  const margin = 5;
-  const padding = 5;
-  const borderWidth = 2;
-  const width = Math.floor(localConfig.getSystemSysInfo().windowWidth / 4 - margin - padding - borderWidth) * 2;
+    let { goodsCardViewStyle, imageStyle, dividerHeight, goodsNameStyle } = createStyles();
 
-  const numberToPxStr = styleHelper.numberToPxStr;
-  const widthAndHeightPx = numberToPxStr(width);
-  const marginPx = numberToPxStr(margin);
-  const paddingPx = numberToPxStr(padding);
-  const borderWidthPx = numberToPxStr(borderWidth);
+    const onError = createSimpleErrorHandler('GoodsCard', undefined);
 
-  const onError = createSimpleErrorHandler('GoodsCard', undefined);
+    const onClick = function () {
+      Taro.navigateTo({
+        url: goodsInfoUrlConfig.createIndexSearchUrl(goods._id)
+      }).catch(onError);
+    };
 
-  const onClick = function () {
-    // TODO
-    Taro.navigateTo({
-      url:''
-    }).catch(onError);
-  };
-
-  return (
-    <View onClick={onClick} className={'goods-card'} style={{width: widthAndHeightPx, margin: marginPx, padding: paddingPx, borderWidth: borderWidthPx}}>
-      <Image style={{width:widthAndHeightPx, height: widthAndHeightPx}} src={goodsPictureSrc}/>
-      <AtDivider/>
-      <View className='at-row'>
-        <View className='at-col'>
-          <AtAvatar circle size={'small'} image={sellerImage}/>
+    card = (
+      <View onClick={onClick} style={goodsCardViewStyle}>
+        <Image style={imageStyle} src={goodsPictureSrc}/>
+        <Text style={goodsNameStyle}>{goodsName}</Text>
+        <Text space={'nbsp'}>￥ {goodsPrice}</Text>
+        <AtDivider height={dividerHeight}/>
+        <View className='at-row at-row__align--center'>
+          <View className='at-col at-col-3'>
+            <AtAvatar circle size={'small'} image={sellerImage}/>
+          </View>
+          <View className='at-col at-col__offset-1 at-col-8 at-col--wrap'>
+            <Text>{sellerName}</Text>
+          </View>
         </View>
-        <View className='at-col'>B</View>
-        <View className='at-col'>C</View>
       </View>
-      <Text>GoodsCard works</Text>
-    </View>
-  )
+    )
+  }
+  return card;
 }
 
 export default GoodsCard;
