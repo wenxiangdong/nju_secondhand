@@ -13,9 +13,9 @@ interface WindowSize {
 }
 
 class LocalConfig {
-  private KEY = 'nju.weapp.help_config';
-  private SYS_INFO = 'nju.weapp.sys_info';
-  private CATEGORY = 'nju.weapp.category';
+  private readonly KEY = 'nju.weapp.help_config';
+  private readonly SYS_INFO = 'nju.weapp.sys_info';
+  private readonly CATEGORY = 'nju.weapp.category';
 
   public isFirstUse(): boolean {
     return !Taro.getStorageSync(this.KEY);

@@ -53,11 +53,40 @@ class MockUserApi implements IUserApi {
   getUserInfo(userID: string): Promise<UserVO> {
     throw new Error("Method not implemented.");
   }
+
+  private static createMockLocation(): Location {
+    return {
+      name: 'address-name',
+      address: 'address-address',
+      latitude: '1',
+      longitude: '1'
+    };
+  }
+
+  private static createMockAccount(account:number|string): AccountVO {
+    return {
+      balance: Number(account).toFixed(2)
+    };
+  }
+
+  static createMockUser(): UserVO {
+    return {
+      _id: '1',
+      _openid: 'openid',
+      phone: 'phone',
+      nickname: 'nickname',
+      address: MockUserApi.createMockLocation(),
+      email: 'email',
+      account: MockUserApi.createMockAccount(0.01),
+      signUpTime: Date.now(),
+      state: UserState.Normal
+    };
+  }
 }
 
 let userApi: IUserApi = new UserApi();
 let mockUserApi: IUserApi = new MockUserApi();
-export { userApi, mockUserApi }
+export { userApi, mockUserApi, MockUserApi }
 
 export interface UserDTO {
   phone: string;

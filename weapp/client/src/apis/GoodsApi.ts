@@ -1,6 +1,6 @@
 import "@tarojs/async-await"
-import { VO, mockHttpRequest, httpRequest } from "./HttpRequest";
-import {UserVO} from "./UserApi";
+import {httpRequest, mockHttpRequest, VO} from "./HttpRequest";
+import {MockUserApi, UserVO} from "./UserApi";
 
 export interface IGoodsApi {
   // 取得商品分类
@@ -50,40 +50,91 @@ class GoodsApi implements IGoodsApi {
 }
 
 class MockGoodsApi implements IGoodsApi {
+  private goodsCount = 50;
+
   getCategories(): Promise<CategoryVO[]> {
-    return mockHttpRequest.success([
-    {name: '数码', icon: '', _id: '1'},
-    {name: '二手图书', icon: '', _id: '1'},
-    {name: '服饰鞋包', icon: '', _id: '1'},
-    {name: '美妆', icon: '', _id: '1'},
-    {name: '二手车', icon: '', _id: '1'},
-    {name: '全部分类', icon: '', _id: '1'},
-    ])
+    const names = ['数码', '二手图书', '服饰鞋包', '美妆', '二手车', '全部分类'];
+    const categories: CategoryVO[] = names.map((name, idx) => {
+      let category = MockGoodsApi.createMockCateGory();
+      category._id = idx.toString();
+      category.name = name;
+      return category;
+    });
+    return mockHttpRequest.success(categories);
   }
   publishGoods(goods: GoodsDTO): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('publishGoods goods:', goods);
+    return mockHttpRequest.success();
   }
   getOngoingGoods(): Promise<GoodsVO[]> {
     throw new Error("Method not implemented.");
   }
   deleteGoods(goodsID: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('deleteGoods goodsID:', goodsID);
+    return mockHttpRequest.success();
   }
   searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-    throw new Error("Method not implemented.");
+    if (lastIndex >= this.goodsCount) {
+      return mockHttpRequest.success([]);
+    } else {
+      const goodsArray: GoodsVO[] = new Array(size).map(() => {
+        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        goods.name += keyword;
+        return goods;
+      });
+      return mockHttpRequest.success(goodsArray);
+    }
   }
   searchGoodsByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-    throw new Error("Method not implemented.");
+    if (lastIndex >= this.goodsCount) {
+      return mockHttpRequest.success([]);
+    } else {
+      const goodsArray: GoodsVO[] = new Array(size).map(() => {
+        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        goods.category._id = categoryID;
+        return goods;
+      });
+      return mockHttpRequest.success(goodsArray);
+    }
   }
   purchase(goodsID: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('purchase goodsID:', goodsID);
+    return mockHttpRequest.success();
   }
 
+  private static createMockCateGory(): CategoryVO {
+    return {
+      _id: '1',
+      name: 'category',
+      icon: ''
+    };
+  }
+
+  private static createMockGoodsVO(): GoodsVO {
+    return {
+      _id: '1',
+      sellerID: '',
+      name: 'name',
+      desc: 'desc',
+      price: '1.01',
+      pictures: ['', ''],
+      category: MockGoodsApi.createMockCateGory(),
+      publishTime: Date.now(),
+      state: GoodsState.InSale
+    };
+  }
+
+  static createMockGoodsWithSeller(): GoodsWithSellerVO {
+    return {
+      goods: MockGoodsApi.createMockGoodsVO(),
+      seller: MockUserApi.createMockUser()
+    };
+  }
 }
 
 let goodsApi: IGoodsApi = new GoodsApi();
 let mockGoodsApi: IGoodsApi = new MockGoodsApi();
-export { goodsApi, mockGoodsApi }
+export { goodsApi, mockGoodsApi, MockGoodsApi }
 
 
 export interface CategoryVO extends VO {

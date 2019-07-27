@@ -20,7 +20,7 @@ const urlList = {
 };
 
 class IndexSearchUrlConfig {
-  private WORD = 'word';
+  private readonly WORD = 'word';
 
   public createIndexSearchUrl(word): string {
     return encodeURI(`${urlList.INDEX_SEARCH_RESULT}?${this.WORD}=${word}`);
@@ -38,7 +38,7 @@ class IndexSearchUrlConfig {
 const indexSearchUrlConfig = new IndexSearchUrlConfig();
 
 class GoodsInfoUrlConfig {
-  private GOODS_ID = 'goods_id';
+  private readonly GOODS_ID = 'goods_id';
 
   public createIndexSearchUrl(id): string {
     return encodeURI(`${urlList.INDEX_GOODS_INFO}?${this.GOODS_ID}=${id}`);
