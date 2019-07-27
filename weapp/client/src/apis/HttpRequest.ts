@@ -2,8 +2,8 @@ import "@tarojs/async-await";
 import * as Taro from "@tarojs/taro";
 
 export interface IHttpRequest {
-    // 云函数
-    callFunction<T>(name: string, data?: object): Promise<T>;
+  // 云函数
+  callFunction<T>(name: string, data?: object): Promise<T>;
 }
 
 // let db: Taro.cloud.DB.Database = Taro.cloud.database();
@@ -11,33 +11,33 @@ export interface IHttpRequest {
 // export { db, command };
 
 class HttpRequest implements IHttpRequest {
-    async callFunction<T>(name: string, data: object = {}): Promise<T> {
-        try {
-            const callResult = await Taro.cloud.callFunction({
-                name,
-                data
-            });
+  async callFunction<T>(name: string, data: object = {}): Promise<T> {
+    try {
+      const callResult = await Taro.cloud.callFunction({
+        name,
+        data
+      });
 
-            const response = callResult.result as HttpResponse<T>;
+      const response = callResult.result as HttpResponse<T>;
 
-            if (response.code = HttpCode.Success) {
-                return response.data;
-            } else {
-                throw response;
-            }
-        } catch (e) {
-            throw e;
-        }
+      if (response.code = HttpCode.Success) {
+        return response.data;
+      } else {
+        throw response;
+      }
+    } catch (e) {
+      throw e;
     }
+  }
 }
 
 class MockHttpRequest {
-    async success<T>(data: T = {} as T): Promise<T> {
-        await new Promise(resolve => {
-            setTimeout(resolve, 1000);
-        })
-        return data;
-    }
+  async success<T>(data: T = {} as T): Promise<T> {
+    await new Promise(resolve => {
+      setTimeout(resolve, 1000);
+    })
+    return data;
+  }
 }
 
 let httpRequest: IHttpRequest = new HttpRequest();
@@ -45,20 +45,20 @@ let mockHttpRequest = new MockHttpRequest();
 export { httpRequest, mockHttpRequest };
 
 export interface VO {
-    _id: string;
+  _id: string;
 }
 
 export enum HttpCode {
-    Success,
-    Conflict, // 409 冲突
-    Not_Found, // 404
-    Bad_Request, // 400 参数错误
-    Fail
+  Success,
+  Conflict, // 409 冲突
+  Not_Found, // 404
+  Bad_Request, // 400 参数错误
+  Fail
 }
 
 export interface HttpResponse<T> {
-    code: HttpCode;
-    data: T;
-    message: string;
+  code: HttpCode;
+  data: T;
+  message: string;
 }
 

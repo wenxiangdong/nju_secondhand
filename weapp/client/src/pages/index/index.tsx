@@ -9,7 +9,7 @@ import localConfig from '../../utils/local-config'
 import {createSimpleErrorHandler} from "../../utils/function-factory";
 import {CategoryVO} from "../../apis/GoodsApi";
 import {CommonEvent} from "@tarojs/components/types/common";
-import urlList from "../../utils/url-list";
+import urlList, {indexSearchUrlConfig} from "../../utils/url-list";
 import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
 
@@ -67,10 +67,12 @@ export default class index extends Component<any, IState> {
   };
 
   private onSearch = (value) => {
-    console.info('index onSearch', value);
-    Taro.navigateTo({
-      url: encodeURI(`${urlList.INDEX_SEARCH_RESULT}?word=${value}`),
-    }).catch(this.onError);
+    if (value) {
+      console.info('index onSearch', value);
+      Taro.navigateTo({
+        url: indexSearchUrlConfig.createIndexSearchUrl(value)
+      }).catch(this.onError);
+    }
   };
 
   private onSearchChange = (searchValue) => {

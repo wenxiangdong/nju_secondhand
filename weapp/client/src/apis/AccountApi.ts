@@ -2,20 +2,20 @@ import "@tarojs/async-await";
 import { httpRequest } from "./HttpRequest";
 
 export interface IAccountApi {
-    // 取款
-    withdraw(amount: String): Promise<void>;
+  // 取款
+  withdraw(amount: String): Promise<void>;
 }
 
 class AccountApi implements IAccountApi {
-    async withdraw(amount: String): Promise<void> {
-        return await httpRequest.callFunction<void>("withdraw", { amount });
-    }
+  async withdraw(amount: String): Promise<void> {
+    return await httpRequest.callFunction<void>("withdraw", { amount });
+  }
 }
 
 class MockAccountApi implements IAccountApi {
-    withdraw(amount: String): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
+  withdraw(amount: String): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }
 
 let accountApi: IAccountApi = new AccountApi();
@@ -24,5 +24,5 @@ let mockAccountApi: IAccountApi = new MockAccountApi();
 export { accountApi, mockAccountApi }
 
 export interface Account {
-    balance: string;
+  balance: string;
 }

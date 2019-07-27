@@ -4,6 +4,7 @@ import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
 import {AtLoadMore} from "taro-ui";
 import {GoodsVO} from "../../../apis/GoodsApi";
+import {indexSearchUrlConfig} from "../../../utils/url-list";
 
 interface IState {
   word?: string,
@@ -43,7 +44,7 @@ export default class SearchResult extends Component<any, IState> {
   }
 
   private initWord = async (): Promise<string> => {
-    const word = this.$router.params.word;
+    const word = indexSearchUrlConfig.getSearchWord(this);
     if (!(word && word.length)) {
       throw new Error('未找到搜索关键词请重试')
     }

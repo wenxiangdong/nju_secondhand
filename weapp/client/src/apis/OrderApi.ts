@@ -1,51 +1,51 @@
 import { VO, httpRequest } from "./HttpRequest";
 
 export interface IOrderApi {
-    getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+  getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
-    accept(orderID: string): Promise<void>;
+  accept(orderID: string): Promise<void>;
 
-    getBuyerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+  getBuyerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
-    getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+  getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
-    getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+  getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 }
 
 class OrderApi implements IOrderApi {
-    async getBuyerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-        return await httpRequest.callFunction<OrderVO[]>("getBuyerOngoingOrders", { lastIndex, size });
-    }
-    async accept(orderID: string): Promise<void> {
-        return await httpRequest.callFunction<void>("accept", { orderID });
-    }
-    async getBuyerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-        return await httpRequest.callFunction<OrderVO[]>("getBuyerHistoryOrders", { lastIndex, size });
-    }
-    async getSellerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-        return await httpRequest.callFunction<OrderVO[]>("getSellerOngoingOrders", { lastIndex, size });
-    }
-    async getSellerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-        return await httpRequest.callFunction<OrderVO[]>("getSellerHistoryOrders", { lastIndex, size });
-    }
+  async getBuyerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
+    return await httpRequest.callFunction<OrderVO[]>("getBuyerOngoingOrders", { lastIndex, size });
+  }
+  async accept(orderID: string): Promise<void> {
+    return await httpRequest.callFunction<void>("accept", { orderID });
+  }
+  async getBuyerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
+    return await httpRequest.callFunction<OrderVO[]>("getBuyerHistoryOrders", { lastIndex, size });
+  }
+  async getSellerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
+    return await httpRequest.callFunction<OrderVO[]>("getSellerOngoingOrders", { lastIndex, size });
+  }
+  async getSellerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
+    return await httpRequest.callFunction<OrderVO[]>("getSellerHistoryOrders", { lastIndex, size });
+  }
 }
 
 class MockOrderApi implements IOrderApi {
-    getBuyerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-        throw new Error("Method not implemented.");
-    }
-    accept(orderID: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    getBuyerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-        throw new Error("Method not implemented.");
-    }
-    getSellerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-        throw new Error("Method not implemented.");
-    }
-    getSellerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-        throw new Error("Method not implemented.");
-    }
+  getBuyerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
+    throw new Error("Method not implemented.");
+  }
+  accept(orderID: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  getBuyerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
+    throw new Error("Method not implemented.");
+  }
+  getSellerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
+    throw new Error("Method not implemented.");
+  }
+  getSellerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
+    throw new Error("Method not implemented.");
+  }
 }
 
 let orderApi: IOrderApi = new OrderApi();
@@ -54,33 +54,33 @@ export { orderApi, mockOrderApi }
 
 
 export interface OrderDTO {
-    buyerID: string;
+  buyerID: string;
 
-    goodID: string;
+  goodID: string;
 }
 
 
 export interface OrderVO extends VO {
-    buyerID: string;
-    buyerName: string;
+  buyerID: string;
+  buyerName: string;
 
-    sellerID: string;
-    sellerName: string;
+  sellerID: string;
+  sellerName: string;
 
-    goodsID: string;
-    goodsName: string;
-    goodsPrice: string;
-    total: string;
+  goodsID: string;
+  goodsName: string;
+  goodsPrice: string;
+  total: string;
 
-    address: Location;
+  address: Location;
 
-    orderTime: number;
-    deliveryTime: number;
+  orderTime: number;
+  deliveryTime: number;
 
-    state: OrderState;
+  state: OrderState;
 }
 
 export enum OrderState {
-    OnGoing,
-    Finished,
+  OnGoing,
+  Finished,
 }

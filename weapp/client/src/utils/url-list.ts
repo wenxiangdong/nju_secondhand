@@ -18,4 +18,25 @@ const urlList = {
   ERROR: ''
 };
 
+class IndexSearchUrlConfig {
+  private WORD = 'word';
+
+  public createIndexSearchUrl(word): string {
+    return encodeURI(`${urlList.INDEX_SEARCH_RESULT}?${this.WORD}=${word}`);
+  }
+
+  public getSearchWord(that): string|undefined {
+    try {
+      return that.$router.params.word;
+    } catch (e) {
+      console.error('IndexSearchUrlConfig getSearchWord', e);
+    }
+  }
+}
+
+const indexSearchUrlConfig = new IndexSearchUrlConfig();
+
 export default urlList;
+export {
+  indexSearchUrlConfig
+};

@@ -9,36 +9,36 @@ import { IOrderApi, orderApi, mockOrderApi } from "./OrderApi";
 import { IUserApi, userApi, mockUserApi } from "./UserApi";
 
 export interface IApiHub {
-    accountApi: IAccountApi;
-    circleApi: ICircleApi;
-    complaintApi: IComplaintApi;
-    fileApi: IFileApi;
-    goodsApi: IGoodsApi;
-    notificationApi: INotificationApi;
-    orderApi: IOrderApi;
-    userApi: IUserApi;
+  accountApi: IAccountApi;
+  circleApi: ICircleApi;
+  complaintApi: IComplaintApi;
+  fileApi: IFileApi;
+  goodsApi: IGoodsApi;
+  notificationApi: INotificationApi;
+  orderApi: IOrderApi;
+  userApi: IUserApi;
 }
 
 class ApiHub implements IApiHub {
-    accountApi: IAccountApi = accountApi;
-    circleApi: ICircleApi = circleApi;
-    complaintApi: IComplaintApi = complainApi;
-    fileApi: IFileApi = fileApi;
-    goodsApi: IGoodsApi = goodsApi;
-    notificationApi: INotificationApi = notificationApi;
-    orderApi: IOrderApi = orderApi;
-    userApi: IUserApi = userApi;
+  accountApi: IAccountApi = accountApi;
+  circleApi: ICircleApi = circleApi;
+  complaintApi: IComplaintApi = complainApi;
+  fileApi: IFileApi = fileApi;
+  goodsApi: IGoodsApi = goodsApi;
+  notificationApi: INotificationApi = notificationApi;
+  orderApi: IOrderApi = orderApi;
+  userApi: IUserApi = userApi;
 }
 
 class MockApiHub implements IApiHub {
-    accountApi: IAccountApi = mockAccountApi;
-    circleApi: ICircleApi = mockCircleApi;
-    complaintApi: IComplaintApi = mockComplaintApi;
-    fileApi: IFileApi = mockFileApi;
-    goodsApi: IGoodsApi = mockGoodsApi;
-    notificationApi: INotificationApi = mockNotificationApi;
-    orderApi: IOrderApi = mockOrderApi;
-    userApi: IUserApi = mockUserApi;
+  accountApi: IAccountApi = mockAccountApi;
+  circleApi: ICircleApi = mockCircleApi;
+  complaintApi: IComplaintApi = mockComplaintApi;
+  fileApi: IFileApi = mockFileApi;
+  goodsApi: IGoodsApi = mockGoodsApi;
+  notificationApi: INotificationApi = mockNotificationApi;
+  orderApi: IOrderApi = mockOrderApi;
+  userApi: IUserApi = mockUserApi;
 }
 
 const mock = true;
