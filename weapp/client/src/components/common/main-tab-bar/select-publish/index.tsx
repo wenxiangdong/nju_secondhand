@@ -30,6 +30,7 @@ function SelectPublish(props: IProp) {
 
   // TODO 优先级 低 warning
   // 应该是 AtIcon 的 value 属性有问题 猜测 待修正
+  // 上面猜的不对 再看吧
   // Warning: Failed prop type: Invalid prop `maxValue` of type `string` supplied to `AtBadge`, expected `number`.
   return (
     <View className={"container"}>

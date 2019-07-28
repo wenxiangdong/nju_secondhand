@@ -1,17 +1,21 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View, Text} from '@tarojs/components'
+import {View} from '@tarojs/components'
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
-import {AtLoadMore} from "taro-ui";
-import {GoodsVO} from "../../../apis/GoodsApi";
+import {AtLoadMore, AtSearchBar} from "taro-ui";
+import {GoodsWithSellerVO} from "../../../apis/GoodsApi";
 import {indexSearchUrlConfig} from "../../../utils/url-list";
+import {loadMoreBtnStyle} from "../../../styles/style-objects";
+import {apiHub} from "../../../apis/ApiHub";
+import GoodsCard from "../../../components/index/goods-card";
 
 interface IState {
-  word?: string,
+  searchValue: string,
   loading: boolean,
   errMsg?: string,
   loadMoreStatus?: 'more' | 'loading' | 'noMore',
-  goods: Array<GoodsVO>,
+  goodsWithSeller: Array<GoodsWithSellerVO>,
+  searchDisabled: boolean,
 }
 
 /**
@@ -21,6 +25,10 @@ interface IState {
  */
 export default class SearchResult extends Component<any, IState> {
 
+  private readonly NOT_FIND_CATEGORY_ERROR:Error = new Error('未找到搜索关键词请重试');
+
+  private beforeSearchValue: string;
+
   config: Config = {
     navigationBarTitleText: '搜索'
   };
@@ -28,58 +36,83 @@ export default class SearchResult extends Component<any, IState> {
   constructor(props) {
     super(props);
     this.state = {
+      searchValue: '',
       loading: true,
-      goods: []
+      goodsWithSeller: [],
+      searchDisabled: true
     };
   }
 
   componentWillMount() {
-    Promise.all([
-      this.initWord(),
-      this.loadMore(),
-    ]).then(value => {
-      const word = value[0];
-      this.setState({word, loading: false});
+    this.initSearchValue()
+      .then(searchValue => {
+        this.setState({searchValue, loading: false, loadMoreStatus: 'loading'},
+          this.searchGoodsWithSeller)
     }).catch(this.onError);
   }
 
-  private initWord = async (): Promise<string> => {
+  private initSearchValue = async (): Promise<string> => {
     const word = indexSearchUrlConfig.getSearchWord(this);
-    if (!(word && word.length)) {
-      throw new Error('未找到搜索关键词请重试')
+    if (word && word.length) {
+      this.beforeSearchValue = word;
+      return Promise.resolve(word);
+    } else {
+      throw this.NOT_FIND_CATEGORY_ERROR;
     }
-    return Promise.resolve(word);
   };
 
-  private loadMore = async (): Promise<GoodsVO[]> => {
-    // TODO 优先级 中 搜索
-    return Promise.resolve([]);
+  private searchGoodsWithSeller = () => {
+    const lastIndex = this.state.goodsWithSeller.length;
+    const word = this.state.searchValue;
+    if (word) {
+      apiHub.goodsApi.searchGoodsWithSellerByKeyword(word, lastIndex)
+        .then((goodsWithSeller) => {
+          if (goodsWithSeller && goodsWithSeller.length) {
+            this.setState({goodsWithSeller: this.state.goodsWithSeller.concat(goodsWithSeller), loadMoreStatus: 'more', searchDisabled: false});
+          } else {
+            this.setState({loadMoreStatus: 'noMore', searchDisabled: false});
+          }
+        })
+    } else {
+      throw this.NOT_FIND_CATEGORY_ERROR;
+    }
+  };
+
+  private reSearch = () => {
+    const { searchValue } = this.state;
+    if (searchValue && searchValue !== this.beforeSearchValue) {
+      this.setState({loadMoreStatus: 'loading', searchDisabled: true, goodsWithSeller: []},
+        this.searchGoodsWithSeller);
+    }
   };
 
   private onLoadMore = () => {
-    this.setState({loadMoreStatus: 'loading'});
-    this.loadMore()
-      .then((goods) => {
-        if (goods && goods.length) {
-          this.setState({goods: this.state.goods.concat(goods), loadMoreStatus: 'more'});
-        } else {
-          this.setState({loadMoreStatus: 'noMore'});
-        }
-      })
-      .catch(this.onError);
+    this.setState({loadMoreStatus: 'loading', searchDisabled: true},
+      this.searchGoodsWithSeller);
   };
 
   render() {
-    const {loading, errMsg, loadMoreStatus} = this.state;
+    const {loading, errMsg, loadMoreStatus, goodsWithSeller, searchValue, searchDisabled} = this.state;
 
-    return loading
+    return loading || errMsg
       ? (
         <LoadingPage errMsg={errMsg}/>
       )
       : (
         <View>
-          <Text>SearchResult works</Text>
+          <AtSearchBar
+            placeholder='请输入关键词搜索'
+            disabled={searchDisabled}
+            maxLength={20}
+            value={searchValue}
+            onChange={(searchValue) => this.setState({searchValue})}
+            onActionClick={this.reSearch}
+          />
+          <View>
+            {goodsWithSeller.map((g, idx) => <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)}
+          </View>
           <AtLoadMore
+            moreBtnStyle={loadMoreBtnStyle}
             onClick={this.onLoadMore}
             status={loadMoreStatus}
           />

@@ -7,10 +7,9 @@ interface IProp {
 /**
  * 主页的滚动视图
  */
-function HomeSwiper(props:IProp) {
-  const {srcs = ['', '', '']} = props;
+function DSwiper(props:IProp) {
+  const {srcs = []} = props;
 
-  //TODO 添加滚动图片
   return (
     <Swiper
       indicatorColor='#999'
@@ -23,4 +22,4 @@ function HomeSwiper(props:IProp) {
   )
 }
 
-export default HomeSwiper;
+export default DSwiper;

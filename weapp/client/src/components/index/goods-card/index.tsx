@@ -75,9 +75,7 @@ function GoodsCard(props: IProp) {
 
     const picturesCount = goods.pictures.length;
     const goodsPictureSrc = picturesCount ? goods.pictures[0] : '';
-    // TODO 优先级 高
-    // 待后端添加头像属性
-    const sellerImage = '';
+    const sellerImage = seller.avatar;
     const sellerName = seller.nickname;
     const goodsName = goods.name;
     const goodsPrice = goods.price;

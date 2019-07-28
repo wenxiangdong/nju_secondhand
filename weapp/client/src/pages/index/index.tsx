@@ -2,7 +2,7 @@ import "@tarojs/async-await";
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
-import HomeSwiper from "../../components/index/home-swiper";
+import DSwiper from "../../components/common/d-swiper";
 import {AtGrid, AtSearchBar} from "taro-ui";
 import {Item} from "taro-ui/@types/grid";
 import localConfig from '../../utils/local-config'
@@ -46,10 +46,7 @@ export default class index extends Component<any, IState> {
       this.getSwiperSrcs(),
       this.getCategories()
     ])
-      .then(value => {
-        console.log('index componentWillMount ', value);
-        this.setState({swiperSrcs: value[0], categories: value[1], loading: false});
-      })
+      .then(value => this.setState({swiperSrcs: value[0], categories: value[1], loading: false}))
       .catch(this.onError);
   }
 
@@ -66,18 +63,14 @@ export default class index extends Component<any, IState> {
     return categories.map((c) => ({image:c.icon, value: c.name}));
   };
 
-  private onSearch = (value) => {
-    if (value) {
-      console.info('index onSearch', value);
+  private onSearch = () => {
+    const { searchValue } = this.state;
+    if (searchValue) {
+      console.info('index onSearch', searchValue);
       Taro.navigateTo({
-        url: indexSearchUrlConfig.createIndexSearchUrl(value)
+        url: indexSearchUrlConfig.createIndexSearchUrl(searchValue)
       }).catch(this.onError);
     }
-  };
-
-  private onSearchChange = (searchValue) => {
-    this.setState({searchValue});
-    return searchValue;
   };
 
   private onCategoryClick = (item: Item, index: number, event: CommonEvent) => {
@@ -93,19 +86,20 @@ export default class index extends Component<any, IState> {
     const {searchValue, swiperSrcs, categories, loading, errMsg} = this.state;
     const categoryData = this.transferCategoryDate(categories);
 
-    return loading
+    return loading || errMsg
       ? (
         <LoadingPage errMsg={errMsg}/>
       )
       : (
         <View>
           <AtSearchBar
-            actionName='请输入关键词搜索'
+            placeholder='请输入关键词搜索'
+            maxLength={20}
             value={searchValue}
-            onChange={this.onSearchChange}
-            onActionClick={(value) => this.onSearch(value)}
+            onChange={(searchValue) => this.setState({searchValue})}
+            onActionClick={this.onSearch}
           />
-          <HomeSwiper srcs={swiperSrcs}/>
+          <DSwiper srcs={swiperSrcs}/>
           <AtGrid hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>
           <MainTabBar currentIndex={MainTabBar.HOME_INDEX}/>
         </View>

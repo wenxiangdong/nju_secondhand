@@ -1,15 +1,18 @@
 import "@tarojs/async-await";
 import Taro, {Component} from '@tarojs/taro'
-import {View, Text} from '@tarojs/components'
-import {CategoryVO, GoodsVO} from "../../../apis/GoodsApi";
+import {View} from '@tarojs/components'
+import {CategoryVO, GoodsWithSellerVO} from "../../../apis/GoodsApi";
 import localConfig from "../../../utils/local-config";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
 import {AtLoadMore} from "taro-ui";
+import {apiHub} from "../../../apis/ApiHub";
+import GoodsCard from "../../../components/index/goods-card";
+import {loadMoreBtnStyle} from "../../../styles/style-objects";
 
 interface IState {
   category?: CategoryVO,
-  goods: GoodsVO[],
+  goodsWithSeller: GoodsWithSellerVO[],
   loading: boolean,
   errMsg?: string,
   loadMoreStatus?: 'more' | 'loading' | 'noMore',
@@ -22,74 +25,71 @@ interface IState {
  */
 export default class CategoryGoods extends Component<any, IState> {
 
+  private readonly NOT_FIND_CATEGORY_ERROR:Error = new Error('未找到类别请重试');
+
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      goods: []
+      goodsWithSeller: []
     };
   }
 
   componentWillMount() {
-    Promise.all([
-      this.initCategory()
-    ]).then(value => {
-      const category = value[0];
+    this.initCategory()
+      .then(category => {
       Taro.setNavigationBarTitle({title: category.name})
         .catch(this.onError);
-      this.setState({category, loading: false});
+      this.setState({category, loading: false, loadMoreStatus: 'loading'},
+        this.searchGoodsWithSeller);
     }).catch(this.onError);
   }
 
-  private initCategory = async function(): Promise<CategoryVO> {
+  private initCategory = async (): Promise<CategoryVO> => {
     const category = localConfig.getGoodsCategory();
-    if (!category) {
-      throw new Error('未找到类别请重试');
+    if (category) {
+      return Promise.resolve(category);
+    } else {
+      throw this.NOT_FIND_CATEGORY_ERROR;
     }
-    return Promise.resolve(category);
   };
 
-  componentDidMount() {
-  }
-
-  componentWillUnmount() {
-  }
-
-  componentDidShow() {
-  }
-
-  componentDidHide() {
-  }
-
-  private loadMore = async (): Promise<GoodsVO[]> => {
-    // TODO 优先级 中 搜索
-    return Promise.resolve([]);
+  private searchGoodsWithSeller = () => {
+    const lastIndex = this.state.goodsWithSeller.length;
+    if (this.state.category) {
+      const { _id } = this.state.category;
+      apiHub.goodsApi.searchGoodsWithSellerByCategory(_id, lastIndex)
+        .then((goodsWithSeller) => {
+          if (goodsWithSeller && goodsWithSeller.length) {
+            this.setState({goodsWithSeller: this.state.goodsWithSeller.concat(goodsWithSeller), loadMoreStatus: 'more'});
+          } else {
+            this.setState({loadMoreStatus: 'noMore'});
+          }
+        })
+    } else {
+      throw this.NOT_FIND_CATEGORY_ERROR;
+    }
   };
 
   private onLoadMore = () => {
-    this.setState({loadMoreStatus: 'loading'});
-    this.loadMore()
-      .then((goods) => {
-        if (goods && goods.length) {
-          this.setState({goods: this.state.goods.concat(goods), loadMoreStatus: 'more'});
-        } else {
-          this.setState({loadMoreStatus: 'noMore'});
-        }
-      })
-      .catch(this.onError);
+    this.setState({loadMoreStatus: 'loading'},
+      this.searchGoodsWithSeller);
   };
 
   render() {
-    const {loading, errMsg, loadMoreStatus} = this.state;
+    const {loading, errMsg, loadMoreStatus, goodsWithSeller} = this.state;
 
-    return loading
+    return loading || errMsg
       ? (
         <LoadingPage errMsg={errMsg}/>
       )
       : (
         <View>
-          <Text>CategoryGoods works</Text>
+          <View>
+            {goodsWithSeller.map((g, idx) => <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)}
+          </View>
           <AtLoadMore
+            moreBtnStyle={loadMoreBtnStyle}
             onClick={this.onLoadMore}
             status={loadMoreStatus}
           />

@@ -22,6 +22,12 @@ export interface IGoodsApi {
   // 种类搜索商品
   searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>;
 
+  // 关键字搜索商品和销售者信息
+  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>;
+
+  // 种类搜索商品和销售者信息
+  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>;
+
   // 购买商品
   purchase(goodsID: string): Promise<void>;
 }
@@ -42,7 +48,7 @@ class GoodsApi implements IGoodsApi {
       .get())
       .data) {
 
-      categories = categories.concat(data)
+      categories = categories.concat(data);
 
       if (data.length < limit) {
         break;
@@ -100,10 +106,23 @@ class GoodsApi implements IGoodsApi {
   async purchase(goodsID: string): Promise<void> {
     return await httpRequest.callFunction<void>("purchase", { goodsID });
   }
+
+  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+    // TODO 优先级 低 接口添加
+    // 求后端小哥加两个接口
+    // 加完记得顺便改一下文档 ❤❤❤
+    throw new Error("Method not implemented.");
+  }
+
+  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+    // TODO 优先级 低 接口添加
+    // 同上
+    throw new Error("Method not implemented.");
+  }
 }
 
 class MockGoodsApi implements IGoodsApi {
-  private goodsCount = 50;
+  private goodsCount = 20;
 
   getCategories(): Promise<CategoryVO[]> {
     const names = ['数码', '二手图书', '服饰鞋包', '美妆', '二手车', '全部分类'];
@@ -130,7 +149,8 @@ class MockGoodsApi implements IGoodsApi {
     if (lastIndex >= this.goodsCount) {
       return mockHttpRequest.success([]);
     } else {
-      const goodsArray: GoodsVO[] = new Array(size).map(() => {
+      const goodsArray: GoodsVO[] = new Array(size).fill(null)
+        .map(() => {
         let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
         goods.name += keyword;
         return goods;
@@ -142,7 +162,8 @@ class MockGoodsApi implements IGoodsApi {
     if (lastIndex >= this.goodsCount) {
       return mockHttpRequest.success([]);
     } else {
-      const goodsArray: GoodsVO[] = new Array(size).map(() => {
+      const goodsArray: GoodsVO[] = new Array(size).fill(null)
+        .map(() => {
         let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
         goods.category._id = categoryID;
         return goods;
@@ -153,6 +174,36 @@ class MockGoodsApi implements IGoodsApi {
   purchase(goodsID: string): Promise<void> {
     console.log('purchase goodsID:', goodsID);
     return mockHttpRequest.success();
+  }
+
+  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+    if (lastIndex >= this.goodsCount) {
+      return mockHttpRequest.success([]);
+    } else {
+      const goodsWithSellerArray: GoodsWithSellerVO[] = new Array(size).fill(null)
+        .map(() => {
+        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        goods.category._id = categoryID;
+        let seller:UserVO = MockUserApi.createMockUser();
+        return {seller, goods};
+      });
+      return mockHttpRequest.success(goodsWithSellerArray);
+    }
+  }
+
+  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+    if (lastIndex >= this.goodsCount) {
+      return mockHttpRequest.success([]);
+    } else {
+      const goodsWithSellerArray: GoodsWithSellerVO[] = new Array(size).fill(null)
+        .map(() => {
+        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        goods.name += keyword;
+        let seller:UserVO = MockUserApi.createMockUser();
+        return {seller, goods};
+      });
+      return mockHttpRequest.success(goodsWithSellerArray);
+    }
   }
 
   private static createMockCateGory(): CategoryVO {
@@ -177,7 +228,7 @@ class MockGoodsApi implements IGoodsApi {
     };
   }
 
-  static createMockGoodsWithSeller(): GoodsWithSellerVO {
+  private static createMockGoodsWithSeller(): GoodsWithSellerVO {
     return {
       goods: MockGoodsApi.createMockGoodsVO(),
       seller: MockUserApi.createMockUser()

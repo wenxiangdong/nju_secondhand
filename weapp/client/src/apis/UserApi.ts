@@ -98,6 +98,7 @@ class MockUserApi implements IUserApi {
       _openid: 'openid',
       phone: 'phone',
       nickname: 'nickname',
+      avatar: '',
       address: MockUserApi.createMockLocation(),
       email: 'email',
       account: MockUserApi.createMockAccount(0.01),
