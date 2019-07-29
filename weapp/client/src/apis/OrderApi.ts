@@ -70,12 +70,11 @@ export interface OrderVO extends VO {
   goodsID: string;
   goodsName: string;
   goodsPrice: string;
-  total: string;
 
   address: Location;
 
   orderTime: number;
-  deliveryTime: number;
+  deliveryTime: number; // -1 表示还未送达
 
   state: OrderState;
 }

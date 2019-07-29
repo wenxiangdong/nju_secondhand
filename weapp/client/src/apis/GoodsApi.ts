@@ -1,6 +1,6 @@
 import "@tarojs/async-await"
-import {httpRequest, mockHttpRequest, VO, db, command} from "./HttpRequest";
-import {MockUserApi, UserVO} from "./UserApi";
+import { httpRequest, mockHttpRequest, VO, db, command } from "./HttpRequest";
+import { MockUserApi, UserVO, userApi } from "./UserApi";
 import { copy } from "./Util";
 
 export interface IGoodsApi {
@@ -107,17 +107,30 @@ class GoodsApi implements IGoodsApi {
     return await httpRequest.callFunction<void>("purchase", { goodsID });
   }
 
-  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
-    // TODO 优先级 低 接口添加
-    // 求后端小哥加两个接口
-    // 加完记得顺便改一下文档 ❤❤❤
-    throw new Error("Method not implemented.");
+  async searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+    let goodsVOs: GoodsVO[] = await this.searchGoodsByCategory(categoryID, lastIndex, size);
+
+    let goodsWithSellerVOs: GoodsWithSellerVO[] = [];
+    for (let goodsVO of goodsVOs) {
+      goodsWithSellerVOs.push({
+        goods: goodsVO,
+        seller: await userApi.getUserInfo(goodsVO.sellerID)
+      })
+    }
+    return goodsWithSellerVOs;
   }
 
-  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
-    // TODO 优先级 低 接口添加
-    // 同上
-    throw new Error("Method not implemented.");
+  async searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+    let goodsVOs: GoodsVO[] = await this.searchGoodsByKeyword(keyword, lastIndex, size);
+
+    let goodsWithSellerVOs: GoodsWithSellerVO[] = [];
+    for (let goodsVO of goodsVOs) {
+      goodsWithSellerVOs.push({
+        goods: goodsVO,
+        seller: await userApi.getUserInfo(goodsVO.sellerID)
+      })
+    }
+    return goodsWithSellerVOs;
   }
 }
 

@@ -56,7 +56,7 @@ export interface PostVO extends VO {
 }
 
 export interface Comment {
-  nickName: string;
+  nickname: string;
   content: string;
   commentTime: number;
 }

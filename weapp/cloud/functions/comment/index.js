@@ -16,7 +16,7 @@ exports.main = async (event, context) => {
       data: {
         comments: command.push([
           {
-            nickName: user.nickName,
+            nickname: user.nickname,
             content: event.content,
             commentTime: Date.now()
           }

@@ -81,6 +81,11 @@ interface GoodsVO extends VO {
     state: GoodsState;
 }
 
+export interface GoodsWithSellerVO {
+  seller: UserVO;
+  goods: GoodsVO
+}
+
 enum GoodsState {
     InSale,
     Deleted
@@ -93,24 +98,23 @@ interface OrderDTO {
     goodID: string;
 }
 
-interface OrderVO extends VO {
-    buyerID: string;
-    buyerName: string;
+export interface OrderVO extends VO {
+  buyerID: string;
+  buyerName: string;
 
-    sellerID: string;
-    sellerName: string;
+  sellerID: string;
+  sellerName: string;
 
-    goodsID: string;
-    goodsName: string;
-    goodsPrice: string;
-    total: string;
+  goodsID: string;
+  goodsName: string;
+  goodsPrice: string;
 
-    address: Location;
+  address: Location;
 
-    orderTime: number;
-    deliveryTime: number;
+  orderTime: number;
+  deliveryTime: number; // -1 表示还未送达
 
-    state: OrderState;
+  state: OrderState;
 }
 
 enum OrderState {
@@ -171,7 +175,7 @@ interface PostVO extends VO {
 }
 
 interface Comment {
-    nickName: string;
+    nickname: string;
     content: string;
     commentTime: number;
 }
@@ -298,6 +302,12 @@ export interface IGoodsApi {
 
     // 种类搜索商品
     searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>; // 不需要
+  
+  	// 关键字搜索商品和销售者信息
+  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>;
+
+  // 种类搜索商品和销售者信息
+  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>;
 
     // 购买商品
     purchase(goodsID: string): Promise<void>;
