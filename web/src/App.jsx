@@ -1,7 +1,9 @@
-import React from 'react';
+import React, {createContext, useContext} from 'react';
 import './App.css';
 import loadable from "@loadable/component";
 import {HashRouter, Route, Switch} from "react-router-dom";
+import Goods from "./pages/Goods/Goods";
+import User from "./pages/User/User";
 
 
 
@@ -9,6 +11,8 @@ import {HashRouter, Route, Switch} from "react-router-dom";
 // 页面
 const Try = loadable(() => import('./pages/Try/Try'));
 const Home = loadable(() => import("./pages/Home/Home"));
+
+const title = createContext("");
 
 
 function App() {
@@ -19,6 +23,8 @@ function App() {
            </div>
            <HashRouter>
                <Switch>
+                   <Route path="/Goods" component={Goods}/>
+                   <Route path="/User" component={User}/>
                    <Route path="/Try" component={Try}/>
                    <Route path="/home" component={Home}/>
                </Switch>

@@ -1,4 +1,4 @@
-import React, {ReactNode, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import "./DTable.css";
 import {Button} from "antd";
 import Logger from "../../utils/logger";
@@ -85,7 +85,7 @@ export default function DTable({columns = [], dataSet = [], onLoad}: IProp = {})
                     loading={loading}
                     onClick={handleClickLoad}
                     icon={loading ? "loading" : "down-circle"}>
-                    {loading ? "加载中" : "加载更多"}
+                    {loading ? "加载中" : "加载"}
                 </Button>
             </div>
         </div>

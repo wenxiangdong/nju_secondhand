@@ -2,7 +2,7 @@ import {Icon, Input} from "antd";
 import React from "react";
 import debounce from "../../utils/debounce";
 
-export default function InputWithDebounce({debounceDuration = 500, onChange} = {}) {
+export default function InputWithDebounce({debounceDuration = 500, onChange, placeholder = "输入关键词搜索"} = {}) {
     const searchIcon = (
         <Icon type={"search"}/>
     );
@@ -16,6 +16,7 @@ export default function InputWithDebounce({debounceDuration = 500, onChange} = {
 
     return (
         <Input
+            placeholder={placeholder}
             suffix={searchIcon}
             onChange={e => {
                 e.persist();
