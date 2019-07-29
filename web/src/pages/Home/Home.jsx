@@ -52,7 +52,7 @@ const TILE_LIST = [
     },
     {
         title: "订单管理",
-        link: "/appeal",
+        link: "/order",
         color: "#84B1ED",
         icon: "account-book"
     },

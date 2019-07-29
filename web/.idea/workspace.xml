@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="364f0a52-96a3-4ae0-9f77-6c5bd777617f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/apis/complaint.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/Complaint/Complaint.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/apis/order.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/Orders/Order.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DTable/DTable.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DTable/DTable.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Complaint/Complaint.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Complaint/Complaint.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/Home/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Home/Home.jsx" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -93,7 +94,7 @@
       <workItem from="1563890214205" duration="10032000" />
       <workItem from="1563937163780" duration="7576000" />
       <workItem from="1564107818215" duration="544000" />
-      <workItem from="1564108365226" duration="26991000" />
+      <workItem from="1564108365226" duration="31507000" />
     </task>
     <servers />
   </component>
@@ -112,17 +113,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/pages/Complaint/Complaint.jsx</url>
-          <line>101</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

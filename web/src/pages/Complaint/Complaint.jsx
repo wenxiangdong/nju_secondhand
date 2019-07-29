@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import useLoadMoreWithKeyword from "../../hooks/use-load-more-with-keyword";
 import complaintApi from "../../apis/complaint";
-import {Card, Divider, Input, message, Modal} from "antd";
+import {BackTop, Card, Divider, Input, message, Modal} from "antd";
 import Logger from "../../utils/logger";
 import type {ComplaintVO} from "../../apis/complaint";
 import {DateUtil} from "../../utils/date";
@@ -145,14 +145,6 @@ function Complaint() {
         }
     });
     const [selectedComplaint, setComplaint] = useState(null);
-    /**
-     * 处理结果
-     */
-    const [result, setResult] = useState("");
-
-    useEffect(() => {
-        logger.info("effect", result);
-    }, [result]);
 
     // handlers
     const handleHandle = async (vo: ComplaintVO) => {
@@ -172,6 +164,7 @@ function Complaint() {
       }
     };
 
+    // elements
     const detailSection = setComplaint ? <DetailView {...selectedComplaint} /> : null;
     const mainSection = (
         <>
@@ -184,6 +177,7 @@ function Complaint() {
     return (
         <div className={"page"}>
             {selectedComplaint ? detailSection : mainSection}
+            <BackTop/>
         </div>
     );
 }
