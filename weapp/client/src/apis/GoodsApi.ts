@@ -32,8 +32,9 @@ export interface IGoodsApi {
   purchase(goodsID: string): Promise<void>;
 }
 
-let categoryCollection = db.collection("category");
-let goodsCollection = db.collection("goods");
+const categoryCollection = db.collection('category');
+const goodsCollection = db.collection('goods');
+const functionName = 'goodsApi';
 
 class GoodsApi implements IGoodsApi {
   async getCategories(): Promise<CategoryVO[]> {
@@ -60,13 +61,13 @@ class GoodsApi implements IGoodsApi {
     return categories;
   }
   async publishGoods(goods: GoodsDTO): Promise<void> {
-    return await httpRequest.callFunction<void>("publishGoods", { goods });
+    return await httpRequest.callFunction<void>(functionName, { $url: 'publishGoods', goods });
   }
   async getOngoingGoods(): Promise<GoodsVO[]> {
-    return await httpRequest.callFunction<GoodsVO[]>("getOngoingGoods");
+    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "getOngoingGoods" });
   }
   async deleteGoods(goodsID: string): Promise<void> {
-    return await httpRequest.callFunction<void>("deleteGoods", { goodsID });
+    return await httpRequest.callFunction<void>(functionName, { $url: "deleteGoods", goodsID });
   }
   async searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
     return copy<GoodsVO[]>((await goodsCollection
@@ -104,7 +105,7 @@ class GoodsApi implements IGoodsApi {
       .data)
   }
   async purchase(goodsID: string): Promise<void> {
-    return await httpRequest.callFunction<void>("purchase", { goodsID });
+    return await httpRequest.callFunction<void>(functionName, { $url: "purchase", goodsID });
   }
 
   async searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {

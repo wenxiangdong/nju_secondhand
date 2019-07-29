@@ -1,6 +1,6 @@
 import "@tarojs/async-await";
 import { VO, httpRequest, db, Fail, HttpCode } from "./HttpRequest";
-import {AccountVO} from "./AccountApi";
+import { AccountVO } from "./AccountApi";
 
 export interface IUserApi {
   // 检查用户状态
@@ -19,11 +19,12 @@ export interface IUserApi {
   getUserInfo(userID: string): Promise<UserVO>;
 }
 
-let userCollection = db.collection("user");
+const userCollection = db.collection('user');
+const functionName = 'userApi'
 
 class UserApi implements IUserApi {
   async checkState(): Promise<UserState> {
-    return await httpRequest.callFunction<UserState>("checkState");
+    return await httpRequest.callFunction<UserState>(functionName, { $url: 'checkState' });
   }
   async signUp(user: UserDTO): Promise<void> {
     if (await this.checkState() !== UserState.UnRegistered) {
@@ -42,7 +43,7 @@ class UserApi implements IUserApi {
       .add({ data: user })
   }
   async login(): Promise<UserVO> {
-    return await httpRequest.callFunction<UserVO>("login");
+    return await httpRequest.callFunction<UserVO>(functionName, { $url: 'login' });
   }
   async modifyInfo(user: UserDTO): Promise<void> {
     let userVO: UserVO = await this.login();
@@ -56,7 +57,7 @@ class UserApi implements IUserApi {
       .update({ data: user })
   }
   async getUserInfo(userID: string): Promise<UserVO> {
-    return await httpRequest.callFunction<UserVO>("getUserInfo", { userID });
+    return await httpRequest.callFunction<UserVO>(functionName, { $url: 'getUserInfo', userID });
   }
 }
 

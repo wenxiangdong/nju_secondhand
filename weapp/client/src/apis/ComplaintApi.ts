@@ -6,12 +6,14 @@ export interface IComplaintApi {
   getComplaints(lastIndex: number, size?: number): Promise<ComplaintVO[]>;
 }
 
+const functionName = 'complaintApi'
+
 class ComplaintApi implements IComplaintApi {
   async complain(complaint: ComplaintDTO): Promise<void> {
-    return await httpRequest.callFunction<void>("complain", { complaint });
+    return await httpRequest.callFunction<void>(functionName, { $url: "complain", complaint });
   }
   async getComplaints(lastIndex: number, size: number = 10): Promise<ComplaintVO[]> {
-    return await httpRequest.callFunction<ComplaintVO[]>("complain", { lastIndex, size });
+    return await httpRequest.callFunction<ComplaintVO[]>(functionName, { $url: "getComplaints", lastIndex, size });
   }
 }
 
@@ -46,7 +48,7 @@ export interface ComplaintVO extends VO {
   pictures: Array<string>;
 
   complainTime: number;
-  
+
   handling: Handling | null;
 
   state: ComplaintState;

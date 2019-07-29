@@ -231,16 +231,16 @@ export class Fail {
  ```typescript
 // API 如果成功调用，则返回 Promise 的返回类型，如 GoodsVO；如果失败，抛出异常，异常的数据结构为 Fail（数据结构部分最后一个）
 
-// 部分需要注册且未冻结，不需要的会指明
+// 需要注册且未冻结，特殊会说明
 export interface IUserApi {
     // 检查用户状态
     checkState(): Promise<UserState>; // 不需要
 
     // 注册
-    signUp(user: UserDTO): Promise<void>; // 不需要
+    signUp(user: UserDTO): Promise<void>; // 不需要，且只能未注册
 
     // 登录
-    login(): Promise<UserVO>;
+    login(): Promise<UserVO>; // 需要注册
 
     // 修改个人信息
     modifyInfo(user: UserDTO): Promise<void>;
@@ -259,7 +259,7 @@ export interface IAccountApi {
 export interface ICircleApi {
     publishPost(post: PostDTO): Promise<void>;
 
-    getPosts(lastIndex: number, size?: number): Promise<PostVO[]>;
+    getPosts(lastIndex: number, size?: number): Promise<PostVO[]>; // 不需要
 
     comment(postID: string, content: string): Promise<void>;
 }
@@ -283,7 +283,7 @@ export interface IFileApi {
 }
 
 
-// 部分需要注册且未冻结，不需要的会指明
+// 需要注册且未冻结，特殊会说明
 export interface IGoodsApi {
     // 取得商品分类
     getCategories(): Promise<CategoryVO[]>; // 不需要
@@ -304,10 +304,10 @@ export interface IGoodsApi {
     searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>; // 不需要
   
   	// 关键字搜索商品和销售者信息
-  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>;
+  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
 
   // 种类搜索商品和销售者信息
-  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>;
+  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
 
     // 购买商品
     purchase(goodsID: string): Promise<void>;

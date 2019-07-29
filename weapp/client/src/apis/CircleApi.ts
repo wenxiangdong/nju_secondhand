@@ -1,5 +1,6 @@
 import "@tarojs/async-await";
-import { VO, httpRequest } from "./HttpRequest";
+import { VO, httpRequest, db } from "./HttpRequest";
+import { copy } from "./Util";
 
 export interface ICircleApi {
   publishPost(post: PostDTO): Promise<void>;
@@ -9,16 +10,24 @@ export interface ICircleApi {
   comment(postID: string, content: string): Promise<void>;
 }
 
+const postCollection = db.collection('post');
+const functionName = 'circleApi'
+
 class CircleApi implements ICircleApi {
   async publishPost(post: PostDTO): Promise<void> {
-    return await httpRequest.callFunction<void>("publishPost", { post });
+    return await httpRequest.callFunction<void>(functionName, { $url: "publishPost", post });
   }
 
   async getPosts(lastIndex: number, size: number = 10): Promise<PostVO[]> {
-    return await httpRequest.callFunction<PostVO[]>("getPosts", { lastIndex, size });
+    let result = await postCollection
+      .skip(lastIndex)
+      .limit(size)
+      .get()
+
+    return copy<PostVO[]>(result.data);
   }
   async comment(postID: string, content: string): Promise<void> {
-    return await httpRequest.callFunction<void>("publishPost", { postID, content });
+    return await httpRequest.callFunction<void>(functionName, { $url: "comment", postID, content });
   }
 }
 

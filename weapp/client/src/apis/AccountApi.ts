@@ -6,9 +6,11 @@ export interface IAccountApi {
   withdraw(amount: String): Promise<void>;
 }
 
+const functionName = 'accountApi'
+
 class AccountApi implements IAccountApi {
   async withdraw(amount: String): Promise<void> {
-    return await httpRequest.callFunction<void>("withdraw", { amount });
+    return await httpRequest.callFunction<void>(functionName, { $url: "withdraw", amount });
   }
 }
 
