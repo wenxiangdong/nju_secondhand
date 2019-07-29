@@ -1,6 +1,6 @@
 import React, {ReactNode, useEffect, useState} from "react";
 import "./DTable.css";
-import {Button} from "antd";
+import {Button, Divider} from "antd";
 import Logger from "../../utils/logger";
 
 const logger = Logger.getLogger("DTable");
@@ -61,6 +61,7 @@ export default function DTable({columns = [], dataSet = [], onLoad}: IProp = {})
         </tbody>
     );
 
+    // handlers
     const handleClickLoad = async () => {
         try {
             setLoading(true);

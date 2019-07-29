@@ -34,7 +34,7 @@ function Tile({title, link = "", color = "#1890ff", icon = ""} = {}) {
 const TILE_LIST = [
     {
         title: "商品管理",
-        link: "/good",
+        link: "/goods",
         color: "#67D5B5",
         icon: "appstore"
     },
@@ -46,7 +46,7 @@ const TILE_LIST = [
     },
     {
         title: "投诉管理",
-        link: "/appeal",
+        link: "/complaint",
         color: "#C89EC4",
         icon: "frown"
     },
