@@ -6,6 +6,7 @@ const urlList = {
   INDEX_CATEGORY_GOODS: '/pages/index/category-goods/index',
   INDEX_GOODS_INFO: '/pages/index/goods-info/index',
   MESSAGE: '/pages/message/index',
+  MESSAGE_SYSTEM: '/pages/message/system/index',
   MY: '/pages/my/index',
   MY_VISITED:'/pages/my/my-visited/index',
   MY_BOUGHT:'/pages/my/my-bought/index',

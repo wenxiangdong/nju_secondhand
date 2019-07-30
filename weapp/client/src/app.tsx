@@ -22,7 +22,7 @@ class App extends Component {
   config: Config = {
     pages: [
       // 测试页面
-      // 'pages/dev/index',
+      'pages/dev/index',
       'pages/index/index',
 
       'pages/circle/index',
@@ -35,6 +35,7 @@ class App extends Component {
       'pages/login/index',
 
       'pages/message/index',
+      'pages/message/system/index',
 
       'pages/my/index',
       'pages/my/my-bought/index',

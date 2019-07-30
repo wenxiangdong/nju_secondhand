@@ -1,7 +1,6 @@
 import "@tarojs/async-await";
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
-import MainTabBar from "../../components/common/main-tab-bar";
 import DSwiper from "../../components/common/d-swiper";
 import {AtGrid, AtSearchBar} from "taro-ui";
 import {Item} from "taro-ui/@types/grid";
@@ -12,6 +11,7 @@ import {CommonEvent} from "@tarojs/components/types/common";
 import urlList, {indexSearchUrlConfig} from "../../utils/url-list";
 import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
+import MainTabBar from "../../components/common/main-tab-bar";
 
 interface IState {
   searchValue: string,

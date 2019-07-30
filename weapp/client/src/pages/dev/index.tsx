@@ -1,37 +1,32 @@
 // @ts-ignore
 import Taro from '@tarojs/taro';
-import {View, Text} from "@tarojs/components";
+import {View} from "@tarojs/components";
 import './index.scss'
-import {AtButton, AtDivider} from "taro-ui";
+import MessageRow from "../../components/message/message-row";
+import {SystemNotification} from "../../components/message/system-notification";
+import MessageAvatar from "../../components/message/message-avatar";
+import MessageContent from "../../components/message/message-content";
+import MessageLeft from "../../components/message/message-left";
+import MessageRight from "../../components/message/message-right";
 
 function Dev() {
   // noinspection JSIgnoredPromiseFromCall
   Taro.setNavigationBarTitle({title: '测试'});
+  const text = "text://dhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello world";
+
 
   return (
     <View>
-      <View>
-        <Text>TODO 商品简介卡片</Text>
-      </View>
-      <AtDivider content='商品详情'/>
-      <Text>TODO 商品详情</Text>
-      <AtDivider content='关于卖家'/>
-      <Text>TODO 关于卖家</Text>
-
-      <AtDivider content='问题互动'/>
-      <Text>TODO 搁置</Text>
-      <AtDivider content='相似商品'/>
-      <Text>TODO 搁置</Text>
-
-      <View className='at-row'>
-        {/*TODO 底部固定*/}
-        <View className='at-col at-col__offset-1 at-col-4'>
-          <AtButton circle type='secondary' customStyle={{height: '30px', lineHeight: '30px'}}>马上买</AtButton>
-        </View>
-        <View className='at-col at-col__offset-2 at-col-4'>
-          <AtButton circle type='primary' customStyle={{height: '30px', lineHeight: '30px'}}>聊一聊</AtButton>
-        </View>
-      </View>
+      <SystemNotification/>
+      <MessageRow name={"李培林"} extra={"hi"}/>
+      <MessageAvatar/>
+      <MessageLeft
+        time={+new Date()}
+        content={text} name={"李培林"}/>
+        <MessageRight
+          time={+new Date()}
+          content={text}
+          name={"文向东"}/>
     </View>
   )
 }

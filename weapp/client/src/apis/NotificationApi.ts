@@ -1,4 +1,4 @@
-import { VO, httpRequest } from "./HttpRequest";
+import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
 
 export interface INotificationApi {
   // 取得通知消息
@@ -19,8 +19,22 @@ class NotificationApi implements INotificationApi {
 }
 
 class MockNotificationApi implements INotificationApi {
-  getNotifications(lastIndex: number, size: number = 10): Promise<NotificationVO[]> {
-    throw new Error("Method not implemented.");
+  async getNotifications(lastIndex: number, size: number = 10): Promise<NotificationVO[]> {
+    const noti: NotificationVO = {
+      _id: "",
+      userID: "userID",
+      content: "这是一条系统通知这是一条系统通知这是一条系统通知这是一条系统通知",
+      time: +new Date()
+    };
+    return mockHttpRequest.success(
+      Array(size)
+        .fill(undefined)
+        .map((_, idx) => ({
+          ...noti,
+          _id: Math.random().toString(),
+          time: noti.time - (lastIndex + idx) * 10000
+        }))
+    );
   }
   sendNotification(notification: NotificationDTO): Promise<void> {
     throw new Error("Method not implemented.");
