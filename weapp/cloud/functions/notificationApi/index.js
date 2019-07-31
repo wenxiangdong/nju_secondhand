@@ -7,12 +7,12 @@ cloud.init()
 const db = cloud.database()
 
 // 云函数入口函数
-exports.main = async(event, context) => {
+exports.main = async (event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async(ctx, next) => {
+  app.use(async (ctx, next) => {
     console.log('----------> 进入 notificationApi 全局中间件')
     ctx.data = {}
     ctx.data.openid = cloud.getWXContext().OPENID
@@ -22,17 +22,17 @@ exports.main = async(event, context) => {
     console.log('----------> 退出 notificationtApi 全局中间件')
   })
 
-  app.router(['getNotifications'], async(ctx, next) => {
+  app.router(['getNotifications'], async (ctx, next) => {
     let self = await cloud.callFunction('userApi', {
       $url: 'getNormalSelf',
-      opneid: ctx.data.openid
+      openid: ctx.data.openid
     }).result;
     ctx.data.self = self;
 
     await next();
   })
 
-  app.router('getNotifications', async(ctx) => {
+  app.router('getNotifications', async (ctx) => {
     let result = await ctx.data.notificationCollection
       .where({
         userID: ctx.data.self._id,
@@ -44,7 +44,7 @@ exports.main = async(event, context) => {
     ctx.body = result.data
   })
 
-  app.router('sendNotification', async(ctx) => {
+  app.router('sendNotification', async (ctx) => {
     let notification = event.notification
     notification.time = Date.now()
 

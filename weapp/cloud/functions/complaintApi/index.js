@@ -7,12 +7,12 @@ cloud.init()
 const db = cloud.database()
 
 // 云函数入口函数
-exports.main = async(event, context) => {
+exports.main = async (event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async(ctx, next) => {
+  app.use(async (ctx, next) => {
     console.log('----------> 进入 complaintApi 全局中间件')
     ctx.data = {}
     ctx.data.openid = cloud.getWXContext().OPENID
@@ -22,17 +22,17 @@ exports.main = async(event, context) => {
     console.log('----------> 退出 complaintApi 全局中间件')
   })
 
-  app.router(['complain', 'getComplaints'], async(ctx, next) => {
+  app.router(['complain', 'getComplaints'], async (ctx, next) => {
     let self = await cloud.callFunction('userApi', {
       $url: 'getNormalSelf',
-      opneid: ctx.data.openid
+      openid: ctx.data.openid
     }).result;
     ctx.data.self = self;
 
     await next();
   })
 
-  app.router('complain', async(ctx) => {
+  app.router('complain', async (ctx) => {
     let complaint = event.complaint
 
     complaint.complaintID = ctx.data.self._id
@@ -50,7 +50,7 @@ exports.main = async(event, context) => {
       })
   })
 
-  app.router('getComplaints', async(ctx) => {
+  app.router('getComplaints', async (ctx) => {
     let result = await ctx.data.complaintCollection
       .where({
         complaintID: ctx.data.self._id

@@ -49,7 +49,7 @@ interface AccountVO {
 enum UserState {
     UnRegistered, // 未注册
     Normal,
-    Forzen, // 被管理员冻结
+    Frozen, // 被管理员冻结
 }
 
 
@@ -352,6 +352,9 @@ List<OrderVO> getOrders(String keyword, int lastIndex, int size);
 
 // 商品管理
 // 查看商品见用户API，省略
+List<CategoryVO> getCategories();
+List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size);
+List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size);
 void deleteGoods(String goodsID); // 下架商品，需要给卖家发通知
 
 
@@ -359,7 +362,7 @@ void deleteGoods(String goodsID); // 下架商品，需要给卖家发通知
 List<UserVO> getNormalUsers(String keyword, int lastIndex, int size);
 void freezeUser(String userID); // 发通知
 
-List<UserVO> getForzenUsers(String keyword, int lastIndex, int size);
+List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size);
 void unfreezeUser(String userID); // 发通知
 ```
 

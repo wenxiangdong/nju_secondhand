@@ -7,12 +7,12 @@ cloud.init()
 const db = cloud.database()
 
 // 云函数入口函数
-exports.main = async(event, context) => {
+exports.main = async (event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async(ctx, next) => {
+  app.use(async (ctx, next) => {
     console.log('----------> 进入 goodsApi 全局中间件')
     ctx.data = {}
     ctx.data.openid = cloud.getWXContext().OPENID
@@ -25,17 +25,17 @@ exports.main = async(event, context) => {
 
   app.router(['publishGoods', 'getOngoingGoods', 'deleteGoods',
     'purchase'
-  ], async(ctx, next) => {
+  ], async (ctx, next) => {
     let self = await cloud.callFunction('userApi', {
       $url: 'getNormalSelf',
-      opneid: ctx.data.openid
+      openid: ctx.data.openid
     }).result;
     ctx.data.self = self;
 
     await next();
   })
 
-  app.router('publishGoods', async(ctx) => {
+  app.router('publishGoods', async (ctx) => {
     let goods = event.goods;
 
     goods.sellerID = ctx.data.self._id;
@@ -68,7 +68,7 @@ exports.main = async(event, context) => {
       })
   })
 
-  app.router('getOngoingGoods', async(ctx) => {
+  app.router('getOngoingGoods', async (ctx) => {
     let goodsList = [];
     let data = [];
     let skip = 0;
@@ -92,7 +92,7 @@ exports.main = async(event, context) => {
     ctx.body = goodsList;
   })
 
-  app.router('deleteGoods', async(ctx) => {
+  app.router('deleteGoods', async (ctx) => {
     await ctx.data.goodsCollection
       .where({
         _id: event.goodsID,
@@ -105,8 +105,8 @@ exports.main = async(event, context) => {
       })
   })
 
-  app.router('purchase', async(ctx) => {
-    
+  app.router('purchase', async (ctx) => {
+
   })
 
   return app.serve();

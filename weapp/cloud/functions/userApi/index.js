@@ -15,9 +15,9 @@ exports.main = async (event, context) => {
   app.use(async (ctx, next) => {
     console.log('----------> 进入 userApi 全局中间件')
     ctx.data = {}
-    ctx.data.openid = cloud.getWXContext().OPENID
+    ctx.data.openid = event.openid | cloud.getWXContext().OPENID
     ctx.data.userCollection = db.collection('user')
-    
+
     await next();
     console.log('----------> 退出 userApi 全局中间件')
   })
@@ -27,7 +27,7 @@ exports.main = async (event, context) => {
   app.router(['getUserInfo'], async (ctx, next) => {
     let self = await getNormalSelf(ctx.data.openid);
     ctx.data.self = self;
-    
+
     await next();
   })
 
@@ -122,7 +122,7 @@ async function getNormalSelf(openid) {
 
   let self = data[0];
 
-  if (self.state === UserState.Forzen) {
+  if (self.state === UserState.Frozen) {
     throw {
       code: HttpCode.Forbidden,
       message: '您的帐号已被冻结，请联系管理员解冻'
@@ -137,7 +137,7 @@ async function getNormalSelf(openid) {
 const UserState = {
   UnRegistered: 0, // 未注册
   Normal: 1,
-  Forzen: 2, // 被管理员冻结
+  Frozen: 2, // 被管理员冻结
 }
 
 const HttpCode = {

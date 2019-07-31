@@ -7,12 +7,12 @@ cloud.init()
 const db = cloud.database()
 
 // 云函数入口函数
-exports.main = async(event, context) => {
+exports.main = async (event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async(ctx, next) => {
+  app.use(async (ctx, next) => {
     console.log('----------> 进入 orderApi 全局中间件')
     ctx.data = {}
     ctx.data.openid = cloud.getWXContext().OPENID
@@ -22,21 +22,21 @@ exports.main = async(event, context) => {
     console.log('----------> 退出 orderApi 全局中间件')
   })
 
-  app.router(['accept', 'getBuyerOrders', 'getSellerOrders'], async(ctx, next) => {
+  app.router(['accept', 'getBuyerOrders', 'getSellerOrders'], async (ctx, next) => {
     let self = await cloud.callFunction('userApi', {
       $url: 'getNormalSelf',
-      opneid: ctx.data.openid
+      openid: ctx.data.openid
     }).result;
     ctx.data.self = self;
 
     await next();
   })
 
-  app.router('accept', async(ctx) => {
+  app.router('accept', async (ctx) => {
 
   })
 
-  app.router('getBuyerOrders', async(ctx) => {
+  app.router('getBuyerOrders', async (ctx) => {
     let result = await ctx.data.orderCollection
       .where({
         buyerID: ctx.data.self._id,
@@ -50,7 +50,7 @@ exports.main = async(event, context) => {
   })
 
 
-  app.router('getSellerOrders', async(ctx) => {
+  app.router('getSellerOrders', async (ctx) => {
     let result = await ctx.data.orderCollection
       .where({
         sellerID: ctx.data.self._id,

@@ -8,12 +8,12 @@ const db = cloud.database()
 const command = db.command()
 
 // 云函数入口函数
-exports.main = async(event, context) => {
+exports.main = async (event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async(ctx, next) => {
+  app.use(async (ctx, next) => {
     console.log('----------> 进入 circleApi 全局中间件')
     ctx.data = {}
     ctx.data.openid = cloud.getWXContext().OPENID
@@ -23,17 +23,17 @@ exports.main = async(event, context) => {
     console.log('----------> 退出 circleApi 全局中间件')
   })
 
-  app.router(['publishPost', 'comment'], async(ctx, next) => {
+  app.router(['publishPost', 'comment'], async (ctx, next) => {
     let self = await cloud.callFunction('userApi', {
       $url: 'getNormalSelf',
-      opneid: ctx.data.openid
+      openid: ctx.data.openid
     }).result;
     ctx.data.self = self;
 
     await next();
   })
 
-  app.router('publish', async(ctx) => {
+  app.router('publish', async (ctx) => {
     let post = event.post;
 
     post.ownerID = user._id
@@ -48,7 +48,7 @@ exports.main = async(event, context) => {
       })
   })
 
-  app.router('comment', async(ctx) => {
+  app.router('comment', async (ctx) => {
     await ctx.data.postCollection
       .doc(event.postID)
       .update({
