@@ -10,14 +10,6 @@ public enum HttpCode {
      */
     SUCCESS,
     /**
-     * 403
-     */
-    FORBIDDEN,
-    /**
-     * 404
-     */
-    NOT_FOUND,
-    /**
      * 500
      */
     FAIL,

@@ -1,22 +1,21 @@
 package nju.secondhand.service.impl;
 
+import com.google.common.collect.ImmutableMap;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.service.GoodsService;
 import nju.secondhand.vo.CategoryVO;
 import nju.secondhand.vo.GoodsVO;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author cst
  */
 @Service
 public class GoodsServiceImpl implements GoodsService {
-    private static final String CATEGORY_COLLECTION_NAME = "category";
-    private static final String GOODS_COLLECTION_NAME = "goods";
+    private static final String GOODS_API = "goodsApi";
     private final CloudService cloudService;
 
     public GoodsServiceImpl(CloudService cloudService) {
@@ -25,30 +24,44 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public List<CategoryVO> getCategories() {
-        List<CategoryVO> categoryVOs = new ArrayList<>();
-        List<CategoryVO> data;
-        int skip = 0;
-        int limit = 10;
-        do {
-            data = cloudService.databaseQuery(CategoryVO.class, CATEGORY_COLLECTION_NAME, skip, limit, Collections.emptyMap());
-            categoryVOs.addAll(data);
-            skip += limit;
-        } while (data.size() >= limit);
-        return categoryVOs;
+        Map<Object, Object> map = ImmutableMap.builder()
+                .put("$url", "getCategories")
+                .build();
+        //noinspection unchecked
+        return cloudService.invokeCloudFunction(List.class, GOODS_API, map);
     }
 
     @Override
     public List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size) {
-        return null;
+        Map<Object, Object> map = ImmutableMap.builder()
+                .put("$url", "searchGoodsByKeyword")
+                .put("keyword", keyword)
+                .put("lastIndex", lastIndex)
+                .put("size", size)
+                .build();
+        //noinspection unchecked
+        return cloudService.invokeCloudFunction(List.class, GOODS_API, map);
     }
 
     @Override
     public List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size) {
-        return null;
+        Map<Object, Object> map = ImmutableMap.builder()
+                .put("$url", "searchGoodsByCategory")
+                .put("categoryID", categoryID)
+                .put("lastIndex", lastIndex)
+                .put("size", size)
+                .build();
+        //noinspection unchecked
+        return cloudService.invokeCloudFunction(List.class, GOODS_API, map);
     }
 
     @Override
     public void deleteGoods(String goodsID) {
-
+        Map<Object, Object> map = ImmutableMap.builder()
+                .put("$url", "deleteGoods")
+                .put("by", "admin")
+                .put("goodsID", goodsID)
+                .build();
+        cloudService.invokeCloudFunction(Void.class, GOODS_API, map);
     }
 }

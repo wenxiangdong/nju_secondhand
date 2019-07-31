@@ -29,11 +29,10 @@ public class ComplaintServiceImpl implements ComplaintService {
         Map<Object, Object> map =
                 ImmutableMap.builder()
                         .put("$url", "getComplaints")
-                        .put("data", ImmutableMap.builder()
-                                .put("keyword", keyword)
-                                .put("lastIndex", lastIndex)
-                                .put("size", size)
-                                .build())
+                        .put("by", "admin")
+                        .put("keyword", keyword)
+                        .put("lastIndex", lastIndex)
+                        .put("size", size)
                         .build();
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, COMPLAINT_API, map);
@@ -43,11 +42,12 @@ public class ComplaintServiceImpl implements ComplaintService {
     public void handle(String complaintID, String result) {
         Map<Object, Object> map =
                 ImmutableMap.builder()
+                        .put("$url", "handleComplaint")
                         .put("handling", ImmutableMap.builder()
                                 .put("time", System.currentTimeMillis())
                                 .put("result", result)
                                 .build())
                         .build();
-        cloudService.databaseUpdateOne(COMPLAINT_COLLECTION_NAME, complaintID, map);
+        cloudService.invokeCloudFunction(Void.class, COMPLAINT_API, map);
     }
 }

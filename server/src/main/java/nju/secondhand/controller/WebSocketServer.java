@@ -50,7 +50,7 @@ public class WebSocketServer {
     @OnMessage
     public void onMessage(String message) {
         MessageDTO messageDTO = new Gson().fromJson(message, MessageDTO.class);
-        
+
         Map<String, Object> map = new HashMap<>(2);
         map.put("$url", "addMessage");
         map.put("data", messageDTO);
