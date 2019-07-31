@@ -1,0 +1,43 @@
+package nju.secondhand.controller;
+
+import nju.secondhand.response.HttpResponse;
+import nju.secondhand.service.GoodsService;
+import nju.secondhand.vo.CategoryVO;
+import nju.secondhand.vo.GoodsVO;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * @author cst
+ */
+@RestController
+@CrossOrigin(value = "*", methods = {RequestMethod.GET, RequestMethod.POST}, allowCredentials = "true")
+public class GoodsController {
+    private final GoodsService goodsService;
+
+    public GoodsController(GoodsService goodsService) {
+        this.goodsService = goodsService;
+    }
+
+    @GetMapping("/getCategories")
+    public HttpResponse<List<CategoryVO>> getCategories() {
+        return new HttpResponse<>(goodsService.getCategories());
+    }
+
+    @GetMapping("/getGoodsByKeyword")
+    public HttpResponse<List<GoodsVO>> getGoodsByKeyword(String keyword, int lastIndex, int size) {
+        return new HttpResponse<>(goodsService.getGoodsByKeyword(keyword, lastIndex, size));
+    }
+
+    @GetMapping("/getGoodsByCategory")
+    public HttpResponse<List<GoodsVO>> getGoodsByCategory(String categoryID, int lastIndex, int size) {
+        return new HttpResponse<>(goodsService.getGoodsByCategory(categoryID, lastIndex, size));
+    }
+
+    @PostMapping("/deleteGoods")
+    public HttpResponse<Void> deleteGoods(String goodsID) {
+        goodsService.deleteGoods(goodsID);
+        return new HttpResponse<>();
+    }
+}
