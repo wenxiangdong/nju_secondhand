@@ -26,8 +26,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderVO> getOrders(String keyword, int lastIndex, int size) {
         Map<Object, Object> map = ImmutableMap.builder()
-                .put("$url", "getOrders")
-                .put("by", "admin")
+                .put("$url", "getOrdersByAdmin")
                 .put("keyword", keyword)
                 .put("lastIndex", lastIndex)
                 .put("size", size)

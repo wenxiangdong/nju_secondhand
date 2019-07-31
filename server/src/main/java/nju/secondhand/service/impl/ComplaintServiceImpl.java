@@ -28,8 +28,7 @@ public class ComplaintServiceImpl implements ComplaintService {
     public List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size) {
         Map<Object, Object> map =
                 ImmutableMap.builder()
-                        .put("$url", "getComplaints")
-                        .put("by", "admin")
+                        .put("$url", "getComplaintsByAdmin")
                         .put("keyword", keyword)
                         .put("lastIndex", lastIndex)
                         .put("size", size)
@@ -42,11 +41,9 @@ public class ComplaintServiceImpl implements ComplaintService {
     public void handle(String complaintID, String result) {
         Map<Object, Object> map =
                 ImmutableMap.builder()
-                        .put("$url", "handleComplaint")
-                        .put("handling", ImmutableMap.builder()
-                                .put("time", System.currentTimeMillis())
-                                .put("result", result)
-                                .build())
+                        .put("$url", "handle")
+                        .put("complaintID", complaintID)
+                        .put("result", result)
                         .build();
         cloudService.invokeCloudFunction(Void.class, COMPLAINT_API, map);
     }

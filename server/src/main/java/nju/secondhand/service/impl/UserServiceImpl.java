@@ -26,34 +26,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserVO> getNormalUsers(String keyword, int lastIndex, int size) {
-        Map<Object, Object> map = ImmutableMap.builder()
-                .put("$url", "getUsers")
-                .put("type", UserState.Normal)
-                .put("keyword", keyword)
-                .put("lastIndex", lastIndex)
-                .put("size", size)
-                .build();
-        //noinspection unchecked
-        return cloudService.invokeCloudFunction(List.class, USER_API, map);
+        return getUsers(UserState.Normal, keyword, lastIndex, size);
+
     }
 
     @Override
     public void freezeUser(String userID) {
-        Map<Object, Object> map = ImmutableMap.builder()
-                .put("$url", "update")
-                .put("userID", userID)
-                .put("data", ImmutableMap.builder()
-                        .put("type", UserState.Frozen).build())
-                .build();
-
-        cloudService.invokeCloudFunction(Void.class, USER_API, map);
+        updateUser(UserState.Frozen, userID);
     }
 
     @Override
     public List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size) {
+        return getUsers(UserState.Frozen, keyword, lastIndex, size);
+    }
+
+    @Override
+    public void unfreezeUser(String userID) {
+        updateUser(UserState.Normal, userID);
+    }
+
+    private List<UserVO> getUsers(UserState userState, String keyword, int lastIndex, int size) {
         Map<Object, Object> map = ImmutableMap.builder()
-                .put("$url", "getUsers")
-                .put("type", UserState.Frozen)
+                .put("$url", "getUsersByAdmin")
+                .put("state", userState)
                 .put("keyword", keyword)
                 .put("lastIndex", lastIndex)
                 .put("size", size)
@@ -62,13 +57,11 @@ public class UserServiceImpl implements UserService {
         return cloudService.invokeCloudFunction(List.class, USER_API, map);
     }
 
-    @Override
-    public void unfreezeUser(String userID) {
+    private void updateUser(UserState userState, String userID) {
         Map<Object, Object> map = ImmutableMap.builder()
-                .put("$url", "update")
+                .put("$url", "updateUserByAdmin")
                 .put("userID", userID)
-                .put("data", ImmutableMap.builder()
-                        .put("type", UserState.Normal).build())
+                .put("state", userState)
                 .build();
 
         cloudService.invokeCloudFunction(Void.class, USER_API, map);

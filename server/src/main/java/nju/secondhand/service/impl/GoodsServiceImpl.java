@@ -58,8 +58,7 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public void deleteGoods(String goodsID) {
         Map<Object, Object> map = ImmutableMap.builder()
-                .put("$url", "deleteGoods")
-                .put("by", "admin")
+                .put("$url", "deleteGoodsByAdmin")
                 .put("goodsID", goodsID)
                 .build();
         cloudService.invokeCloudFunction(Void.class, GOODS_API, map);
