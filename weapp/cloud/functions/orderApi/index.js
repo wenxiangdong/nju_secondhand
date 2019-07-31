@@ -6,6 +6,8 @@ cloud.init()
 
 const db = cloud.database()
 
+const command = db.command
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   const app = new TcbRounter({
@@ -27,13 +29,39 @@ exports.main = async (event, context) => {
       $url: 'getNormalSelf',
       openid: ctx.data.openid
     }).result;
-    ctx.data.self = self;
+    ctx.data.self = JSON.parse(self);
 
     await next();
   })
 
   app.router('accept', async (ctx) => {
 
+  })
+
+  app.router('getOrdersByAdmin', async (ctx) => {
+    let result = await ctx.data.orderCollection
+      .where(command
+        .or([{
+          goodsName: db.RegExp({
+            regexp: event.keyword,
+            options: 'i',
+          })
+        }, {
+          sellerName: db.RegExp({
+            regexp: event.keyword,
+            options: 'i',
+          })
+        }, {
+          buyerName: db.RegExp({
+            regexp: event.keyword,
+            options: 'i',
+          })
+        },]))
+      .skip(event.lastIndex)
+      .limit(event.size)
+      .get()
+
+    ctx.body = result.data
   })
 
   app.router('getBuyerOrders', async (ctx) => {

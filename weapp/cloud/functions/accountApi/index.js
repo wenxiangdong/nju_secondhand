@@ -27,7 +27,7 @@ exports.main = async (event, context) => {
       $url: 'getNormalSelf',
       openid: ctx.data.openid
     }).result;
-    ctx.data.self = self;
+    ctx.data.self = JSON.parse(self);
 
     await next();
   })

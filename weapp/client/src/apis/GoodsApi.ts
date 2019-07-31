@@ -32,33 +32,12 @@ export interface IGoodsApi {
   purchase(goodsID: string): Promise<void>;
 }
 
-const categoryCollection = db.collection('category');
 const goodsCollection = db.collection('goods');
 const functionName = 'goodsApi';
 
 class GoodsApi implements IGoodsApi {
   async getCategories(): Promise<CategoryVO[]> {
-    let categories: CategoryVO[] = [];
-    let skip = 0;
-    const limit = 20;
-
-    let data: Array<any>;
-    while (data = (await categoryCollection
-      .skip(skip)
-      .limit(limit)
-      .get())
-      .data) {
-
-      categories = categories.concat(data);
-
-      if (data.length < limit) {
-        break;
-      }
-
-      skip += limit;
-    }
-
-    return categories;
+    return await httpRequest.callFunction<CategoryVO[]>(functionName, { $url: 'getCategories' });
   }
   async publishGoods(goods: GoodsDTO): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: 'publishGoods', goods });
@@ -67,42 +46,14 @@ class GoodsApi implements IGoodsApi {
     return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "getOngoingGoods" });
   }
   async deleteGoods(goodsID: string): Promise<void> {
+    
     return await httpRequest.callFunction<void>(functionName, { $url: "deleteGoods", goodsID });
   }
   async searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-    return copy<GoodsVO[]>((await goodsCollection
-      .where(
-        command
-          .or([
-            // @ts-ignore
-            { name: db.RegExp({ regexp: keyword, options: 'i', }) },
-            {
-              category: {
-                // @ts-ignore
-                name: db.RegExp({ regexp: keyword, options: 'i' })
-              }
-            }
-          ])
-          .and({ state: GoodsState.InSale })
-      )
-      .skip(lastIndex)
-      .limit(size)
-      .get())
-      .data)
-
+    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByKeyword", keyword, lastIndex, size });
   }
   async searchGoodsByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-    return copy<GoodsVO[]>((await goodsCollection
-      .where({
-        category: {
-          _id: categoryID
-        },
-        state: GoodsState.InSale
-      })
-      .skip(lastIndex)
-      .limit(size)
-      .get())
-      .data)
+    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByCategory", categoryID, lastIndex, size });
   }
   async purchase(goodsID: string): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "purchase", goodsID });

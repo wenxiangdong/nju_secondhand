@@ -5,6 +5,7 @@ const TcbRounter = require('tcb-router')
 cloud.init()
 
 const db = cloud.database()
+const command = db.command
 
 // 云函数入口函数
 exports.main = async (event, context) => {
@@ -27,7 +28,7 @@ exports.main = async (event, context) => {
       $url: 'getNormalSelf',
       openid: ctx.data.openid
     }).result;
-    ctx.data.self = self;
+    ctx.data.self = JSON.parse(self);
 
     await next();
   })
@@ -62,10 +63,48 @@ exports.main = async (event, context) => {
     ctx.body = result.data
   })
 
+  app.router('getComplaintsByAdmin', async (ctx) => {
+    let result = await ctx.data.complaintCollection
+      .where({
+        desc: db.RegExp({
+          regexp: event.keyword,
+          options: 'i'
+        })
+      })
+      .skip(event.lastIndex)
+      .limit(event.size)
+      .get()
+
+    ctx.body = result.data
+  })
+
+  app.router('handle', async (ctx) => {
+    await ctx.data.complaintCollection
+      .where({
+        _id: event.complaintID,
+        state: ComplaintState.Ongoing
+      }).update({
+        data: {
+          handling: {
+            time: Date.now(),
+            result: event.result
+          },
+          state: ComplaintState.Handled
+        }
+      })
+  })
+
   return app.serve();
 }
 
 const ComplaintState = {
   Ongoing: 0,
   Handled: 1
+}
+
+const HttpCode = {
+  Forbidden: 403, // 403
+  Not_Found: 404, // 404
+  Conflict: 409, // 409 冲突
+  Fail: 500 // 500
 }

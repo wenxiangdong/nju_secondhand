@@ -6,6 +6,8 @@ cloud.init()
 
 const db = cloud.database()
 
+const command = db.command
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   const app = new TcbRounter({
@@ -52,7 +54,7 @@ exports.main = async (event, context) => {
   app.router('login', async (ctx) => {
     let result = await ctx.data.userCollection
       .where({
-        _openid: openid
+        _openid: ctx.data.openid
       })
       .limit(1)
       .get();
@@ -96,6 +98,46 @@ exports.main = async (event, context) => {
 
   app.router('getNormalSelf', async (ctx) => {
     ctx.body = await getNormalSelf(ctx.data.openid)
+  })
+
+  app.router('getUsersByAdmin', async (ctx) => {
+    let result = await ctx.data.userCollection
+      .where(command
+        .or([{
+          nickname: db.RegExp({
+            regexp: event.keyword,
+            options: 'i',
+          }),
+        }, {
+          phone: db.RegExp({
+            regexp: event.keyword,
+            options: 'i',
+          }),
+        }, {
+          email: db.RegExp({
+            regexp: event.keyword,
+            options: 'i',
+          }),
+        }]).and({
+          state: event.state
+        }))
+      .skip(event.lastIndex)
+      .limit(event.size)
+      .get()
+
+    ctx.body = result.data
+  })
+
+  app.router("updateUserByAdmin", async (ctx) => {
+    await ctx.data.userCollection
+      .where({
+        _id: event.userID,
+      })
+      .update({
+        data: {
+          state: event.state
+        }
+      })
   })
 
   return app.serve();

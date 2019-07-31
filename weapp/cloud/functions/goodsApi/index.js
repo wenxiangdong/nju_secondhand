@@ -6,6 +6,8 @@ cloud.init()
 
 const db = cloud.database()
 
+const command = db.command
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   const app = new TcbRounter({
@@ -30,9 +32,76 @@ exports.main = async (event, context) => {
       $url: 'getNormalSelf',
       openid: ctx.data.openid
     }).result;
-    ctx.data.self = self;
+    ctx.data.self = JSON.parse(self);
 
     await next();
+  })
+
+  app.router('getCategories', async (ctx) => {
+    let categories = [];
+    let skip = 0;
+    const limit = 20;
+
+    let data;
+    while (data = (await ctx.data.categoryCollection
+      .skip(skip)
+      .limit(limit)
+      .get())
+      .data) {
+
+      categories = categories.concat(data);
+
+      if (data.length < limit) {
+        break;
+      }
+
+      skip += limit;
+    }
+
+    ctx.body = categories;
+  })
+
+  app.router('searchGoodsByKeyword', async (ctx) => {
+    let result = await ctx.data.goodsCollection
+      .where(
+        command
+          .or([{
+            name: db.RegExp({
+              regexp: event.keyword,
+              options: 'i',
+            })
+          },
+          {
+            category: {
+              name: db.RegExp({
+                regexp: event.keyword,
+                options: 'i'
+              })
+            }
+          }
+          ])
+          .and({
+            state: GoodsState.InSale
+          })
+      )
+      .skip(event.lastIndex)
+      .limit(evrnt.size)
+      .get()
+    ctx.body = result.data
+  })
+
+  app.router('searchGoodsByCategory', async (ctx) => {
+    let result = await goodsCollection
+      .where({
+        category: {
+          _id: categoryID
+        },
+        state: GoodsState.InSale
+      })
+      .skip(lastIndex)
+      .limit(size)
+      .get()
+    ctx.body = result.data
   })
 
   app.router('publishGoods', async (ctx) => {
@@ -97,6 +166,19 @@ exports.main = async (event, context) => {
       .where({
         _id: event.goodsID,
         sellerID: ctx.data.self._id,
+      })
+      .update({
+        data: {
+          state: GoodsState.Deleted
+        }
+      })
+  })
+
+
+  app.router('deleteGoodsByAdmin', async (ctx) => {
+    await ctx.data.goodsCollection
+      .where({
+        _id: event.goodsID,
       })
       .update({
         data: {
