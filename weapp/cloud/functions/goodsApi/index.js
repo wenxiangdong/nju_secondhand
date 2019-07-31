@@ -94,7 +94,7 @@ exports.main = async (event, context) => {
     let result = await goodsCollection
       .where({
         category: {
-          _id: categoryID
+          _id: event.categoryID
         },
         state: GoodsState.InSale
       })
