@@ -1,6 +1,0 @@
-mini-program:
-  appID: wx709c7e8a1ee79dce
-  appSecret: b8d326365aa3be816653a194d4175de2
-  env: first-57afbf
-server:
-  port: 18080
