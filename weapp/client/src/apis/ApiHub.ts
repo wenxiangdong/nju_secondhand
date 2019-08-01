@@ -41,6 +41,6 @@ class MockApiHub implements IApiHub {
   userApi: IUserApi = mockUserApi;
 }
 
-const mock = true;
+export const mock = true;
 let apiHub: IApiHub = mock ? new MockApiHub() : new ApiHub();
 export { apiHub };

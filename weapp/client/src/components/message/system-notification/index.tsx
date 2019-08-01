@@ -6,7 +6,7 @@ import {View} from "@tarojs/components";
 import urlList from "../../../utils/url-list";
 
 
-export function SystemNotification() {
+export default function SystemNotification() {
   const handleClick = () => {
     Taro.navigateTo({
       url: urlList.MESSAGE_SYSTEM,

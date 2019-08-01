@@ -2,6 +2,7 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import Index from './pages/index'
 
 import './app.scss'
+import messageHub from "./apis/MessageApi";
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -63,9 +64,23 @@ class App extends Component {
     if (process.env.TARO_ENV === 'weapp') {
       Taro.cloud.init()
     }
+
+    this.initWebsocket();
   }
 
-  componentDidShow () {}
+  initWebsocket() {
+    // 记得在要有消息通知的页面，引用  <AtMessage />
+    messageHub.subscribe((vo) => {
+      Taro.atMessage({
+        message: `收到一条来自 ${vo.senderName} 的消息`
+      })
+    });
+  }
+
+
+  componentDidShow () {
+
+  }
 
   componentDidHide () {}
 
