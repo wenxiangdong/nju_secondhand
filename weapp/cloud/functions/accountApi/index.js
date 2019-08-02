@@ -71,6 +71,21 @@ const pay = async (openID) => {
   try {
     const res = await wx.payment.unifiedOrder(defaultInfo);
     console.log(res);
+    const {prepay_id} = res;
+    const toSign = {
+      appId: APP_CONFIG.APP_ID,
+      signType: Payment.SIGN_TYPE.MD5,
+      package: `prepay_id=${$prepay_id}`,
+      nonceStr: nonceStr,
+      timeStamp: +new Date()
+    };
+    // 再次签名
+    const paySign = wx.payment.generateSignature(toSign);
+    // 返回给小程序，直接可以利用这些数据发起支付
+    ctx.body = {
+      ...toSign,
+      paySign
+    };
   } catch (e) {
     console.error(e);
     throw {
