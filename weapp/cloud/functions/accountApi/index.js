@@ -66,7 +66,7 @@ const pay = async (openID) => {
     nonce_str: nonceStr,
     sign_type: Payment.SIGN_TYPE.MD5
   };
-  console.log(defaultInfo);
+  console.log(defaultInfo, APP_CONFIG);
   
   try {
     const res = await wx.payment.unifiedOrder(defaultInfo);
@@ -83,10 +83,14 @@ const pay = async (openID) => {
 
 
 const APP_CONFIG = {
-  APP_ID: "wx8e5c5b550a9d9874",
-  APP_SECRET: "ca5fbd48dfa1a22282998e2ffcd4ecbf",
-  ACCOUNT: "1512752051",
-  KEY: "shenghuokexuejiaoshi123456789123"
+  // APP_ID: "wx8e5c5b550a9d9874", // kefubao
+  APP_ID: "wxc4e156082fbd97ba",
+  // APP_SECRET: "ca5fbd48dfa1a22282998e2ffcd4ecbf", // kefubao
+  APP_SECRET: "08c5dba9b8e3f52eded6f4c9a0ad4650",
+  // ACCOUNT: "1512752051", // kefubao
+  ACCOUNT: "1521513131",
+  // KEY: "shenghuokexuejiaoshi123456789123",  // kefubao
+  KEY: "ljxst2018!"
 };
 
 const WECHAT_CONFIG = {
@@ -99,7 +103,7 @@ const WECHAT_CONFIG = {
   merchantId: APP_CONFIG.ACCOUNT, //商户ID
   paymentSandBox: false, //沙箱模式，验收用例
   paymentKey: APP_CONFIG.KEY, //必传，验签密钥，TIP:获取沙箱密钥也需要真实的密钥，所以即使在沙箱模式下，真实验签密钥也需要传入。
-  //pfx 证书
+  //pfx 证书 这个可以先随便填
   paymentCertificatePfx: "hhh",
   //默认微信支付通知地址
   paymentNotifyUrl: `http://your.domain.com/api/wechat/payment/`,
