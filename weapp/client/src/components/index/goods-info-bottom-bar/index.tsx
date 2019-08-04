@@ -25,13 +25,13 @@ function GoodsInfoBottomBar(props: IProp) {
 
   const buy = function () {
     Taro.navigateTo({
-      url: buyUrlConfig.createChatUrl(goodsWithSeller.goods._id)
+      url: buyUrlConfig.createUrl(goodsWithSeller.goods._id)
     }).catch(onError);
   };
 
   const chat = function () {
     Taro.navigateTo({
-      url: chatUrlConfig.createChatUrl(goodsWithSeller.seller._id)
+      url: chatUrlConfig.createUrl(goodsWithSeller.seller._id)
     }).catch(onError);
   };
 

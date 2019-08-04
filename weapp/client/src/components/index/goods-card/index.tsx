@@ -87,7 +87,7 @@ function GoodsCard(props: IProp) {
 
     const onClick = function () {
       Taro.navigateTo({
-        url: goodsInfoUrlConfig.createGoodsInfoUrl(goods._id)
+        url: goodsInfoUrlConfig.createUrl(goods._id)
       }).catch(onError);
     };
 

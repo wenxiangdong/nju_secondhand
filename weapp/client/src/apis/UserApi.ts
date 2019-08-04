@@ -82,10 +82,10 @@ class MockUserApi implements IUserApi {
 
   static createMockLocation(): Location {
     return {
-      name: 'address-name',
-      address: 'address-address',
-      latitude: '1',
-      longitude: '1'
+      longitude: '113.324520',
+      latitude: '23.099994',
+      name: 'testLocation',
+      address: 'testAddress'
     };
   }
 

@@ -5,6 +5,8 @@ import {AtIcon} from "taro-ui";
 
 import "taro-ui/dist/style/components/flex.scss";
 import "./index.scss"
+import {locationUrlConfig} from "../../../utils/url-list";
+import {createSimpleErrorHandler} from "../../../utils/function-factory";
 
 interface IProp {
   address: Location
@@ -17,13 +19,16 @@ interface IProp {
  */
 function AddressShowBar(props: IProp) {
   const {address = MockUserApi.createMockLocation()} = props;
-  const {name} = address;
+
+  const onError = createSimpleErrorHandler('GoodsInfoBottomBar', undefined);
 
   const onClick = function () {
-    // TODO 优先级 中
-    // 跳转到地图
-    console.log("查看位置 onclick TODO!");
+    Taro.navigateTo({
+      url: locationUrlConfig.createUrl(address)
+    }).catch(onError);
   };
+
+  const {name} = address;
 
   return (
     <View className='at-row at-row__justify--between address-show-bar-view' onClick={onClick}>
