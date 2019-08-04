@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @EqualsAndHashCode
 public class WebSocketServer {
     private final CloudService cloudService;
-    private static final Map<String, WebSocketServer> webSocketServers = new ConcurrentHashMap<>();
+    private static final Map<String, WebSocketServer> WEB_SOCKET_SERVERS = new ConcurrentHashMap<>();
 
     private String uid;
     private Session session;
@@ -39,12 +39,12 @@ public class WebSocketServer {
         this.uid = uid;
         this.session = session;
 
-        webSocketServers.put(uid, this);
+        WEB_SOCKET_SERVERS.put(uid, this);
     }
 
     @OnClose
     public void onClose() {
-        webSocketServers.remove(this.uid);
+        WEB_SOCKET_SERVERS.remove(this.uid);
     }
 
     @OnMessage
@@ -56,7 +56,7 @@ public class WebSocketServer {
         map.put("data", messageDTO);
         MessageVO messageVO = cloudService.invokeCloudFunction(MessageVO.class, "messageApi", map);
 
-        WebSocketServer receiver = webSocketServers.get(messageDTO.receiverID);
+        WebSocketServer receiver = WEB_SOCKET_SERVERS.get(messageDTO.receiverID);
         if (receiver != null) {
             receiver.session.getAsyncRemote().sendText(new Gson().toJson(messageVO));
         }
