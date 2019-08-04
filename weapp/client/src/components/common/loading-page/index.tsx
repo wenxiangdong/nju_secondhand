@@ -15,12 +15,13 @@ interface IProp {
  */
 function LoadingPage(props: IProp) {
   const {errMsg} = props;
-  const windowHeight = localConfig.getSystemSysInfo().windowHeight;
+  const sysInfo = localConfig.getSystemSysInfo();
+  const {windowHeight, windowWidth} = sysInfo;
   return (
     errMsg
       ? (<AtToast isOpened text={errMsg}/>)
       : (
-        <View style={{position: 'relative', height: `${windowHeight}px`}}>
+        <View style={{position: 'absolute', left: '0', top: '0', zIndex: 1000, width: `${windowWidth}px`, height: `${windowHeight}px`}}>
           <AtActivityIndicator content='加载中...' size={32} mode='center'/>
         </View>
       )

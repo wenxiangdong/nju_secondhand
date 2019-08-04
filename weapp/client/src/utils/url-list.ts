@@ -60,24 +60,6 @@ class GoodsInfoUrlConfig {
 
 const goodsInfoUrlConfig = new GoodsInfoUrlConfig();
 
-class BuyUrlConfig {
-  private readonly GOODS_ID = 'goods_id';
-
-  public createUrl(id): string {
-    return encodeURI(`${urlList.INDEX_BUY}?${this.GOODS_ID}=${id}`);
-  }
-
-  public getGoodsId(that): string|undefined {
-    try {
-      return that.$router.params[this.GOODS_ID];
-    } catch (e) {
-      console.error('BuyUrlConfig getGoodsId', e);
-    }
-  }
-}
-
-const buyUrlConfig = new BuyUrlConfig();
-
 class LocationUrlConfig {
   private readonly LOCATION = 'location';
 
@@ -119,6 +101,5 @@ export {
   indexSearchUrlConfig,
   goodsInfoUrlConfig,
   chatUrlConfig,
-  buyUrlConfig,
   locationUrlConfig,
 };
