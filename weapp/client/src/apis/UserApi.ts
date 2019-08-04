@@ -1,5 +1,5 @@
 import "@tarojs/async-await";
-import { VO, httpRequest, db, Fail, HttpCode } from "./HttpRequest";
+import {VO, httpRequest, db, Fail, HttpCode, mockHttpRequest} from "./HttpRequest";
 import { AccountVO } from "./AccountApi";
 
 export interface IUserApi {
@@ -75,10 +75,12 @@ class MockUserApi implements IUserApi {
     throw new Error("Method not implemented.");
   }
   getUserInfo(userID: string): Promise<UserVO> {
-    throw new Error("Method not implemented.");
+    let userInfo = MockUserApi.createMockUser();
+    userInfo._id = userID;
+    return mockHttpRequest.success(userInfo);
   }
 
-  private static createMockLocation(): Location {
+  static createMockLocation(): Location {
     return {
       name: 'address-name',
       address: 'address-address',
@@ -87,7 +89,7 @@ class MockUserApi implements IUserApi {
     };
   }
 
-  private static createMockAccount(account:number|string): AccountVO {
+  static createMockAccount(account:number|string): AccountVO {
     return {
       balance: Number(account).toFixed(2)
     };

@@ -5,7 +5,9 @@ const urlList = {
   INDEX_SEARCH_RESULT: '/pages/index/search-result/index',
   INDEX_CATEGORY_GOODS: '/pages/index/category-goods/index',
   INDEX_GOODS_INFO: '/pages/index/goods-info/index',
+  INDEX_BUY: '/pages/index/buy/index',
   MESSAGE: '/pages/message/index',
+  MESSAGE_CHAT: '/pages/message/chat/index',
   MY: '/pages/my/index',
   MY_VISITED:'/pages/my/my-visited/index',
   MY_BOUGHT:'/pages/my/my-bought/index',
@@ -40,7 +42,7 @@ const indexSearchUrlConfig = new IndexSearchUrlConfig();
 class GoodsInfoUrlConfig {
   private readonly GOODS_ID = 'goods_id';
 
-  public createIndexSearchUrl(id): string {
+  public createGoodsInfoUrl(id): string {
     return encodeURI(`${urlList.INDEX_GOODS_INFO}?${this.GOODS_ID}=${id}`);
   }
 
@@ -55,8 +57,46 @@ class GoodsInfoUrlConfig {
 
 const goodsInfoUrlConfig = new GoodsInfoUrlConfig();
 
+class BuyUrlConfig {
+  private readonly GOODS_ID = 'goods_id';
+
+  public createChatUrl(id): string {
+    return encodeURI(`${urlList.INDEX_BUY}?${this.GOODS_ID}=${id}`);
+  }
+
+  public getGoodsId(that): string|undefined {
+    try {
+      return that.$router.params[this.GOODS_ID];
+    } catch (e) {
+      console.error('ChatUrlConfig getUserId', e);
+    }
+  }
+}
+
+const buyUrlConfig = new BuyUrlConfig();
+
+class ChatUrlConfig {
+  private readonly USER_ID = 'user_id';
+
+  public createChatUrl(id): string {
+    return encodeURI(`${urlList.MESSAGE_CHAT}?${this.USER_ID}=${id}`);
+  }
+
+  public getUserId(that): string|undefined {
+    try {
+      return that.$router.params[this.USER_ID];
+    } catch (e) {
+      console.error('ChatUrlConfig getUserId', e);
+    }
+  }
+}
+
+const chatUrlConfig = new ChatUrlConfig();
+
 export default urlList;
 export {
   indexSearchUrlConfig,
-  goodsInfoUrlConfig
+  goodsInfoUrlConfig,
+  chatUrlConfig,
+  buyUrlConfig
 };

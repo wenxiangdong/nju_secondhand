@@ -28,6 +28,12 @@ export interface IGoodsApi {
   // 种类搜索商品和销售者信息
   searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>;
 
+  // 通过 id 获取商品和销售者信息
+  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO>;
+
+  // 通过 Id 获取商品信息
+  getGoods(goodsID: string): Promise<GoodsVO>;
+
   // 购买商品
   purchase(goodsID: string): Promise<void>;
 }
@@ -46,7 +52,7 @@ class GoodsApi implements IGoodsApi {
     return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "getOngoingGoods" });
   }
   async deleteGoods(goodsID: string): Promise<void> {
-    
+
     return await httpRequest.callFunction<void>(functionName, { $url: "deleteGoods", goodsID });
   }
   async searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
@@ -84,6 +90,20 @@ class GoodsApi implements IGoodsApi {
     }
     return goodsWithSellerVOs;
   }
+
+  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO> {
+    // TODO 优先级 低 接口添加
+    // 求后端小哥加通过 id 获取 VO 的接口
+    // 加完记得顺便改一下文档 ❤❤❤
+    // 其他用 id 获取 VO 的接口暂时还不急
+    throw new Error("Method not implemented." + categoryID);
+  }
+
+  getGoods(goodsID: string): Promise<GoodsVO> {
+    // TODO 优先级 低 接口添加
+    // 同上
+    throw new Error("Method not implemented." + categoryID);
+  }
 }
 
 class MockGoodsApi implements IGoodsApi {
@@ -116,7 +136,7 @@ class MockGoodsApi implements IGoodsApi {
     } else {
       const goodsArray: GoodsVO[] = new Array(size).fill(null)
         .map(() => {
-        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        let goods: GoodsVO = MockGoodsApi.createMockGoods();
         goods.name += keyword;
         return goods;
       });
@@ -129,7 +149,7 @@ class MockGoodsApi implements IGoodsApi {
     } else {
       const goodsArray: GoodsVO[] = new Array(size).fill(null)
         .map(() => {
-        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        let goods: GoodsVO = MockGoodsApi.createMockGoods();
         goods.category._id = categoryID;
         return goods;
       });
@@ -147,7 +167,7 @@ class MockGoodsApi implements IGoodsApi {
     } else {
       const goodsWithSellerArray: GoodsWithSellerVO[] = new Array(size).fill(null)
         .map(() => {
-        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        let goods: GoodsVO = MockGoodsApi.createMockGoods();
         goods.category._id = categoryID;
         let seller:UserVO = MockUserApi.createMockUser();
         return {seller, goods};
@@ -162,7 +182,7 @@ class MockGoodsApi implements IGoodsApi {
     } else {
       const goodsWithSellerArray: GoodsWithSellerVO[] = new Array(size).fill(null)
         .map(() => {
-        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        let goods: GoodsVO = MockGoodsApi.createMockGoods();
         goods.name += keyword;
         let seller:UserVO = MockUserApi.createMockUser();
         return {seller, goods};
@@ -171,7 +191,20 @@ class MockGoodsApi implements IGoodsApi {
     }
   }
 
-  private static createMockCateGory(): CategoryVO {
+  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO> {
+    let goodsWithSeller = MockGoodsApi.createMockGoodsWithSeller();
+    goodsWithSeller.goods._id = goodsID;
+    goodsWithSeller.seller._id = goodsID;
+    return mockHttpRequest.success(goodsWithSeller);
+  }
+
+  getGoods(goodsID: string): Promise<GoodsVO> {
+    let goods = MockGoodsApi.createMockGoods();
+    goods._id = goodsID;
+    return goods;
+  }
+
+  static createMockCateGory(): CategoryVO {
     return {
       _id: '1',
       name: 'category',
@@ -179,7 +212,7 @@ class MockGoodsApi implements IGoodsApi {
     };
   }
 
-  private static createMockGoodsVO(): GoodsVO {
+  static createMockGoods(): GoodsVO {
     return {
       _id: '1',
       sellerID: '',
@@ -193,9 +226,11 @@ class MockGoodsApi implements IGoodsApi {
     };
   }
 
-  private static createMockGoodsWithSeller(): GoodsWithSellerVO {
+  // TODO 优先级 低
+  // 设置为 private
+  static createMockGoodsWithSeller(): GoodsWithSellerVO {
     return {
-      goods: MockGoodsApi.createMockGoodsVO(),
+      goods: MockGoodsApi.createMockGoods(),
       seller: MockUserApi.createMockUser()
     };
   }
