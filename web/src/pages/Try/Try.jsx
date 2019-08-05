@@ -23,7 +23,7 @@ const getData = async (index, offset, keyword) => {
 
 function Try() {
     // hooks
-    const [data, loadMore ,setKeyword] = useLoadMoreWithKeyword({
+    const {data, loadMore ,setKeyword} = useLoadMoreWithKeyword({
         dataSource: (index, offset, keyword) => {
             return getData(index, offset, keyword);
         },

@@ -9,7 +9,7 @@ interface IProp<T> {
 /**
  * 分页加载，使用关键字搜索 逻辑
  * @param props
- * @returns {*[]}
+ * @returns {{data: *, setKeyword: *, loadData: *, setData: *}}
  */
 export default function useLoadMoreWithKeyword(props: IProp) {
 
@@ -25,7 +25,7 @@ export default function useLoadMoreWithKeyword(props: IProp) {
     let dataSourceCurry = curry();
 
     // 使用自定义hook
-    const [data, loadData, reset] = useLoadMore({
+    const {data, loadData, reset, setData} = useLoadMore({
         onSuccess,
         onError,
         dataSource: dataSourceCurry
@@ -37,8 +37,8 @@ export default function useLoadMoreWithKeyword(props: IProp) {
      */
     useEffect( () => {
         dataSourceCurry = curry();
-        loadData({reset: true});
+        reset();
     }, [keyword]);
 
-    return [data, loadData, setKeyword];
+    return {data, loadData, setKeyword, setData};
 }

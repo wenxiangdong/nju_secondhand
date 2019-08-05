@@ -1,6 +1,6 @@
-import React, {ReactNode, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import "./DTable.css";
-import {Button} from "antd";
+import {Button, Divider} from "antd";
 import Logger from "../../utils/logger";
 
 const logger = Logger.getLogger("DTable");
@@ -20,6 +20,7 @@ export default function DTable({columns = [], dataSet = [], onLoad}: IProp = {})
 
     // states
     const [loading, setLoading] = useState(false);
+    
 
     /**
      * 表格头部
@@ -61,6 +62,7 @@ export default function DTable({columns = [], dataSet = [], onLoad}: IProp = {})
         </tbody>
     );
 
+    // handlers
     const handleClickLoad = async () => {
         try {
             setLoading(true);
@@ -85,7 +87,7 @@ export default function DTable({columns = [], dataSet = [], onLoad}: IProp = {})
                     loading={loading}
                     onClick={handleClickLoad}
                     icon={loading ? "loading" : "down-circle"}>
-                    {loading ? "加载中" : "加载更多"}
+                    {loading ? "加载中" : "加载"}
                 </Button>
             </div>
         </div>
