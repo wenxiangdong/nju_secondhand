@@ -35,30 +35,42 @@ exports.main = async (event, context) => {
   })
 
   app.router('withdraw', async (ctx) => {
-
+    
   })
 
+  /**
+   * 参数
+   * payTitle 支付的标题，例“商品xxx”
+   * payAmount 支付的金额，单位为 分
+   * orderID 要保证唯一性，此笔交易的id
+   */
   app.router('pay', async(ctx) => {
     console.log("进入 pay route", ctx.data);
-    await pay(ctx.data.openid);
+    const {payTitle, payAmount, orderID} = event;
+    await pay({openID: ctx.data.openid, payTitle, payAmount, orderID});
   })
 
   return app.serve();
 }
 
-const pay = async (openID) => {
+
+const withdraw = async () => {
+  
+}
+
+const pay = async ({openID, payTitle = "南大小书童闲置物品", payAmount = 0, orderID = ""}) => {
   const wx = new Wechat(WECHAT_CONFIG);
 
   const nonceStr = utils.createNonceStr();
-  const body = `ORDER_测试`;
+  const body = payTitle;
+  orderID = orderID || wx.payment.simpleTradeNo();
 
   const defaultInfo = {
-    device_info: 'wechat_test_web',
-    body: body,
-    attach: '上海分店',
-    total_fee: '101',
+    device_info: 'wechat_web',
+    body: payTitle,
+    total_fee: payAmount,
     spbill_create_ip: '127.0.0.1',
-    goods_tag: 'wx_test',
+    out_trade_no: orderID,
     trade_type: Payment.TRADE_TYPE.JSAPI,
     openid: openID,
     appid: APP_CONFIG.APP_ID,
@@ -105,7 +117,7 @@ const APP_CONFIG = {
   // ACCOUNT: "1512752051", // kefubao
   ACCOUNT: "1521513131",
   // KEY: "shenghuokexuejiaoshi123456789123",  // kefubao
-  KEY: "ljxst2018!"
+  KEY: "ljxst2018！ljxst2018！ljxst2018！"
 };
 
 const WECHAT_CONFIG = {
