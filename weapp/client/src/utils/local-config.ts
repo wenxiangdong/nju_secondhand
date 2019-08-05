@@ -16,6 +16,8 @@ class LocalConfig {
   private readonly KEY = 'nju.weapp.help_config';
   private readonly SYS_INFO = 'nju.weapp.sys_info';
   private readonly CATEGORY = 'nju.weapp.category';
+  private readonly USER_ID = 'nju.weapp.user_id';
+  private readonly WITHDRAW_TIME = 'nju.weapp.withdraw_time';
 
   public isFirstUse(): boolean {
     return !Taro.getStorageSync(this.KEY);
@@ -41,6 +43,22 @@ class LocalConfig {
 
   public getGoodsCategory(): CategoryVO {
     return Taro.getStorageSync(this.CATEGORY);
+  }
+
+  public setUserId(userId: string): void {
+    Taro.setStorageSync(this.USER_ID, userId);
+  }
+
+  public getUserId(): string {
+    return Taro.getStorageSync(this.USER_ID);
+  }
+
+  public setWithdrawTime(time: number): void {
+    Taro.setStorageSync(this.WITHDRAW_TIME, time);
+  }
+
+  public getWithdrawTime(): number {
+    return Taro.getStorageSync(this.WITHDRAW_TIME);
   }
 }
 

@@ -16,14 +16,22 @@ class AccountApi implements IAccountApi {
 
 class MockAccountApi implements IAccountApi {
   withdraw(amount: String): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log(`withdraw success ${amount}`);
+    return Promise.resolve();
+  }
+
+  static createMockAccount(account?:number|string): AccountVO {
+    account = account || '1.01';
+    return {
+      balance: Number(account).toFixed(2)
+    };
   }
 }
 
 let accountApi: IAccountApi = new AccountApi();
 let mockAccountApi: IAccountApi = new MockAccountApi();
 
-export { accountApi, mockAccountApi }
+export { accountApi, mockAccountApi, MockAccountApi }
 
 export interface AccountVO {
   balance: string;

@@ -1,6 +1,6 @@
 import "@tarojs/async-await";
 import {VO, httpRequest, db, Fail, HttpCode, mockHttpRequest} from "./HttpRequest";
-import { AccountVO } from "./AccountApi";
+import {AccountVO, MockAccountApi} from "./AccountApi";
 
 export interface IUserApi {
   // 检查用户状态
@@ -89,12 +89,6 @@ class MockUserApi implements IUserApi {
     };
   }
 
-  static createMockAccount(account:number|string): AccountVO {
-    return {
-      balance: Number(account).toFixed(2)
-    };
-  }
-
   static createMockUser(): UserVO {
     return {
       _id: '1',
@@ -104,7 +98,7 @@ class MockUserApi implements IUserApi {
       avatar: '',
       address: MockUserApi.createMockLocation(),
       email: 'email',
-      account: MockUserApi.createMockAccount(0.01),
+      account: MockAccountApi.createMockAccount(0.01),
       signUpTime: Date.now(),
       state: UserState.Normal
     };
