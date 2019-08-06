@@ -1,7 +1,7 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View, Text} from '@tarojs/components'
+import {Text, View} from '@tarojs/components'
 import {AtDivider} from "taro-ui";
-import {GoodsWithSellerVO, MockGoodsApi} from "../../../apis/GoodsApi";
+import {GoodsState, GoodsWithSellerVO, MockGoodsApi} from "../../../apis/GoodsApi";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import {goodsInfoUrlConfig} from "../../../utils/url-list";
 import {apiHub} from "../../../apis/ApiHub";
@@ -10,6 +10,7 @@ import LoadingPage from "../../../components/common/loading-page";
 import UserInfoCard from "../../../components/index/user-info-card";
 import GoodsInfoCard from "../../../components/index/goods-info-card";
 import GoodsInfoBottomBar from "../../../components/index/goods-info-bottom-bar";
+import localConfig from "../../../utils/local-config";
 
 interface IState {
   loading: boolean,
@@ -24,6 +25,7 @@ interface IState {
 export class index extends Component<any, IState> {
 
   private readonly NOT_FIND_GOODS_ID_ERROR:Error = new Error('未找到选择的商品请重试');
+  private readonly GOODS_DELETED_ERROR:Error = new Error('商品已经被抢走了\nQwQ');
 
   config: Config = {
     navigationBarTitleText: '商品信息'
@@ -44,7 +46,18 @@ export class index extends Component<any, IState> {
     this.setState({loading: true}, () => {
       this.initGoodsWithSeller()
         .then(goodsWithSeller => {
-          this.setState({goodsWithSeller, loading: false})
+          const state = goodsWithSeller.goods.state;
+          switch (state) {
+            case GoodsState.InSale:
+              localConfig.addVisitedGoodsWithSeller(goodsWithSeller);
+              this.setState({goodsWithSeller, loading: false});
+              break;
+            case GoodsState.Deleted:
+              localConfig.removeVisitedGoodsWithSeller(goodsWithSeller);
+              throw this.GOODS_DELETED_ERROR;
+            default:
+              throw this.NOT_FIND_GOODS_ID_ERROR;
+          }
         }).catch(this.onError);
     });
   };

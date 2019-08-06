@@ -72,7 +72,7 @@ export default class SearchResult extends Component<any, IState> {
           } else {
             this.setState({loadMoreStatus: 'noMore', searchDisabled: false});
           }
-        })
+        });
     } else {
       throw this.NOT_FIND_CATEGORY_ERROR;
     }

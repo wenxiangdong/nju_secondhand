@@ -2,6 +2,7 @@ import "@tarojs/async-await"
 import { httpRequest, mockHttpRequest, VO, db, command } from "./HttpRequest";
 import { MockUserApi, UserVO, userApi } from "./UserApi";
 import { copy } from "./Util";
+import localConfig from "../utils/local-config";
 
 export interface IGoodsApi {
   // 取得商品分类
@@ -36,6 +37,20 @@ export interface IGoodsApi {
 
   // 购买商品
   purchase(goodsID: string): Promise<void>;
+
+  // 获取浏览过的商品和销售者信息
+  getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]>;
+}
+
+function getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]> {
+  const goodsWithSellerArray = localConfig.getVisitedGoodsWithSeller().filter((goodsWithSeller) => {
+    const {goods, seller} = goodsWithSeller;
+    const {name, category} = goods;
+    const {nickname, address} = seller;
+    return name.includes(keyword) || category.name.includes(keyword)
+      || nickname.includes(keyword) || address.name.includes(keyword);
+  });
+  return Promise.resolve(goodsWithSellerArray.slice(lastIndex, lastIndex + 10));
 }
 
 const goodsCollection = db.collection('goods');
@@ -96,13 +111,17 @@ class GoodsApi implements IGoodsApi {
     // 求后端小哥加通过 id 获取 VO 的接口
     // 加完记得顺便改一下文档 ❤❤❤
     // 其他用 id 获取 VO 的接口暂时还不急
-    throw new Error("Method not implemented." + categoryID);
+    throw new Error("Method not implemented." + goodsID);
   }
 
   getGoods(goodsID: string): Promise<GoodsVO> {
     // TODO 优先级 低 接口添加
     // 同上
-    throw new Error("Method not implemented." + categoryID);
+    throw new Error("Method not implemented." + goodsID);
+  }
+
+  getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]> {
+    return getVisitedGoodsWithSeller(keyword, lastIndex);
   }
 }
 
@@ -201,7 +220,7 @@ class MockGoodsApi implements IGoodsApi {
   getGoods(goodsID: string): Promise<GoodsVO> {
     let goods = MockGoodsApi.createMockGoods();
     goods._id = goodsID;
-    return goods;
+    return mockHttpRequest.success(goods);
   }
 
   static createMockCateGory(): CategoryVO {
@@ -226,13 +245,15 @@ class MockGoodsApi implements IGoodsApi {
     };
   }
 
-  // TODO 优先级 低
-  // 设置为 private
   static createMockGoodsWithSeller(): GoodsWithSellerVO {
     return {
       goods: MockGoodsApi.createMockGoods(),
       seller: MockUserApi.createMockUser()
     };
+  }
+
+  getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]> {
+    return getVisitedGoodsWithSeller(keyword, lastIndex);
   }
 }
 
