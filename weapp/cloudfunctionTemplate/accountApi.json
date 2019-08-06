@@ -6,5 +6,12 @@
       "payTitle": "test",
       "payAmount": "1.0"
     }
+  },
+  {
+    "name": "withraw",
+    "value": {
+      "$url": "withdraw",
+      "amount": 10
+    }
   }
 ]

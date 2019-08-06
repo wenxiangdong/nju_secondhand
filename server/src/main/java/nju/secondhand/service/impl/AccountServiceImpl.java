@@ -18,6 +18,7 @@ public class AccountServiceImpl implements AccountService {
     public static String RETURN_CODE = "return_code";
     public static String RESULT_CODE = "result_code";
     public static String RETURN_MESSAGE = "return_msg";
+    public static String TRANSFER_DESC = "南大小书童提现";
 
     private HttpService httpService;
     private MyWXPayConfig wxPayConfig;
@@ -89,7 +90,19 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void withdraw(String openID, int account) {
-
+    public void withdraw(String openID, int amount) {
+        Map<String, String > reqData = new HashMap<>();
+        reqData.put("partner_trade_no", openID + WXPayUtil.getCurrentTimestamp());
+        reqData.put("openid", openID);
+        reqData.put("amount", String.valueOf(amount));
+        reqData.put("desc", TRANSFER_DESC);
+        reqData.put("spbill_create_ip", "127.0.0.1");
+        try {
+            WXTransfer wxTransfer = new WXTransfer(wxPayConfig);
+            Map<String, String> transferResult = wxTransfer.transfer(reqData);
+            System.out.println(transferResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

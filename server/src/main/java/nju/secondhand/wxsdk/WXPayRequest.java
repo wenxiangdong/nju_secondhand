@@ -113,6 +113,7 @@ public class WXPayRequest {
 
 
     private String request(String urlSuffix, String uuid, String data, int connectTimeoutMs, int readTimeoutMs, boolean useCert, boolean autoReport) throws Exception {
+        System.out.println(data);
         Exception exception = null;
         long elapsedTimeMillis = 0;
         long startTimestampMs = WXPayUtil.getCurrentTimestampMs();

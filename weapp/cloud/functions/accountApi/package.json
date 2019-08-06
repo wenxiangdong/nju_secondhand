@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "tcb-router": "latest",
+    "tenpay": "^2.1.18",
     "wechat-jssdk": "^5.0.2",
-    "wx-server-sdk": "latest",
-    "tcb-router": "latest"
+    "wx-server-sdk": "latest"
   }
 }

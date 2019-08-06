@@ -32,7 +32,8 @@ public class SecondhandApplicationTests {
 
     @Test
     public void testAccountService() {
-        this.accountService.pay("abckd", "title", 100, "kdkdk");
+        this.accountService.withdraw("hhhkkhj", 100);
+        this.accountService.pay("hdhd", "title", 100, "orderID");
     }
 
 }

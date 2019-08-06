@@ -3,6 +3,7 @@ const cloud = require('wx-server-sdk')
 const TcbRounter = require('tcb-router')
 const {Wechat, Payment} = require('wechat-jssdk');
 const fs = require("fs");
+const TenPay = require("tenpay");
 
 cloud.init()
 
@@ -35,7 +36,11 @@ exports.main = async (event, context) => {
   })
 
   app.router('withdraw', async (ctx) => {
-    
+    const {amount} = event;
+    await withdraw({
+      openID: ctx.data.openid,
+      amount: amount
+    });
   })
 
   /**
@@ -54,9 +59,31 @@ exports.main = async (event, context) => {
 }
 
 
-const withdraw = async () => {
-  
+const withdraw = async ({openID = "", amount = 0}) => {
+  const config = {
+    appid: APP_CONFIG.APP_ID,
+    mchid: APP_CONFIG.ACCOUNT,
+    partnerKey: APP_CONFIG.KEY,
+    // pfx: require('fs').readFileSync(''),
+    spbill_create_ip: '127.0.0.1'
+  };
+  const tenPay = new TenPay(config, true);
+  try {
+    const param = {
+      partner_trade_no: utils.createNonceStr(),
+      openid: openID,
+      check_name: "NO_CHECK",
+      amount: amount,
+      desc: "南大小书童提现"
+    };
+    console.log(param);
+    const result = await tenPay.transfers(param);
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
 }
+
 
 const pay = async ({openID, payTitle = "南大小书童闲置物品", payAmount = 0, orderID = ""}) => {
   const wx = new Wechat(WECHAT_CONFIG);

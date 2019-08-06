@@ -4,6 +4,7 @@ import nju.secondhand.config.MiniProgramConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 @Component
@@ -34,7 +35,7 @@ public class MyWXPayConfig extends WXPayConfig {
 
     @Override
     public InputStream getCertStream() {
-        return null;
+        return new ByteArrayInputStream("whatever".getBytes());
     }
 
     @Override
