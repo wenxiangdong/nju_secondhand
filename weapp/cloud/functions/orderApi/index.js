@@ -69,4 +69,5 @@ exports.main = async (event, context) => {
 const OrderState = {
   Ongoing: 0,
   Finished: 1,
+  Paying: -1  // 正在支付中 by eric
 }

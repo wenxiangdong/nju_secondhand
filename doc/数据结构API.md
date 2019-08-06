@@ -69,6 +69,7 @@ interface GoodsDTO {
 
 interface GoodsVO extends VO {
     sellerID: string;
+    sellerName: string; // 给goods加一个卖家名字 by eric
 
     name: string;
     desc: string;
