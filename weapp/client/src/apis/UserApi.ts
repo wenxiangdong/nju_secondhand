@@ -31,6 +31,9 @@ class UserApi implements IUserApi {
       throw new Fail(HttpCode.Forbidden, "该用户已注册")
     }
 
+    user['signUpTime'] = Date.now()
+    user['state'] = UserState.Normal
+
     if ((await userCollection
       .where({
         email: user.email
@@ -48,8 +51,14 @@ class UserApi implements IUserApi {
   async modifyInfo(user: UserDTO): Promise<void> {
     let userVO: UserVO = await this.login();
 
-    if (userVO.state === UserState.Forzen) {
-      throw new Fail(HttpCode.Forbidden, "你已被冻结，无法修改个人信息");
+    if (userVO.state === UserState.Frozen) {
+      throw new Fail(HttpCode.Forbidden, "您的帐户被冻结，无法修改个人信息");
+    }
+
+    for (let key in user) {
+      if (!user[key]) {
+        user[key] = userVO[key]
+      }
     }
 
     await userCollection

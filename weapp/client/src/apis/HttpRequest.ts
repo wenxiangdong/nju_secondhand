@@ -1,6 +1,5 @@
 import "@tarojs/async-await";
 import * as Taro from "@tarojs/taro";
-import { copy } from "./Util";
 
 export interface IHttpRequest {
   // 云函数
@@ -19,18 +18,15 @@ class HttpRequest implements IHttpRequest {
         data
       });
 
-      // const response = callResult.result as HttpResponse<T>;
-      return copy<T>(callResult.result);
-      // if (response.code = HttpCode.Success) {
-      //     return response.data;
-      // } else {
-      //     throw new Fail(response.code, response.message);
-      // }
+      const response = callResult.result as HttpResponse<T>;
+      console.log(response)
+      if (response.code === HttpCode.Success) {
+        return response.data;
+      } else {
+        throw new Fail(response.code, response.message);
+      }
     } catch (e) {
-      if (e.hasOwnProperty('code'))
-        throw new Fail(e.code, e.message);
-      else
-        throw new Fail(HttpCode.Fail, e.errMsg);
+        throw e
     }
   }
 }
@@ -53,7 +49,7 @@ export interface VO {
 }
 
 export enum HttpCode {
-  // Success,
+  Success = 200,
   Forbidden = 403, // 403
   Not_Found = 404, // 404
   Conflict = 409, // 409 冲突
@@ -61,11 +57,11 @@ export enum HttpCode {
   Fail = 500 // 500
 }
 
-// export interface HttpResponse<T> {
-//     code: HttpCode;
-//     data: T;
-//     message: string;
-// }
+export interface HttpResponse<T> {
+  code: HttpCode;
+  data: T;
+  message: string;
+}
 
 export class Fail {
   code: HttpCode;

@@ -1,7 +1,6 @@
 import "@tarojs/async-await"
-import { httpRequest, mockHttpRequest, VO, db, command } from "./HttpRequest";
+import { httpRequest, mockHttpRequest, VO, db} from "./HttpRequest";
 import { MockUserApi, UserVO, userApi } from "./UserApi";
-import { copy } from "./Util";
 
 export interface IGoodsApi {
   // 取得商品分类

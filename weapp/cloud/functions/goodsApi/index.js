@@ -9,12 +9,12 @@ const db = cloud.database()
 const command = db.command
 
 // 云函数入口函数
-exports.main = async (event, context) => {
+exports.main = async(event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async (ctx, next) => {
+  app.use(async(ctx, next) => {
     console.log('----------> 进入 goodsApi 全局中间件')
     ctx.data = {}
     ctx.data.openid = cloud.getWXContext().OPENID
@@ -27,26 +27,46 @@ exports.main = async (event, context) => {
 
   app.router(['publishGoods', 'getOngoingGoods', 'deleteGoods',
     'purchase'
-  ], async (ctx, next) => {
-    let self = await cloud.callFunction('userApi', {
-      $url: 'getNormalSelf',
-      openid: ctx.data.openid
-    }).result;
-    ctx.data.self = JSON.parse(self);
+  ], async(ctx, next) => {
+    let loginResult = (await cloud.callFunction({
+      name: 'userApi',
+      data: {
+        $url: 'login',
+        openid: ctx.data.openid
+      }
+    })).result;
 
-    await next();
+    if (loginResult.code === HttpCode.Not_Found) {
+      ctx = {
+        code: HttpCode.Not_Found,
+        message: '找不到您的个人消息'
+      }
+    } else {
+      self = loginResult.data
+      switch (self.state) {
+        case UserState.Frozen:
+          ctx.body = {
+            code: HttpCode.Forbidden,
+            message: '您的帐户被冻结'
+          }
+          break
+        default:
+          ctx.data.self = self;
+          await next();
+      }
+    }
   })
 
-  app.router('getCategories', async (ctx) => {
+  app.router('getCategories', async(ctx) => {
     let categories = [];
     let skip = 0;
     const limit = 20;
 
     let data;
     while (data = (await ctx.data.categoryCollection
-      .skip(skip)
-      .limit(limit)
-      .get())
+        .skip(skip)
+        .limit(limit)
+        .get())
       .data) {
 
       categories = categories.concat(data);
@@ -58,39 +78,50 @@ exports.main = async (event, context) => {
       skip += limit;
     }
 
-    ctx.body = categories;
+    ctx.body = {
+      code: HttpCode.Success,
+      data: categories
+    };
   })
 
-  app.router('searchGoodsByKeyword', async (ctx) => {
+  app.router('searchGoodsByKeyword', async(ctx) => {
+    const keyword = event.keyword;
+    console.log(keyword)
     let result = await ctx.data.goodsCollection
       .where(
+        keyword ?
         command
-          .or([{
+        .or([{
             name: db.RegExp({
-              regexp: event.keyword,
+              regexp: keyword,
               options: 'i',
             })
           },
           {
             category: {
               name: db.RegExp({
-                regexp: event.keyword,
+                regexp: keyword,
                 options: 'i'
               })
             }
           }
-          ])
-          .and({
-            state: GoodsState.InSale
-          })
+        ])
+        .and({
+          state: GoodsState.InSale
+        }) : {
+          state: GoodsState.InSale
+        }
       )
       .skip(event.lastIndex)
-      .limit(evrnt.size)
+      .limit(event.size)
       .get()
-    ctx.body = result.data
+    ctx.body = {
+      code: HttpCode.Success,
+      data: result.data,
+    }
   })
 
-  app.router('searchGoodsByCategory', async (ctx) => {
+  app.router('searchGoodsByCategory', async(ctx) => {
     let result = await goodsCollection
       .where({
         category: {
@@ -98,46 +129,61 @@ exports.main = async (event, context) => {
         },
         state: GoodsState.InSale
       })
-      .skip(lastIndex)
-      .limit(size)
+      .skip(event.lastIndex)
+      .limit(event.size)
       .get()
-    ctx.body = result.data
+    ctx.body = {
+      code: HttpCode.Success,
+      data: result.data
+    }
   })
 
-  app.router('publishGoods', async (ctx) => {
+  app.router('publishGoods', async(ctx) => {
     let goods = event.goods;
 
     goods.sellerID = ctx.data.self._id;
 
-    let categoryResult = await ctx.data.categoryCollection
-      .doc(goods.categoryID)
-      .get();
+    try {
+      let categoryResult = await ctx.data.categoryCollection
+        .doc(goods.categoryID)
+        .get();
 
-    let data = categoryResult.data;
+      let data = categoryResult.data;
 
-    if (!data.length) {
-      throw {
+      if (!data) {
+        ctx.body = {
+          code: HttpCode.Not_Found,
+          message: '找不到商品分类信息'
+        }
+      } else {
+        let category = data
+
+        goods.category = category;
+        delete goods.categoryID;
+
+        goods.publishTime = Date.now()
+
+        goods.state = GoodsState.InSale
+
+        await ctx.data.goodsCollection
+          .add({
+            data: goods
+          })
+
+
+        ctx.body = {
+          code: HttpCode.Success
+        }
+      }
+    } catch (e) {
+      ctx.body = {
         code: HttpCode.Not_Found,
-        message: '找不到商品分类信息'
+        message: '发布失败，请检查商品分类消息等是否正确'
       }
     }
-
-    let category = data[0]
-
-    goods.category = category;
-    delete goods.categoryID;
-
-    goods.publishTime = Date.now()
-
-    goods.state = GoodsState.InSale
-
-    await ctx.data.goodsCollection
-      .add({
-        data: goods
-      })
   })
 
-  app.router('getOngoingGoods', async (ctx) => {
+  app.router('getOngoingGoods', async(ctx) => {
     let goodsList = [];
     let data = [];
     let skip = 0;
@@ -155,13 +201,16 @@ exports.main = async (event, context) => {
 
       let data = result.data;
 
-      goodsList = goods.concat(data);
+      goodsList = goodsList.concat(data);
     } while (data.length >= limit);
 
-    ctx.body = goodsList;
+    ctx.body = {
+      code: HttpCode.Success,
+      data: goodsList
+    }
   })
 
-  app.router('deleteGoods', async (ctx) => {
+  app.router('deleteGoods', async(ctx) => {
     await ctx.data.goodsCollection
       .where({
         _id: event.goodsID,
@@ -172,10 +221,13 @@ exports.main = async (event, context) => {
           state: GoodsState.Deleted
         }
       })
+    ctx.body = {
+      code: HttpCode.Success,
+    }
   })
 
 
-  app.router('deleteGoodsByAdmin', async (ctx) => {
+  app.router('deleteGoodsByAdmin', async(ctx) => {
     await ctx.data.goodsCollection
       .where({
         _id: event.goodsID,
@@ -187,7 +239,7 @@ exports.main = async (event, context) => {
       })
   })
 
-  app.router('purchase', async (ctx) => {
+  app.router('purchase', async(ctx) => {
 
   })
 
@@ -199,7 +251,14 @@ const GoodsState = {
   Deleted: 1
 }
 
+const UserState = {
+  UnRegistered: 0, // 未注册
+  Normal: 1,
+  Frozen: 2, // 被管理员冻结
+}
+
 const HttpCode = {
+  Success: 200,
   Forbidden: 403, // 403
   Not_Found: 404, // 404
   Conflict: 409, // 409 冲突

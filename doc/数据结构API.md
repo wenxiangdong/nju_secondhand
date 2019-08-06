@@ -159,7 +159,7 @@ enum ComplaintState {
 // 圈子
 interface PostDTO {
     desc: string;
-    picture: Array<string>;
+    pictures: Array<string>;
 }
 
 interface PostVO extends VO {
@@ -212,6 +212,7 @@ interface MessageVO extends VO {
 }
 
 export enum HttpCode {
+  Success = 200,
   Forbidden = 403, // 403
   Not_Found = 404, // 404
   Conflict = 409, // 409 冲突
