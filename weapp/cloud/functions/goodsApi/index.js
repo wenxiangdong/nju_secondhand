@@ -9,12 +9,12 @@ const db = cloud.database()
 const command = db.command
 
 // 云函数入口函数
-exports.main = async(event, context) => {
+exports.main = async (event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async(ctx, next) => {
+  app.use(async (ctx, next) => {
     console.log('----------> 进入 goodsApi 全局中间件')
     ctx.data = {}
     ctx.data.openid = cloud.getWXContext().OPENID
@@ -27,7 +27,7 @@ exports.main = async(event, context) => {
 
   app.router(['publishGoods', 'getOngoingGoods', 'deleteGoods',
     'purchase'
-  ], async(ctx, next) => {
+  ], async (ctx, next) => {
     let loginResult = (await cloud.callFunction({
       name: 'userApi',
       data: {
@@ -57,16 +57,16 @@ exports.main = async(event, context) => {
     }
   })
 
-  app.router('getCategories', async(ctx) => {
+  app.router('getCategories', async (ctx) => {
     let categories = [];
     let skip = 0;
     const limit = 20;
 
     let data;
     while (data = (await ctx.data.categoryCollection
-        .skip(skip)
-        .limit(limit)
-        .get())
+      .skip(skip)
+      .limit(limit)
+      .get())
       .data) {
 
       categories = categories.concat(data);
@@ -84,61 +84,86 @@ exports.main = async(event, context) => {
     };
   })
 
-  app.router('searchGoodsByKeyword', async(ctx) => {
-    const keyword = event.keyword;
-    console.log(keyword)
-    let result = await ctx.data.goodsCollection
-      .where(
-        keyword ?
-        command
-        .or([{
-            name: db.RegExp({
-              regexp: keyword,
-              options: 'i',
-            })
-          },
-          {
-            category: {
-              name: db.RegExp({
-                regexp: keyword,
-                options: 'i'
-              })
-            }
-          }
-        ])
-        .and({
-          state: GoodsState.InSale
-        }) : {
-          state: GoodsState.InSale
-        }
-      )
-      .skip(event.lastIndex)
-      .limit(event.size)
-      .get()
+  app.router('searchGoodsByKeyword', async (ctx) => {
+    let goodsList = await searchGoodsByKeyword(event.keyword, event.lastIndex, event.size)
     ctx.body = {
       code: HttpCode.Success,
-      data: result.data,
+      data: goodsList
     }
   })
 
-  app.router('searchGoodsByCategory', async(ctx) => {
-    let result = await goodsCollection
-      .where({
-        category: {
-          _id: event.categoryID
-        },
-        state: GoodsState.InSale
+  app.router('searchGoodsByCategory', async (ctx) => {
+    let goodsList = await searchGoodsByCategory(event.categoryID, event.lastIndex, event.size)
+    ctx.body = {
+      code: HttpCode.Success,
+      data: goodsList
+    }
+  })
+
+  app.router('searchGoodsWithSellerByKeyword', async (ctx) => {
+    let goodsList = await searchGoodsByKeyword(event.keyword, event.lastIndex, event.size)
+
+    let goodsWithSellers = []
+    for (let goods of goodsList) {
+      goodsWithSellers.push({
+        goods,
+        seller: await getSeller(goods.sellerID)
       })
-      .skip(event.lastIndex)
-      .limit(event.size)
-      .get()
+    }
     ctx.body = {
       code: HttpCode.Success,
-      data: result.data
+      data: goodsWithSellers
     }
   })
 
-  app.router('publishGoods', async(ctx) => {
+  app.router('searchGoodsWithSellerByCategory', async (ctx) => {
+    let goodsList = await searchGoodsByCategory(event.categoryID, event.lastIndex, event.size)
+
+    let goodsWithSellers = []
+    for (let goods of goodsList) {
+      goodsWithSellers.push({
+        goods,
+        seller: await getSeller(goods.sellerID)
+      })
+    }
+    ctx.body = {
+      code: HttpCode.Success,
+      data: goodsWithSellers
+    }
+  })
+
+  app.router('getGoodsWithSeller', async (ctx) => {
+    try {
+      let goods = await getGoods(event.goodsID)
+
+      let seller = await getSeller(goods.sellerID)
+
+      ctx.body = {
+        code: HttpCode.Success,
+        data: {
+          seller,
+          goods
+        }
+      }
+    } catch (e) {
+      ctx.body = e
+    }
+  })
+
+  app.router('getGoods', async (ctx) => {
+    try {
+      let goods = await getGoods(event.goodsID)
+
+      ctx.body = {
+        code: HttpCode.Success,
+        data: goods
+      }
+    } catch (e) {
+      ctx.body = e
+    }
+  })
+
+  app.router('publishGoods', async (ctx) => {
     let goods = event.goods;
 
     goods.sellerID = ctx.data.self._id;
@@ -183,7 +208,7 @@ exports.main = async(event, context) => {
     }
   })
 
-  app.router('getOngoingGoods', async(ctx) => {
+  app.router('getOngoingGoods', async (ctx) => {
     let goodsList = [];
     let data = [];
     let skip = 0;
@@ -210,7 +235,7 @@ exports.main = async(event, context) => {
     }
   })
 
-  app.router('deleteGoods', async(ctx) => {
+  app.router('deleteGoods', async (ctx) => {
     await ctx.data.goodsCollection
       .where({
         _id: event.goodsID,
@@ -226,8 +251,7 @@ exports.main = async(event, context) => {
     }
   })
 
-
-  app.router('deleteGoodsByAdmin', async(ctx) => {
+  app.router('deleteGoodsByAdmin', async (ctx) => {
     await ctx.data.goodsCollection
       .where({
         _id: event.goodsID,
@@ -239,11 +263,97 @@ exports.main = async(event, context) => {
       })
   })
 
-  app.router('purchase', async(ctx) => {
+  app.router('purchase', async (ctx) => {
 
   })
 
   return app.serve();
+}
+
+async function getGoods(goodsID) {
+  try {
+    let goodsCollection = db.collection('goods')
+
+    let result = await goodsCollection
+      .doc(goodsID)
+      .get()
+
+    return result.data
+  } catch (e) {
+    throw {
+      code: HttpCode.Not_Found,
+      message: '找不到商品消息'
+    }
+  }
+}
+
+async function getSeller(sellerID) {
+  try {
+    let result = await cloud.callFunction({
+      name: 'userApi',
+      data: {
+        $url: 'getUserInfo',
+        userID: sellerID
+      }
+    })
+
+    let seller = result.result
+
+    return seller
+  } catch (e) {
+    throw {
+      code: HttpCode.Not_Found,
+      message: '找不到卖家消息'
+    }
+  }
+}
+
+async function searchGoodsByKeyword(keyword, lastIndex, size) {
+  let result = await db.collection('goods')
+    .where(
+      keyword ?
+        command
+          .or([{
+            name: db.RegExp({
+              regexp: keyword,
+              options: 'i',
+            })
+          },
+          {
+            category: {
+              name: db.RegExp({
+                regexp: keyword,
+                options: 'i'
+              })
+            }
+          }
+          ])
+          .and({
+            state: GoodsState.InSale
+          }) : {
+          state: GoodsState.InSale
+        }
+    )
+    .skip(lastIndex)
+    .limit(size)
+    .get()
+
+  return result.data
+}
+
+async function searchGoodsByCategory(categoryID, lastIndex, size) {
+  let result = await db.collection('goods')
+    .where({
+      category: {
+        _id: categoryID
+      },
+      state: GoodsState.InSale
+    })
+    .skip(lastIndex)
+    .limit(size)
+    .get()
+
+  return result.data
 }
 
 const GoodsState = {
