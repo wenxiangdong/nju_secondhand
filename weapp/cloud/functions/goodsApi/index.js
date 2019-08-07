@@ -161,6 +161,7 @@ exports.main = async (event, context) => {
           data: order
         });
         order._id = _id;
+        console.log("插入的order", order);
       } catch (error) {
         // 放着异步做了，无力的保证
         goodsCollection.doc(goodsID).update({
@@ -180,7 +181,7 @@ exports.main = async (event, context) => {
           /**
            * 参数
            * payTitle 支付的标题，例“商品xxx”
-           * payAmount 支付的金额，单位为 分
+           * payAmount 支付的金额
            * orderID 要保证唯一性，此笔交易的id
            */
           payTitle: goods.name,

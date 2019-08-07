@@ -11,6 +11,7 @@ const db = cloud.database()
 
 // 云函数入口函数
 exports.main = async (event, context) => {
+  console.log(event);
   const app = new TcbRounter({
     event
   })
@@ -25,7 +26,7 @@ exports.main = async (event, context) => {
     console.log('----------> 退出 accountApi 全局中间件')
   })
 
-  app.router(['withdraw'], async (ctx, next) => {
+  app.router(['withdraw', 'pay'], async (ctx, next) => {
     let self = await cloud.callFunction('userApi', {
       $url: 'getNormalSelf',
       openid: ctx.data.openid
@@ -36,17 +37,43 @@ exports.main = async (event, context) => {
   })
 
   app.router('withdraw', async (ctx) => {
-    const {amount} = event;
+    const {self, userCollection} = ctx.data;
+    let {amount} = event;
+
+    // 前置检查余额
+    const {account = {}} = self;
+    let {balance = 0} = account;
+    amount = parseFloat(amount);
+    balance = parseFloat(balance);
+    if (balance < amount) {
+      throw {
+        code: HttpCode.Conflict,
+        message: "账户余额不足"
+      }
+    }
+
+    // 微信企业付款
     await withdraw({
       openID: ctx.data.openid,
       amount: amount
     });
+
+    // 更新数据库
+    await userCollection
+      .doc(self._id)
+      .update({
+        data: {
+          account: {
+            balance: (balance - amount) + ''
+          }
+        }
+      })
   })
 
   /**
    * 参数
    * payTitle 支付的标题，例“商品xxx”
-   * payAmount 支付的金额，单位为 分
+   * payAmount 支付的金额
    * orderID 要保证唯一性，此笔交易的id
    */
   app.router('pay', async(ctx) => {
@@ -60,20 +87,26 @@ exports.main = async (event, context) => {
 
 
 const withdraw = async ({openID = "", amount = 0}) => {
+  
   const config = {
     appid: APP_CONFIG.APP_ID,
     mchid: APP_CONFIG.ACCOUNT,
     partnerKey: APP_CONFIG.KEY,
+    // TODO: 读取证书
     // pfx: require('fs').readFileSync(''),
     spbill_create_ip: '127.0.0.1'
   };
+
   const tenPay = new TenPay(config, true);
   try {
+    // 确保金额是数字
+    amount = parseFloat(amount);
+    // 支付参数
     const param = {
       partner_trade_no: utils.createNonceStr(),
       openid: openID,
       check_name: "NO_CHECK",
-      amount: amount,
+      amount: amount * 100, // 用 分作单位
       desc: "南大小书童提现"
     };
     console.log(param);
@@ -81,7 +114,12 @@ const withdraw = async ({openID = "", amount = 0}) => {
     console.log(result);
   } catch (error) {
     console.error(error);
+    throw {
+      code: HttpCode.Fail,
+      message: "提现失败，如果出现账户资金异常请投诉或联系客服进行操作。"
+    };
   }
+
 }
 
 
@@ -91,6 +129,10 @@ const pay = async ({openID, payTitle = "南大小书童闲置物品", payAmount 
   const nonceStr = utils.createNonceStr();
   const body = payTitle;
   orderID = orderID || wx.payment.simpleTradeNo();
+
+  // 转换成分
+  payAmount = parseFloat(payAmount);
+  payAmount = payAmount * 100;
 
   const defaultInfo = {
     device_info: 'wechat_web',
@@ -182,3 +224,23 @@ const HttpCode = {
   Conflict: 409, // 409 冲突
   Fail: 500 // 500
 }
+
+
+// interface UserVO extends VO {
+//   // _openid: string;  为安全性考虑，不将该属性返回
+
+//   phone: string;
+//   avatar: string;
+//   nickname: string;
+//   address: Location;
+//   email: string;
+
+//   account: AccountVO;
+
+//   signUpTime: number;
+//   state: UserState;
+// }
+
+// interface AccountVO {
+//   balance: string;
+// }
