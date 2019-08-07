@@ -111,6 +111,10 @@ exports.main = async (event, context) => {
   })
 
   /**
+   * 步骤：
+   * 1. 查询商品，下架
+   * 2. 新建订单
+   * 3. 调用 预支付并返回数据包
    * goodsID: string
    */
   app.router('purchase', async (ctx) => {
