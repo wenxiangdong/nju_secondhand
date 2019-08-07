@@ -1,7 +1,8 @@
 import "@tarojs/async-await"
-import {httpRequest, mockHttpRequest, VO, db, command} from "./HttpRequest";
-import {MockUserApi, UserVO} from "./UserApi";
+import { httpRequest, mockHttpRequest, VO, db, command } from "./HttpRequest";
+import { MockUserApi, UserVO, userApi } from "./UserApi";
 import { copy } from "./Util";
+import localConfig from "../utils/local-config";
 
 export interface IGoodsApi {
   // 取得商品分类
@@ -28,96 +29,99 @@ export interface IGoodsApi {
   // 种类搜索商品和销售者信息
   searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>;
 
+  // 通过 id 获取商品和销售者信息
+  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO>;
+
+  // 通过 Id 获取商品信息
+  getGoods(goodsID: string): Promise<GoodsVO>;
+
   // 购买商品
   purchase(goodsID: string): Promise<void>;
+
+  // 获取浏览过的商品和销售者信息
+  getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]>;
 }
 
-let categoryCollection = db.collection("category");
-let goodsCollection = db.collection("goods");
+function getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]> {
+  const goodsWithSellerArray = localConfig.getVisitedGoodsWithSeller().filter((goodsWithSeller) => {
+    const {goods, seller} = goodsWithSeller;
+    const {name, category} = goods;
+    const {nickname, address} = seller;
+    return name.includes(keyword) || category.name.includes(keyword)
+      || nickname.includes(keyword) || address.name.includes(keyword);
+  });
+  return Promise.resolve(goodsWithSellerArray.slice(lastIndex, lastIndex + 10));
+}
+
+const goodsCollection = db.collection('goods');
+const functionName = 'goodsApi';
 
 class GoodsApi implements IGoodsApi {
   async getCategories(): Promise<CategoryVO[]> {
-    let categories: CategoryVO[] = [];
-    let skip = 0;
-    const limit = 20;
-
-    let data: Array<any>;
-    while (data = (await categoryCollection
-      .skip(skip)
-      .limit(limit)
-      .get())
-      .data) {
-
-      categories = categories.concat(data);
-
-      if (data.length < limit) {
-        break;
-      }
-
-      skip += limit;
-    }
-
-    return categories;
+    return await httpRequest.callFunction<CategoryVO[]>(functionName, { $url: 'getCategories' });
   }
   async publishGoods(goods: GoodsDTO): Promise<void> {
-    return await httpRequest.callFunction<void>("publishGoods", { goods });
+    return await httpRequest.callFunction<void>(functionName, { $url: 'publishGoods', goods });
   }
   async getOngoingGoods(): Promise<GoodsVO[]> {
-    return await httpRequest.callFunction<GoodsVO[]>("getOngoingGoods");
+    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "getOngoingGoods" });
   }
   async deleteGoods(goodsID: string): Promise<void> {
-    return await httpRequest.callFunction<void>("deleteGoods", { goodsID });
+
+    return await httpRequest.callFunction<void>(functionName, { $url: "deleteGoods", goodsID });
   }
   async searchGoodsByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-    return copy<GoodsVO[]>((await goodsCollection
-      .where(
-        command
-          .or([
-            // @ts-ignore
-            { name: db.RegExp({ regexp: keyword, options: 'i', }) },
-            {
-              category: {
-                // @ts-ignore
-                name: db.RegExp({ regexp: keyword, options: 'i' })
-              }
-            }
-          ])
-          .and({ state: GoodsState.InSale })
-      )
-      .skip(lastIndex)
-      .limit(size)
-      .get())
-      .data)
-
+    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByKeyword", keyword, lastIndex, size });
   }
   async searchGoodsByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
-    return copy<GoodsVO[]>((await goodsCollection
-      .where({
-        category: {
-          _id: categoryID
-        },
-        state: GoodsState.InSale
-      })
-      .skip(lastIndex)
-      .limit(size)
-      .get())
-      .data)
+    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByCategory", categoryID, lastIndex, size });
   }
   async purchase(goodsID: string): Promise<void> {
-    return await httpRequest.callFunction<void>("purchase", { goodsID });
+    return await httpRequest.callFunction<void>(functionName, { $url: "purchase", goodsID });
   }
 
-  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+  async searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+    let goodsVOs: GoodsVO[] = await this.searchGoodsByCategory(categoryID, lastIndex, size);
+
+    let goodsWithSellerVOs: GoodsWithSellerVO[] = [];
+    for (let goodsVO of goodsVOs) {
+      goodsWithSellerVOs.push({
+        goods: goodsVO,
+        seller: await userApi.getUserInfo(goodsVO.sellerID)
+      })
+    }
+    return goodsWithSellerVOs;
+  }
+
+  async searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+    let goodsVOs: GoodsVO[] = await this.searchGoodsByKeyword(keyword, lastIndex, size);
+
+    let goodsWithSellerVOs: GoodsWithSellerVO[] = [];
+    for (let goodsVO of goodsVOs) {
+      goodsWithSellerVOs.push({
+        goods: goodsVO,
+        seller: await userApi.getUserInfo(goodsVO.sellerID)
+      })
+    }
+    return goodsWithSellerVOs;
+  }
+
+  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO> {
     // TODO 优先级 低 接口添加
-    // 求后端小哥加两个接口
+    // 求后端小哥加通过 id 获取 VO 的接口
     // 加完记得顺便改一下文档 ❤❤❤
-    throw new Error("Method not implemented.");
+    // 其他用 id 获取 VO 的接口暂时还不急
+    throw new Error("Method not implemented." + goodsID);
   }
 
-  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
+  getGoods(goodsID: string): Promise<GoodsVO> {
     // TODO 优先级 低 接口添加
     // 同上
-    throw new Error("Method not implemented.");
+    throw new Error("Method not implemented." + goodsID);
+  }
+
+  getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]> {
+    return getVisitedGoodsWithSeller(keyword, lastIndex);
   }
 }
 
@@ -151,7 +155,7 @@ class MockGoodsApi implements IGoodsApi {
     } else {
       const goodsArray: GoodsVO[] = new Array(size).fill(null)
         .map(() => {
-        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        let goods: GoodsVO = MockGoodsApi.createMockGoods();
         goods.name += keyword;
         return goods;
       });
@@ -164,7 +168,7 @@ class MockGoodsApi implements IGoodsApi {
     } else {
       const goodsArray: GoodsVO[] = new Array(size).fill(null)
         .map(() => {
-        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        let goods: GoodsVO = MockGoodsApi.createMockGoods();
         goods.category._id = categoryID;
         return goods;
       });
@@ -182,7 +186,7 @@ class MockGoodsApi implements IGoodsApi {
     } else {
       const goodsWithSellerArray: GoodsWithSellerVO[] = new Array(size).fill(null)
         .map(() => {
-        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        let goods: GoodsVO = MockGoodsApi.createMockGoods();
         goods.category._id = categoryID;
         let seller:UserVO = MockUserApi.createMockUser();
         return {seller, goods};
@@ -197,7 +201,7 @@ class MockGoodsApi implements IGoodsApi {
     } else {
       const goodsWithSellerArray: GoodsWithSellerVO[] = new Array(size).fill(null)
         .map(() => {
-        let goods: GoodsVO = MockGoodsApi.createMockGoodsVO();
+        let goods: GoodsVO = MockGoodsApi.createMockGoods();
         goods.name += keyword;
         let seller:UserVO = MockUserApi.createMockUser();
         return {seller, goods};
@@ -206,7 +210,20 @@ class MockGoodsApi implements IGoodsApi {
     }
   }
 
-  private static createMockCateGory(): CategoryVO {
+  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO> {
+    let goodsWithSeller = MockGoodsApi.createMockGoodsWithSeller();
+    goodsWithSeller.goods._id = goodsID;
+    goodsWithSeller.seller._id = goodsID;
+    return mockHttpRequest.success(goodsWithSeller);
+  }
+
+  getGoods(goodsID: string): Promise<GoodsVO> {
+    let goods = MockGoodsApi.createMockGoods();
+    goods._id = goodsID;
+    return mockHttpRequest.success(goods);
+  }
+
+  static createMockCateGory(): CategoryVO {
     return {
       _id: '1',
       name: 'category',
@@ -214,7 +231,7 @@ class MockGoodsApi implements IGoodsApi {
     };
   }
 
-  private static createMockGoodsVO(): GoodsVO {
+  static createMockGoods(): GoodsVO {
     return {
       _id: '1',
       sellerID: '',
@@ -228,11 +245,15 @@ class MockGoodsApi implements IGoodsApi {
     };
   }
 
-  private static createMockGoodsWithSeller(): GoodsWithSellerVO {
+  static createMockGoodsWithSeller(): GoodsWithSellerVO {
     return {
-      goods: MockGoodsApi.createMockGoodsVO(),
+      goods: MockGoodsApi.createMockGoods(),
       seller: MockUserApi.createMockUser()
     };
+  }
+
+  getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]> {
+    return getVisitedGoodsWithSeller(keyword, lastIndex);
   }
 }
 

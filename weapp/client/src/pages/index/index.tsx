@@ -68,7 +68,7 @@ export default class index extends Component<any, IState> {
     if (searchValue) {
       console.info('index onSearch', searchValue);
       Taro.navigateTo({
-        url: indexSearchUrlConfig.createIndexSearchUrl(searchValue)
+        url: indexSearchUrlConfig.createUrl(searchValue)
       }).catch(this.onError);
     }
   };

@@ -1,0 +1,11 @@
+mini-program:
+#  appID: wx29233e2d5de2273c # eric的
+  appID: wxc4e156082fbd97ba # 甲方的
+#  appSecret: f974e179bfa5922bfcbef56e6648f3e2 #eric的
+  appSecret: 08c5dba9b8e3f52eded6f4c9a0ad4650 # 甲方的
+  env: eric-idaa8
+server:
+  port: 18080
+wechat-pay:
+  account: 1521513131
+  key: ljxst2018！ljxst2018！ljxst2018！

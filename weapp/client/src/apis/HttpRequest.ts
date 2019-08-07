@@ -20,7 +20,7 @@ class HttpRequest implements IHttpRequest {
       });
 
       // const response = callResult.result as HttpResponse<T>;
-      return copy<T>(callResult);
+      return copy<T>(callResult.result);
       // if (response.code = HttpCode.Success) {
       //     return response.data;
       // } else {

@@ -49,7 +49,7 @@ interface AccountVO {
 enum UserState {
     UnRegistered, // 未注册
     Normal,
-    Forzen, // 被管理员冻结
+    Frozen, // 被管理员冻结
 }
 
 
@@ -81,6 +81,11 @@ interface GoodsVO extends VO {
     state: GoodsState;
 }
 
+export interface GoodsWithSellerVO {
+  seller: UserVO;
+  goods: GoodsVO
+}
+
 enum GoodsState {
     InSale,
     Deleted
@@ -93,24 +98,23 @@ interface OrderDTO {
     goodID: string;
 }
 
-interface OrderVO extends VO {
-    buyerID: string;
-    buyerName: string;
+export interface OrderVO extends VO {
+  buyerID: string;
+  buyerName: string;
 
-    sellerID: string;
-    sellerName: string;
+  sellerID: string;
+  sellerName: string;
 
-    goodsID: string;
-    goodsName: string;
-    goodsPrice: string;
-    total: string;
+  goodsID: string;
+  goodsName: string;
+  goodsPrice: string;
 
-    address: Location;
+  address: Location;
 
-    orderTime: number;
-    deliveryTime: number;
+  orderTime: number;
+  deliveryTime: number; // -1 表示还未送达
 
-    state: OrderState;
+  state: OrderState;
 }
 
 enum OrderState {
@@ -171,7 +175,7 @@ interface PostVO extends VO {
 }
 
 interface Comment {
-    nickName: string;
+    nickname: string;
     content: string;
     commentTime: number;
 }
@@ -227,16 +231,16 @@ export class Fail {
  ```typescript
 // API 如果成功调用，则返回 Promise 的返回类型，如 GoodsVO；如果失败，抛出异常，异常的数据结构为 Fail（数据结构部分最后一个）
 
-// 部分需要注册且未冻结，不需要的会指明
+// 需要注册且未冻结，特殊会说明
 export interface IUserApi {
     // 检查用户状态
     checkState(): Promise<UserState>; // 不需要
 
     // 注册
-    signUp(user: UserDTO): Promise<void>; // 不需要
+    signUp(user: UserDTO): Promise<void>; // 不需要，且只能未注册
 
     // 登录
-    login(): Promise<UserVO>;
+    login(): Promise<UserVO>; // 需要注册
 
     // 修改个人信息
     modifyInfo(user: UserDTO): Promise<void>;
@@ -255,7 +259,7 @@ export interface IAccountApi {
 export interface ICircleApi {
     publishPost(post: PostDTO): Promise<void>;
 
-    getPosts(lastIndex: number, size?: number): Promise<PostVO[]>;
+    getPosts(lastIndex: number, size?: number): Promise<PostVO[]>; // 不需要
 
     comment(postID: string, content: string): Promise<void>;
 }
@@ -279,7 +283,7 @@ export interface IFileApi {
 }
 
 
-// 部分需要注册且未冻结，不需要的会指明
+// 需要注册且未冻结，特殊会说明
 export interface IGoodsApi {
     // 取得商品分类
     getCategories(): Promise<CategoryVO[]>; // 不需要
@@ -298,6 +302,12 @@ export interface IGoodsApi {
 
     // 种类搜索商品
     searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>; // 不需要
+  
+  	// 关键字搜索商品和销售者信息
+  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
+
+  // 种类搜索商品和销售者信息
+  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
 
     // 购买商品
     purchase(goodsID: string): Promise<void>;
@@ -342,6 +352,9 @@ List<OrderVO> getOrders(String keyword, int lastIndex, int size);
 
 // 商品管理
 // 查看商品见用户API，省略
+List<CategoryVO> getCategories();
+List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size);
+List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size);
 void deleteGoods(String goodsID); // 下架商品，需要给卖家发通知
 
 
@@ -349,7 +362,7 @@ void deleteGoods(String goodsID); // 下架商品，需要给卖家发通知
 List<UserVO> getNormalUsers(String keyword, int lastIndex, int size);
 void freezeUser(String userID); // 发通知
 
-List<UserVO> getForzenUsers(String keyword, int lastIndex, int size);
+List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size);
 void unfreezeUser(String userID); // 发通知
 ```
 

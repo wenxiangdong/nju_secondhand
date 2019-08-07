@@ -8,13 +8,15 @@ export interface INotificationApi {
   sendNotification(notification: NotificationDTO): Promise<void>;
 }
 
+const functionName = 'notificationApi'
+
 class NotificationApi implements INotificationApi {
   async getNotifications(lastIndex: number, size: number = 10): Promise<NotificationVO[]> {
-    return await httpRequest.callFunction<NotificationVO[]>("getNotifications", { lastIndex, size });
+    return await httpRequest.callFunction<NotificationVO[]>(functionName, { $url: "getNotifications", lastIndex, size });
   }
 
   async sendNotification(notification: NotificationDTO): Promise<void> {
-    return await httpRequest.callFunction<void>("sendNotification", { notification });
+    return await httpRequest.callFunction<void>(functionName, { $url: "sendNotification", notification });
   }
 }
 

@@ -6,8 +6,9 @@ import {styleHelper} from "../../../utils/style-helper";
 import {AtAvatar, AtDivider} from "taro-ui";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import {CSSProperties} from "react";
-import "taro-ui/dist/style/components/flex.scss";
 import {goodsInfoUrlConfig} from "../../../utils/url-list";
+
+import "taro-ui/dist/style/components/flex.scss";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO
@@ -86,7 +87,7 @@ function GoodsCard(props: IProp) {
 
     const onClick = function () {
       Taro.navigateTo({
-        url: goodsInfoUrlConfig.createIndexSearchUrl(goods._id)
+        url: goodsInfoUrlConfig.createUrl(goods._id)
       }).catch(onError);
     };
 
@@ -105,7 +106,7 @@ function GoodsCard(props: IProp) {
           </View>
         </View>
       </View>
-    )
+    );
   }
   return card;
 }

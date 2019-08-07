@@ -32,11 +32,13 @@ class App extends Component {
       'pages/index/search-result/index',
       'pages/index/category-goods/index',
       'pages/index/goods-info/index',
+      'pages/index/location/index',
 
       'pages/login/index',
 
       'pages/message/index',
       'pages/message/system/index',
+      'pages/message/chat/index',
 
       'pages/my/index',
       'pages/my/my-bought/index',

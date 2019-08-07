@@ -1,6 +1,6 @@
 import "@tarojs/async-await";
-import { VO, httpRequest, db, Fail, HttpCode } from "./HttpRequest";
-import {AccountVO} from "./AccountApi";
+import {VO, httpRequest, db, Fail, HttpCode, mockHttpRequest} from "./HttpRequest";
+import {AccountVO, MockAccountApi} from "./AccountApi";
 
 export interface IUserApi {
   // 检查用户状态
@@ -19,11 +19,12 @@ export interface IUserApi {
   getUserInfo(userID: string): Promise<UserVO>;
 }
 
-let userCollection = db.collection("user");
+const userCollection = db.collection('user');
+const functionName = 'userApi'
 
 class UserApi implements IUserApi {
   async checkState(): Promise<UserState> {
-    return await httpRequest.callFunction<UserState>("checkState");
+    return await httpRequest.callFunction<UserState>(functionName, { $url: 'checkState' });
   }
   async signUp(user: UserDTO): Promise<void> {
     if (await this.checkState() !== UserState.UnRegistered) {
@@ -42,7 +43,7 @@ class UserApi implements IUserApi {
       .add({ data: user })
   }
   async login(): Promise<UserVO> {
-    return await httpRequest.callFunction<UserVO>("login");
+    return await httpRequest.callFunction<UserVO>(functionName, { $url: 'login' });
   }
   async modifyInfo(user: UserDTO): Promise<void> {
     let userVO: UserVO = await this.login();
@@ -56,7 +57,7 @@ class UserApi implements IUserApi {
       .update({ data: user })
   }
   async getUserInfo(userID: string): Promise<UserVO> {
-    return await httpRequest.callFunction<UserVO>("getUserInfo", { userID });
+    return await httpRequest.callFunction<UserVO>(functionName, { $url: 'getUserInfo', userID });
   }
 }
 
@@ -74,21 +75,17 @@ class MockUserApi implements IUserApi {
     throw new Error("Method not implemented.");
   }
   getUserInfo(userID: string): Promise<UserVO> {
-    throw new Error("Method not implemented.");
+    let userInfo = MockUserApi.createMockUser();
+    userInfo._id = userID;
+    return mockHttpRequest.success(userInfo);
   }
 
-  private static createMockLocation(): Location {
+  static createMockLocation(): Location {
     return {
-      name: 'address-name',
-      address: 'address-address',
-      latitude: '1',
-      longitude: '1'
-    };
-  }
-
-  private static createMockAccount(account:number|string): AccountVO {
-    return {
-      balance: Number(account).toFixed(2)
+      longitude: '113.324520',
+      latitude: '23.099994',
+      name: 'testLocation',
+      address: 'testAddress'
     };
   }
 
@@ -101,7 +98,7 @@ class MockUserApi implements IUserApi {
       avatar: '',
       address: MockUserApi.createMockLocation(),
       email: 'email',
-      account: MockUserApi.createMockAccount(0.01),
+      account: MockAccountApi.createMockAccount(0.01),
       signUpTime: Date.now(),
       state: UserState.Normal
     };
@@ -145,5 +142,5 @@ export interface Location {
 export enum UserState {
   UnRegistered, // 未注册
   Normal,
-  Forzen, // 被管理员冻结
+  Frozen, // 被管理员冻结
 }

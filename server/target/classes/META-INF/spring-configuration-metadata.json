@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "mini-program",
+      "type": "nju.secondhand.config.MiniProgramConfig",
+      "sourceType": "nju.secondhand.config.MiniProgramConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "mini-program.app-id",
+      "type": "java.lang.String",
+      "sourceType": "nju.secondhand.config.MiniProgramConfig"
+    },
+    {
+      "name": "mini-program.app-secret",
+      "type": "java.lang.String",
+      "sourceType": "nju.secondhand.config.MiniProgramConfig"
+    },
+    {
+      "name": "mini-program.env",
+      "type": "java.lang.String",
+      "sourceType": "nju.secondhand.config.MiniProgramConfig"
+    }
+  ],
+  "hints": []
+}

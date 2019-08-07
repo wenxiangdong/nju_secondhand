@@ -1,3 +1,5 @@
+import {Location} from "../apis/UserApi";
+
 const urlList = {
   CIRCLE: '/pages/circle/index',
   CIRCLE_SEND_POST: '/pages/circle/send-post/index',
@@ -5,8 +7,11 @@ const urlList = {
   INDEX_SEARCH_RESULT: '/pages/index/search-result/index',
   INDEX_CATEGORY_GOODS: '/pages/index/category-goods/index',
   INDEX_GOODS_INFO: '/pages/index/goods-info/index',
+  INDEX_BUY: '/pages/index/buy/index',
+  INDEX_LOCATION: '/pages/index/location/index',
   MESSAGE: '/pages/message/index',
   MESSAGE_SYSTEM: '/pages/message/system/index',
+  MESSAGE_CHAT: '/pages/message/chat/index',
   MY: '/pages/my/index',
   MY_VISITED:'/pages/my/my-visited/index',
   MY_BOUGHT:'/pages/my/my-bought/index',
@@ -23,7 +28,7 @@ const urlList = {
 class IndexSearchUrlConfig {
   private readonly WORD = 'word';
 
-  public createIndexSearchUrl(word): string {
+  public createUrl(word): string {
     return encodeURI(`${urlList.INDEX_SEARCH_RESULT}?${this.WORD}=${word}`);
   }
 
@@ -41,7 +46,7 @@ const indexSearchUrlConfig = new IndexSearchUrlConfig();
 class GoodsInfoUrlConfig {
   private readonly GOODS_ID = 'goods_id';
 
-  public createIndexSearchUrl(id): string {
+  public createUrl(id): string {
     return encodeURI(`${urlList.INDEX_GOODS_INFO}?${this.GOODS_ID}=${id}`);
   }
 
@@ -56,8 +61,46 @@ class GoodsInfoUrlConfig {
 
 const goodsInfoUrlConfig = new GoodsInfoUrlConfig();
 
+class LocationUrlConfig {
+  private readonly LOCATION = 'location';
+
+  public createUrl(location:Location): string {
+    return encodeURI(`${urlList.INDEX_LOCATION}?${this.LOCATION}=${JSON.stringify(location)}`);
+  }
+
+  public getLocation(that): Location|undefined {
+    try {
+      return JSON.parse(that.$router.params[this.LOCATION]);
+    } catch (e) {
+      console.error('LocationUrlConfig getLocation', e);
+    }
+  }
+}
+
+const locationUrlConfig = new LocationUrlConfig();
+
+class ChatUrlConfig {
+  private readonly USER_ID = 'user_id';
+
+  public createUrl(id): string {
+    return encodeURI(`${urlList.MESSAGE_CHAT}?${this.USER_ID}=${id}`);
+  }
+
+  public getUserId(that): string|undefined {
+    try {
+      return that.$router.params[this.USER_ID];
+    } catch (e) {
+      console.error('ChatUrlConfig getUserId', e);
+    }
+  }
+}
+
+const chatUrlConfig = new ChatUrlConfig();
+
 export default urlList;
 export {
   indexSearchUrlConfig,
-  goodsInfoUrlConfig
+  goodsInfoUrlConfig,
+  chatUrlConfig,
+  locationUrlConfig,
 };
