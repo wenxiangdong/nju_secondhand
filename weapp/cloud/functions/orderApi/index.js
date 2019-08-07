@@ -77,7 +77,7 @@ exports.main = async (event, context) => {
           }
         });
       },
-      '-1': aysnc (order) => {
+      '-1': async (order) => {
         // 删除订单
         // 就算出错了也没有太多关系，放着异步
         orderCollection.doc(order._id).remove();
