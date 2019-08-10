@@ -2,7 +2,7 @@ import "@tarojs/async-await";
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import DSwiper from "../../components/common/d-swiper";
-import {AtGrid, AtSearchBar} from "taro-ui";
+import {AtGrid, AtSearchBar, AtMessage} from "taro-ui";
 import {Item} from "taro-ui/@types/grid";
 import localConfig from '../../utils/local-config'
 import {createSimpleErrorHandler} from "../../utils/function-factory";
@@ -25,7 +25,7 @@ interface IState {
  * 首页
  * @create 2019/7/25 11:49
  */
-export default class index extends Component<any, IState> {
+class index extends Component<any, IState> {
 
   config: Config = {
     navigationBarTitleText: '首页'
@@ -102,7 +102,10 @@ export default class index extends Component<any, IState> {
           <DSwiper srcs={swiperSrcs}/>
           <AtGrid hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>
           <MainTabBar currentIndex={MainTabBar.HOME_INDEX}/>
+          <AtMessage />
         </View>
       );
   }
 }
+
+export default index;

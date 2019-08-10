@@ -3,6 +3,8 @@ import Index from './pages/index'
 
 import './app.scss'
 import messageHub from "./apis/MessageApi";
+import { View } from '@tarojs/components';
+import { AtMessage } from 'taro-ui';
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -23,7 +25,7 @@ class App extends Component {
   config: Config = {
     pages: [
       // 测试页面
-      'pages/dev/index',
+      // 'pages/dev/index',
       'pages/index/index',
 
       'pages/circle/index',
