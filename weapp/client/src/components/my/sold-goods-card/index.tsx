@@ -20,7 +20,7 @@ function SoldGoodsCard(props: IProp) {
   const {goods = MockGoodsApi.createMockGoods(), onDeleteGoods} = props;
 
   const picSrc = goods.pictures[0];
-  const {name, publishTime, price, _id} = goods;
+  const {name, publishTime, price} = goods;
 
   const publishTimeDateString = new Date(publishTime).toLocaleDateString();
 
@@ -35,7 +35,7 @@ function SoldGoodsCard(props: IProp) {
       </View>
       <View style={subColumnStyle}>
         <Text style={dateStringStyle}>{publishTimeDateString}</Text>
-        <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onDeleteGoods(_id)}>下架</AtButton>
+        <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onDeleteGoods()}>下架</AtButton>
       </View>
     </View>
   )

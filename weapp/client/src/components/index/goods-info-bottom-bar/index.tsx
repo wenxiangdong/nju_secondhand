@@ -32,6 +32,13 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
 
   static defaultProps: IProp = {goodsWithSeller: MockGoodsApi.createMockGoodsWithSeller()};
 
+  private readonly defaultBuyingState = {
+    isBuying: false,
+    buyingLoading: false,
+    errMsg: undefined,
+    sucMsg: undefined
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -47,11 +54,11 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
   };
 
   private handleBuy = () => {
-    this.setState({isBuying: true, buyingLoading: false, errMsg: undefined, sucMsg: undefined});
+    this.setState({...this.defaultBuyingState, isBuying: true});
   };
 
   private handleCancel = () => {
-    this.setState({isBuying: false, buyingLoading: false, errMsg: undefined, sucMsg: undefined});
+    this.setState({...this.defaultBuyingState});
   };
 
   private handleConfirm = () => {

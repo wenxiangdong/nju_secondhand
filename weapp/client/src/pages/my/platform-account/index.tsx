@@ -29,6 +29,13 @@ export class index extends Component<any, IState> {
 
   private userId:string;
 
+  private readonly defaultWithdrawState = {
+    isWithdrawing: false,
+    withdrawLoading: false,
+    errMsg: undefined,
+    sucMsg: undefined,
+  };
+
   config: Config = {
     navigationBarTitleText: '平台账户'
   };
@@ -60,11 +67,11 @@ export class index extends Component<any, IState> {
   };
 
   private handleWithdraw = () => {
-    this.setState({isWithdrawing: true, withdrawLoading: false, errMsg: undefined, sucMsg: undefined})
+    this.setState({...this.defaultWithdrawState, isWithdrawing: true});
   };
 
   private handleCancel = () => {
-    this.setState({isWithdrawing: false, withdrawLoading: false, errMsg: undefined, sucMsg: undefined});
+    this.setState({...this.defaultWithdrawState});
   };
 
   private handleConfirm = () => {

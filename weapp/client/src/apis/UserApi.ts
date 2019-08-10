@@ -98,7 +98,7 @@ class MockUserApi implements IUserApi {
       avatar: '',
       address: MockUserApi.createMockLocation(),
       email: 'email',
-      account: MockAccountApi.createMockAccount(0.01),
+      account: MockAccountApi.createMockAccount(),
       signUpTime: Date.now(),
       state: UserState.Normal
     };

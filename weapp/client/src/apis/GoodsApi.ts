@@ -1,7 +1,7 @@
 import "@tarojs/async-await"
 import { httpRequest, mockHttpRequest, VO, db, command } from "./HttpRequest";
 import { MockUserApi, UserVO, userApi } from "./UserApi";
-import { copy } from "./Util";
+import {copy, createRandomNumberStr} from "./Util";
 import localConfig from "../utils/local-config";
 
 export interface IGoodsApi {
@@ -143,7 +143,8 @@ class MockGoodsApi implements IGoodsApi {
     return mockHttpRequest.success();
   }
   getOngoingGoods(): Promise<GoodsVO[]> {
-    const goodsArray: GoodsVO[] = new Array(10).fill(MockGoodsApi.createMockGoods());
+    const goodsArray: GoodsVO[] = new Array(10).fill(null)
+      .map(() => MockGoodsApi.createMockGoods());
     return mockHttpRequest.success(goodsArray);
   }
   deleteGoods(goodsID: string): Promise<void> {
@@ -238,7 +239,7 @@ class MockGoodsApi implements IGoodsApi {
       sellerID: '',
       name: 'name',
       desc: 'desc',
-      price: '1.01',
+      price: createRandomNumberStr(),
       pictures: ['', ''],
       category: MockGoodsApi.createMockCateGory(),
       publishTime: Date.now(),

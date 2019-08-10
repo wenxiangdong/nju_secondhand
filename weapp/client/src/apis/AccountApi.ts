@@ -1,5 +1,6 @@
 import "@tarojs/async-await";
 import {httpRequest, mockHttpRequest} from "./HttpRequest";
+import {createRandomNumberStr} from "./Util";
 
 export interface IAccountApi {
   // 取款
@@ -20,10 +21,9 @@ class MockAccountApi implements IAccountApi {
     return mockHttpRequest.success();
   }
 
-  static createMockAccount(account?:number|string): AccountVO {
-    account = account || '1.01';
+  static createMockAccount(): AccountVO {
     return {
-      balance: Number(account).toFixed(2)
+      balance: createRandomNumberStr()
     };
   }
 }
