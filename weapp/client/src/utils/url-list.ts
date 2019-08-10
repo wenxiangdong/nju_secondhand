@@ -21,6 +21,7 @@ const urlList = {
   MY_PRIVACY_POLICY:'/pages/my/privacy-policy/index',
   MY_PLATFORM_RULES:'/pages/my/platform-rules/index',
   MY_USER_INFO: '/pages/my/user-info/index',
+  MY_COMPLAINT: '/pages/my/complaint/index',
   ERROR: ''
 };
 

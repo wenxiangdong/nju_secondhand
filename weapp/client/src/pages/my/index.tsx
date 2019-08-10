@@ -62,6 +62,11 @@ export class My extends Component<any, IState> {
       title: '平台规则',
       iconInfo: {value: 'star'},
     },
+    {
+      page: urlList.MY_COMPLAINT,
+      title: '反馈',
+      iconInfo: {value: 'phone'},
+    },
   ];
 
   constructor(props) {
