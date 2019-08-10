@@ -1,4 +1,4 @@
-import Taro from "@tarojs/taro";
+import Taro, { SocketTask } from "@tarojs/taro";
 
 export interface MessageVO {
   _id: string;
@@ -21,14 +21,14 @@ class MessageHub {
   private readonly messageHistory: Map<string, MessageVO[]>;
   private STORAGE_KEY: string = "messages";
 
-  constructor(private websocket: WebSocket) {
+  constructor(private websocket: SocketTask) {
     this.observers = [];
     this.messageHistory = new Map<string, MessageVO[]>();
     this.initWebsocket();
   }
 
   private initWebsocket() {
-    this.websocket.onmessage = (ev: MessageEvent) => {
+    this.websocket.onMessage((ev) => {
       console.log("onmessage", ev);
       const vo: MessageVO = JSON.parse(ev.data);
       // notify
@@ -47,7 +47,15 @@ class MessageHub {
         key: this.STORAGE_KEY,
         data: this.messageHistory
       });
-    }
+    });
+
+    this.websocket.onOpen(() => {
+      console.log("socket 成功连接");
+    });
+
+    this.websocket.onError((e) => {
+      console.log(`socket连接出错，${e.errMsg}`);
+    });
   }
 
   public subscribe(observer: Observer) {
@@ -69,6 +77,9 @@ class MessageHub {
 class MockSocket {
   public onmessage: (ev: MessageEvent) => void;
   constructor() {
+  }
+
+  onMessage(callback: Taro.SocketTask.onMessage.Param) {
     const vo: MessageVO = {
       _id: "string",
       senderID: "sender",
@@ -82,7 +93,7 @@ class MockSocket {
     const senders = ["eric", "wang", "wen"];
     setInterval(() => {
       const sender = senders[Math.floor(Math.random() * senders.length)];
-      this.onmessage && this.onmessage(
+      callback && callback(
         // @ts-ignore
         {
           data: JSON.stringify({
@@ -95,6 +106,10 @@ class MockSocket {
       )
     }, 3000);
   }
+
+  onOpen(){}
+
+  onError(){}
 
 }
 
