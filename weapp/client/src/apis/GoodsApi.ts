@@ -143,7 +143,8 @@ class MockGoodsApi implements IGoodsApi {
     return mockHttpRequest.success();
   }
   getOngoingGoods(): Promise<GoodsVO[]> {
-    throw new Error("Method not implemented.");
+    const goodsArray: GoodsVO[] = new Array(10).fill(MockGoodsApi.createMockGoods());
+    return mockHttpRequest.success(goodsArray);
   }
   deleteGoods(goodsID: string): Promise<void> {
     console.log('deleteGoods goodsID:', goodsID);

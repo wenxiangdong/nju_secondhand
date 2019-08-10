@@ -2,13 +2,13 @@ import Taro from '@tarojs/taro'
 import {View, Text, Image} from '@tarojs/components'
 import {GoodsWithSellerVO} from "../../../apis/GoodsApi";
 import localConfig from "../../../utils/local-config";
-import {styleHelper} from "../../../utils/style-helper";
 import {AtAvatar, AtDivider} from "taro-ui";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import {CSSProperties} from "react";
 import {goodsInfoUrlConfig} from "../../../utils/url-list";
 
 import "taro-ui/dist/style/components/flex.scss";
+import {StyleHelper} from "../../../utils/style-helper";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO
@@ -21,18 +21,17 @@ function createStyles() {
   const width = Math.floor(localConfig.getSystemSysInfo().windowWidth / 4 - margin - padding - borderWidth) * 2;
   const imageBorderRadius = 4;
 
-  const numberToPxStr = styleHelper.numberToPxStr;
+  const numberToPxStr = StyleHelper.numberToPxStr;
   const widthAndHeightPx = numberToPxStr(width);
   const marginPx = numberToPxStr(margin);
   const paddingPx = numberToPxStr(padding);
-  const borderWidthPx = numberToPxStr(borderWidth);
   const imageBorderRadiusPx = numberToPxStr(imageBorderRadius);
 
   const goodsCardViewStyle: CSSProperties = {
     width: widthAndHeightPx,
     margin: marginPx,
     padding: paddingPx,
-    border: `${borderWidthPx} solid lightgray`,
+    border: StyleHelper.NORMAL_BORDER,
     display: 'inline-block'
   };
 
@@ -41,7 +40,7 @@ function createStyles() {
     height: widthAndHeightPx,
     // TODO 优先级 低
     // 检查样式
-    border: 'thin sold transparent',
+    border: 'thin solid transparent',
     borderRadius: imageBorderRadiusPx
   };
 

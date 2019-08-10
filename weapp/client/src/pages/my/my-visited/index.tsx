@@ -20,7 +20,7 @@ interface IState {
  */
 export default class index extends Component<any, IState> {
 
-  private beforeSearchValue: string;
+  private readonly beforeSearchValue: string;
 
   config: Config = {
     navigationBarTitleText: '我的足迹'
