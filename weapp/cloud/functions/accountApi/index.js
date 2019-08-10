@@ -93,7 +93,7 @@ const withdraw = async ({openID = "", amount = 0}) => {
     mchid: APP_CONFIG.ACCOUNT,
     partnerKey: APP_CONFIG.KEY,
     // TODO: 读取证书
-    // pfx: require('fs').readFileSync(''),
+    pfx: APP_CONFIG.CERT,
     spbill_create_ip: '127.0.0.1'
   };
 
@@ -184,9 +184,10 @@ const APP_CONFIG = {
   // APP_SECRET: "ca5fbd48dfa1a22282998e2ffcd4ecbf", // kefubao
   APP_SECRET: "08c5dba9b8e3f52eded6f4c9a0ad4650",
   // ACCOUNT: "1512752051", // kefubao
-  ACCOUNT: "1521513131",
+  ACCOUNT: "1524825661",
   // KEY: "shenghuokexuejiaoshi123456789123",  // kefubao
-  KEY: "ljxst2018！ljxst2018！ljxst2018！"
+  KEY: "NanjingdunshudianzishangwuYXXL18",
+  CERT: fs.readFileSync('cert.p12')
 };
 
 const WECHAT_CONFIG = {
