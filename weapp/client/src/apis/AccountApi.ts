@@ -1,5 +1,5 @@
 import "@tarojs/async-await";
-import { httpRequest } from "./HttpRequest";
+import {httpRequest, mockHttpRequest} from "./HttpRequest";
 
 export interface IAccountApi {
   // 取款
@@ -17,7 +17,7 @@ class AccountApi implements IAccountApi {
 class MockAccountApi implements IAccountApi {
   withdraw(amount: String): Promise<void> {
     console.log(`withdraw success ${amount}`);
-    return Promise.resolve();
+    return mockHttpRequest.success();
   }
 
   static createMockAccount(account?:number|string): AccountVO {

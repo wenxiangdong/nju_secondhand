@@ -1,21 +1,22 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View, Button, Text} from '@tarojs/components'
+import {View} from '@tarojs/components'
 import LoadingPage from "../../../components/common/loading-page";
 import localConfig from "../../../utils/local-config";
 import {apiHub} from "../../../apis/ApiHub";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
-import {AtActivityIndicator, AtButton, AtCard, AtModal, AtModalAction, AtModalContent, AtModalHeader} from "taro-ui";
+import {AtButton, AtCard} from "taro-ui";
 import {MockUserApi, UserVO} from "../../../apis/UserApi";
 import urlList from "../../../utils/url-list";
+import ConfirmModal from "../../../components/common/confirm-modal";
 
 interface IState {
   loading: boolean,
-  modalLoading: boolean,
-  errMsg?: string,
-  sucMsg?: string,
-  isWithdrawing: boolean,
   withdrawAvailable: boolean,
   user?: UserVO,
+  isWithdrawing: boolean,
+  withdrawLoading: boolean,
+  errMsg?: string,
+  sucMsg?: string,
 }
 
 /**
@@ -36,7 +37,7 @@ export class index extends Component<any, IState> {
     super(props);
     this.state = {
       loading: true,
-      modalLoading: false,
+      withdrawLoading: false,
       isWithdrawing: false,
       withdrawAvailable: new Date(localConfig.getWithdrawTime() || 0).toDateString()
         !== new Date(Date.now()).toDateString()
@@ -58,26 +59,30 @@ export class index extends Component<any, IState> {
     }
   };
 
+  private handleWithdraw = () => {
+    this.setState({isWithdrawing: true, withdrawLoading: false, errMsg: undefined, sucMsg: undefined})
+  };
+
   private handleCancel = () => {
-    this.setState({isWithdrawing: false});
+    this.setState({isWithdrawing: false, withdrawLoading: false, errMsg: undefined, sucMsg: undefined});
   };
 
   private handleConfirm = () => {
     const that = this;
-    this.setState({modalLoading: true}, function() {
+    this.setState({withdrawLoading: true}, function() {
       const {user} = that.state;
       if (user) {
         apiHub.accountApi.withdraw(user.account.balance)
           .then(function () {
             const sucMsg = '提现完成';
-            that.setState({sucMsg}, function () {
+            that.setState({sucMsg, withdrawLoading: false}, function () {
               setTimeout(function () {
-                localConfig.setWithdrawTime(Date.now());
                 Taro.reLaunch({
                   url: urlList.MY
                 }).catch(that.onError);
               }, 1000);
             });
+            localConfig.setWithdrawTime(Date.now());
           })
           .catch(that.onError);
       } else {
@@ -91,62 +96,14 @@ export class index extends Component<any, IState> {
   };
 
   render() {
-    const {loading, modalLoading, errMsg, sucMsg, isWithdrawing, withdrawAvailable, user = MockUserApi.createMockUser()} = this.state;
+    const {loading, errMsg, withdrawAvailable, user = MockUserApi.createMockUser(), isWithdrawing, withdrawLoading, sucMsg} = this.state;
     const {nickname, account} = user;
     const {balance} = account;
 
     const atModalContent = `总计￥${balance}`;
+    const atCardNode = withdrawAvailable? '每天只能提现一次哦': '今天已经不能提现了，请明天再来';
 
-    let errMsgModal = (
-      <AtModal isOpened
-               closeOnClickOverlay={false}>
-        <AtModalHeader>出错了</AtModalHeader>
-        <AtModalContent>
-          <Text>{errMsg}</Text>
-        </AtModalContent>
-        <AtModalAction>
-          <Button onClick={this.handleCancel}>确定</Button>
-        </AtModalAction>
-      </AtModal>
-    );
-
-    let loadingModal = (
-      <AtModal isOpened
-               closeOnClickOverlay={false}>
-        <AtModalHeader>提现确认</AtModalHeader>
-        <AtModalContent>
-          <View style={{position: 'relative', height: '100px'}}>
-            <AtActivityIndicator content='加载中...' size={32} mode="center"/>
-          </View>
-        </AtModalContent>
-      </AtModal>
-    );
-
-    let sucMsgModal = (
-      <AtModal isOpened
-               closeOnClickOverlay={false}>
-        <AtModalHeader>提现确认</AtModalHeader>
-        <AtModalContent>
-          <Text>{sucMsg}</Text>
-        </AtModalContent>
-      </AtModal>
-    );
-
-    let buyModal = (
-      <AtModal isOpened
-               closeOnClickOverlay={false}>
-        <AtModalHeader>提现确认</AtModalHeader>
-        <AtModalContent>
-          <Text decode>${atModalContent}</Text>
-        </AtModalContent>
-        <AtModalAction>
-          <Button onClick={this.handleCancel}>取消</Button>
-          <Button onClick={this.handleConfirm}>确定</Button>
-        </AtModalAction>
-      </AtModal>
-    );
-
-    return (loading || (!isWithdrawing && errMsg)
+    return (loading || (!withdrawLoading && errMsg))
       ? (
         <LoadingPage errMsg={errMsg}/>
       )
@@ -155,16 +112,20 @@ export class index extends Component<any, IState> {
 
           {
             isWithdrawing
-              ? ( errMsg ? errMsgModal
-                : ( sucMsg ? sucMsgModal
-                    : ( modalLoading ? (loadingModal) : (buyModal))
-                )
+              ? (
+                <ConfirmModal loading={withdrawLoading}
+                              onCancel={this.handleCancel}
+                              onConfirm={this.handleConfirm}
+                              errMsg={errMsg}
+                              sucMsg={sucMsg}
+                              title="提现确认"
+                              content={atModalContent}/>
               )
               : null
           }
 
           <AtCard
-            note='每天只能提现一次哦'
+            note={atCardNode}
             extra={nickname}
             title="平台账户"
           >
@@ -176,7 +137,7 @@ export class index extends Component<any, IState> {
               ?  (
                 <AtButton type='primary'
                           customStyle={{position: 'fixed', bottom: 0, left: 0, width: '100%'}}
-                          onClick={() => this.setState({isWithdrawing: true})}>
+                          onClick={this.handleWithdraw}>
                   全部提现
                 </AtButton>
               )
@@ -185,7 +146,7 @@ export class index extends Component<any, IState> {
 
         </View>
       )
-    );
+    ;
   }
 
   private onError = createSimpleErrorHandler('PlatformAccount', this);
