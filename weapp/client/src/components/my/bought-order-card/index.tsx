@@ -52,7 +52,7 @@ function BoughtOrderCard(props: IProp) {
         <View style={atButtonGroupStyle}>
           <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onComplaint()}>反馈</AtButton>
           {
-            state === OrderState.Ongoing && isBuyer && onAccept
+            state === OrderState.Ongoing && isBuyer && onAccept !== undefined
               ? <AtButton circle type='primary' customStyle={atButtonStyle} onClick={() => onAccept()}>收货</AtButton>
               : null
           }

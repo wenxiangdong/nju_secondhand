@@ -1,5 +1,6 @@
 import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
 import {Location, MockUserApi} from "./UserApi";
+import {createRandomNumberStr} from "./Util";
 
 export interface IOrderApi {
   getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
@@ -79,7 +80,7 @@ class MockOrderApi implements IOrderApi {
 
       goodsID: 'goodsID',
       goodsName: 'goodsName',
-      goodsPrice: 'goodsPrice',
+      goodsPrice: createRandomNumberStr(),
 
       address: MockUserApi.createMockLocation(),
 

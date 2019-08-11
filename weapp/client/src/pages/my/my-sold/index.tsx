@@ -9,10 +9,10 @@ import ConfirmModal from "../../../components/common/confirm-modal";
 import {OrderVO} from "../../../apis/OrderApi";
 import {AtLoadMore, AtTabs, AtTabsPane} from "taro-ui";
 import WhiteSpace from "../../../components/common/white-space";
-
-import '../../../styles/tab-title-fixed.scss';
 import {StyleHelper} from "../../../styles/style-helper";
 import BoughtOrderCard from "../../../components/my/bought-order-card";
+
+import '../../../styles/tab-title-fixed.scss';
 
 interface IState {
   loading: boolean,
@@ -37,6 +37,10 @@ interface IState {
  */
 export default class index extends Component<any, IState> {
 
+  config: Config = {
+    navigationBarTitleText: '我卖出的'
+  };
+
   private readonly defaultAtModalContent = '出错了，请取消操作';
 
   private readonly defaultDeleteState = {
@@ -49,10 +53,6 @@ export default class index extends Component<any, IState> {
   };
 
   private cancelTimeout;
-
-  config: Config = {
-    navigationBarTitleText: '我卖出的'
-  };
 
   private readonly tabList = [{ title: '正在出售' }, { title: '待送达' }, { title: '历史订单' }];
 
