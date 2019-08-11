@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     private List<UserVO> getUsers(UserState userState, String keyword, int lastIndex, int size) {
         Map<Object, Object> map = ImmutableMap.builder()
                 .put("$url", "getUsersByAdmin")
-                .put("state", userState)
+                .put("state", userState.ordinal())
                 .put("keyword", keyword)
                 .put("lastIndex", lastIndex)
                 .put("size", size)
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
         Map<Object, Object> map = ImmutableMap.builder()
                 .put("$url", "updateUserByAdmin")
                 .put("userID", userID)
-                .put("state", userState)
+                .put("state", userState.ordinal())
                 .build();
 
         cloudService.invokeCloudFunction(Void.class, USER_API, map);

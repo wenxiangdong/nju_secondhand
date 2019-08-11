@@ -1,7 +1,6 @@
 package nju.secondhand.vo;
 
 import lombok.Data;
-import nju.secondhand.vo.state.GoodsState;
 
 import java.util.List;
 
@@ -20,5 +19,5 @@ public class GoodsVO extends VO {
 
     Integer publishTime;
 
-    GoodsState state;
+    Integer state;
 }

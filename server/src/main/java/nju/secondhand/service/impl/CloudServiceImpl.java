@@ -2,6 +2,8 @@ package nju.secondhand.service.impl;
 
 import com.google.gson.Gson;
 import lombok.Builder;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import nju.secondhand.config.MiniProgramConfig;
 import nju.secondhand.exception.FailException;
@@ -23,8 +25,8 @@ public class CloudServiceImpl implements CloudService {
     private final HttpService httpService;
     private final MiniProgramConfig miniProgramConfig;
 
-    private LocalDateTime accessTokenExpireTime;
-    private String accessToken;
+    private static LocalDateTime accessTokenExpireTime;
+    private static String accessToken;
 
     public CloudServiceImpl(HttpService httpService, MiniProgramConfig miniProgramConfig) {
         this.httpService = httpService;
@@ -33,29 +35,32 @@ public class CloudServiceImpl implements CloudService {
 
     @Override
     public <T> T invokeCloudFunction(Class<T> tClass, String name, Object object) {
+        log.info("Invoke: " + name);
         String url = String.format("https://api.weixin.qq.com/tcb/invokecloudfunction?access_token=%s&env=%s&name=%s",
                 getAccessToken(),
                 miniProgramConfig.getEnv(),
                 name);
 
-        FunctionParam functionParam = FunctionParam
-                .builder()
-                .POSTBODY(new Gson().toJson(object))
-                .build();
+        FunctionResult result = httpService.post(url, new Gson().toJson(object), FunctionResult.class);
 
-        FunctionResult result = httpService.post(url, functionParam, FunctionResult.class);
+        log.info("Function Result: " + result);
 
-        if (result.errcode != 0) {
+        if (result.invalid()) {
             throw new FailException(result.errmsg);
         }
 
-        return new Gson().fromJson(result.resp_data, tClass);
+        HttpResponse<T> httpResponse = new Gson().fromJson(result.resp_data, HttpResponse.class);
+        if (httpResponse.code == 200) {
+            return httpResponse.data;
+        } else {
+            throw new FailException(httpResponse.message);
+        }
     }
 
     @SafeVarargs
     @Override
     public final <T> List<T> databaseQuery(Class<T> tClass, String collectionName, int skip, int limit, Map<String, Object>... conditions) {
-        log.info(String.format("Query: %s", collectionName));
+        log.info("Query: " + collectionName);
         String url = String.format("https://api.weixin.qq.com/tcb/databasequery?access_token=%s",
                 getAccessToken());
 
@@ -71,9 +76,11 @@ public class CloudServiceImpl implements CloudService {
                 .query(query)
                 .build();
 
-        QueryResult result = httpService.post(url, databaseParam, QueryResult.class);
+        QueryResult result = httpService.post(url, new Gson().toJson(databaseParam), QueryResult.class);
 
-        if (result.errcode != 0) {
+        log.info("Query Result: " + result);
+
+        if (result.invalid()) {
             throw new FailException(result.errmsg);
         }
 
@@ -100,9 +107,11 @@ public class CloudServiceImpl implements CloudService {
                 .query(query)
                 .build();
 
-        UpdateResult result = httpService.post(url, databaseParam, UpdateResult.class);
+        UpdateResult result = httpService.post(url, new Gson().toJson(databaseParam), UpdateResult.class);
 
-        if (result.errcode != 0) {
+        log.info("Update Result: " + result.toString());
+
+        if (result.invalid()) {
             throw new FailException(result.errmsg);
         }
     }
@@ -116,34 +125,16 @@ public class CloudServiceImpl implements CloudService {
 
             AccessToken access_token = httpService.get(url, AccessToken.class);
 
-            if (access_token.errcode != 0) {
+            log.info("AccessToken: " + access_token);
+
+            if (access_token.invalid()) {
                 throw new FailException(access_token.errmsg);
             }
-            this.accessTokenExpireTime = LocalDateTime.now().plusSeconds(access_token.expires_in);
-            this.accessToken = access_token.access_token;
-
-            log.info(String.format("Get AccessToken: %s", this.accessToken));
+            accessTokenExpireTime = LocalDateTime.now().plusSeconds(access_token.expires_in);
+            accessToken = access_token.access_token;
         }
-        return this.accessToken;
+        return accessToken;
     }
-}
-
-class AccessToken {
-    String access_token;
-    Integer expires_in;
-    Integer errcode;
-    String errmsg;
-}
-
-@Builder
-class FunctionParam {
-    String POSTBODY;
-}
-
-class FunctionResult {
-    Integer errcode;
-    String errmsg;
-    String resp_data;
 }
 
 @Builder
@@ -152,9 +143,39 @@ class DatabaseParam {
     String query;
 }
 
-class QueryResult {
+@ToString
+@Setter
+class WechatError {
     Integer errcode;
     String errmsg;
+
+    boolean invalid() {
+        return errcode != null && errcode != 0;
+    }
+}
+
+@ToString(callSuper = true)
+@Setter
+class AccessToken extends WechatError {
+    String access_token;
+    Integer expires_in;
+}
+
+class HttpResponse<T> {
+    Integer code;
+    String message;
+    T data;
+}
+
+@ToString(callSuper = true)
+@Setter
+class FunctionResult extends WechatError {
+    String resp_data;
+}
+
+@ToString(callSuper = true)
+@Setter
+class QueryResult extends WechatError {
     Pager pager;
 
     private static class Pager {
@@ -166,9 +187,9 @@ class QueryResult {
     List<String> data;
 }
 
-class UpdateResult {
-    Integer errcode;
-    String errmsg;
+@ToString(callSuper = true)
+@Setter
+class UpdateResult extends WechatError {
     Integer matched;
     Integer modified;
     String id;

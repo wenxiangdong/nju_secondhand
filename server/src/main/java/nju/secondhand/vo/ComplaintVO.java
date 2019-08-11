@@ -1,7 +1,6 @@
 package nju.secondhand.vo;
 
 import lombok.Data;
-import nju.secondhand.vo.state.ComplaintState;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class ComplaintVO {
 
     Handling handling;
 
-    ComplaintState state;
+    Integer state;
 
     @Data
     private static class Handling {
