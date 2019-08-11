@@ -58,7 +58,8 @@ export class index extends Component<any, IState> {
             default:
               throw this.NOT_FIND_GOODS_ID_ERROR;
           }
-        }).catch(this.onError);
+        })
+        .catch(this.onError);
     });
   };
 

@@ -48,7 +48,8 @@ export default class SearchResult extends Component<any, IState> {
       .then(searchValue => {
         this.setState({searchValue, loading: false, loadMoreStatus: 'loading'},
           this.searchGoodsWithSeller)
-    }).catch(this.onError);
+      })
+      .catch(this.onError);
   }
 
   private initSearchValue = async (): Promise<string> => {
@@ -72,7 +73,8 @@ export default class SearchResult extends Component<any, IState> {
           } else {
             this.setState({loadMoreStatus: 'noMore', searchDisabled: false});
           }
-        });
+        })
+        .catch(this.onError);
     } else {
       throw this.NOT_FIND_CATEGORY_ERROR;
     }

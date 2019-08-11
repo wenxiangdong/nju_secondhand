@@ -38,11 +38,12 @@ export default class CategoryGoods extends Component<any, IState> {
   componentWillMount() {
     this.initCategory()
       .then(category => {
-      Taro.setNavigationBarTitle({title: category.name})
-        .catch(this.onError);
-      this.setState({category, loading: false, loadMoreStatus: 'loading'},
-        this.searchGoodsWithSeller);
-    }).catch(this.onError);
+        Taro.setNavigationBarTitle({title: category.name})
+          .catch(this.onError);
+        this.setState({category, loading: false, loadMoreStatus: 'loading'},
+          this.searchGoodsWithSeller);
+      })
+      .catch(this.onError);
   }
 
   private initCategory = async (): Promise<CategoryVO> => {
@@ -66,6 +67,7 @@ export default class CategoryGoods extends Component<any, IState> {
             this.setState({loadMoreStatus: 'noMore'});
           }
         })
+        .catch(this.onError);
     } else {
       throw this.NOT_FIND_CATEGORY_ERROR;
     }

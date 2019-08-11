@@ -5,8 +5,12 @@ import {apiHub} from "../../../apis/ApiHub";
 import {AtLoadMore, AtSearchBar} from "taro-ui";
 import GoodsCard from "../../../components/index/goods-card";
 import {StyleHelper} from "../../../styles/style-helper";
+import {createSimpleErrorHandler} from "../../../utils/function-factory";
+import LoadingPage from "../../../components/common/loading-page";
 
 interface IState {
+  loading: boolean,
+  errMsg?: string,
   searchValue: string,
   loadMoreStatus?: 'more' | 'loading' | 'noMore',
   goodsWithSeller: Array<GoodsWithSellerVO>,
@@ -30,6 +34,7 @@ export default class index extends Component<any, IState> {
     super(props);
     this.beforeSearchValue = '';
     this.state = {
+      loading: true,
       searchValue: '',
       goodsWithSeller: [],
       searchDisabled: true
@@ -46,11 +51,12 @@ export default class index extends Component<any, IState> {
     apiHub.goodsApi.getVisitedGoodsWithSeller(word, lastIndex)
       .then((goodsWithSeller) => {
         if (goodsWithSeller && goodsWithSeller.length) {
-          this.setState({goodsWithSeller: this.state.goodsWithSeller.concat(goodsWithSeller), loadMoreStatus: 'more', searchDisabled: false});
+          this.setState({loading: false, goodsWithSeller: this.state.goodsWithSeller.concat(goodsWithSeller), loadMoreStatus: 'more', searchDisabled: false});
         } else {
-          this.setState({loadMoreStatus: 'noMore', searchDisabled: false});
+          this.setState({loading: false, loadMoreStatus: 'noMore', searchDisabled: false});
         }
-      });
+      })
+      .catch(this.onError);
   };
 
   private reSearch = () => {
@@ -67,27 +73,36 @@ export default class index extends Component<any, IState> {
   };
 
   render() {
-    const {loadMoreStatus, goodsWithSeller, searchValue, searchDisabled} = this.state;
+    const {
+      loading, errMsg,
+      loadMoreStatus, goodsWithSeller, searchValue, searchDisabled
+    } = this.state;
 
-    return (
-      <View>
-        <AtSearchBar
-          placeholder='请输入关键词搜索'
-          disabled={searchDisabled}
-          maxLength={20}
-          value={searchValue}
-          onChange={(searchValue) => this.setState({searchValue})}
-          onActionClick={this.reSearch}
-        />
+    return loading || errMsg
+      ? (
+        <LoadingPage errMsg={errMsg}/>
+      )
+      : (
         <View>
-          {goodsWithSeller.map((g, idx) => <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)}
+          <AtSearchBar
+            placeholder='请输入关键词搜索'
+            disabled={searchDisabled}
+            maxLength={20}
+            value={searchValue}
+            onChange={(searchValue) => this.setState({searchValue})}
+            onActionClick={this.reSearch}
+          />
+          <View>
+            {goodsWithSeller.map((g, idx) => <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)}
+          </View>
+          <AtLoadMore
+            moreBtnStyle={StyleHelper.loadMoreBtnStyle}
+            onClick={this.onLoadMore}
+            status={loadMoreStatus}
+          />
         </View>
-        <AtLoadMore
-          moreBtnStyle={StyleHelper.loadMoreBtnStyle}
-          onClick={this.onLoadMore}
-          status={loadMoreStatus}
-        />
-      </View>
-    );
+      );
   }
+
+  private onError = createSimpleErrorHandler('myVisited', this);
 }

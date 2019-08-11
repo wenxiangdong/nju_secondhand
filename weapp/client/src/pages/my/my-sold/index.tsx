@@ -74,7 +74,8 @@ export default class index extends Component<any, IState> {
         } else {
           this.setState({ongoingOrdersLoadMoreStatus: 'noMore'});
         }
-      });
+      })
+      .catch(this.onError);
   };
 
   private onLoadMoreHistoryOrders = () => {
@@ -91,7 +92,8 @@ export default class index extends Component<any, IState> {
         } else {
           this.setState({historyOrdersLoadMoreStatus: 'noMore'});
         }
-      });
+      })
+      .catch(this.onError);
   };
 
   private handleClick = (value) => {

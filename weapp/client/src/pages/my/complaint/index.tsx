@@ -1,8 +1,18 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View, Text} from '@tarojs/components'
+import {View} from '@tarojs/components'
+import {ComplaintVO} from "../../../apis/ComplaintApi";
+import {apiHub} from "../../../apis/ApiHub";
+import {createSimpleErrorHandler} from "../../../utils/function-factory";
+import LoadingPage from "../../../components/common/loading-page";
+import {AtLoadMore} from "taro-ui";
+import {StyleHelper} from "../../../styles/style-helper";
+import ComplaintCard from "../../../components/my/complaint-card";
 
 interface IState {
-
+  loading: boolean,
+  errMsg?: string,
+  complaints: Array<ComplaintVO>,
+  complaintsLoadMoreStatus?: 'more' | 'loading' | 'noMore',
 }
 
 /**
@@ -18,29 +28,56 @@ export default class index extends Component<any, IState> {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      loading: true,
+      complaints: [],
+    };
   }
 
   componentWillMount() {
+    this.loadMoreHistoryComplaints();
   }
 
-  componentDidMount() {
-  }
+  private onLoadMoreHistoryComplaints = () => {
+    this.setState({complaintsLoadMoreStatus: 'loading'},
+      this.loadMoreHistoryComplaints);
+  };
 
-  componentWillUnmount() {
-  }
-
-  componentDidShow() {
-  }
-
-  componentDidHide() {
-  }
+  private loadMoreHistoryComplaints = () => {
+    const lastIndex = this.state.complaints.length;
+    apiHub.complaintApi.getComplaints(lastIndex)
+      .then((complaints) => {
+        if (complaints && complaints.length) {
+          this.setState({loading: false, complaints: this.state.complaints.concat(complaints), complaintsLoadMoreStatus: 'more'});
+        } else {
+          this.setState({loading: false, complaintsLoadMoreStatus: 'noMore'});
+        }
+      })
+      .catch(this.onError);
+  };
 
   render() {
-    return (
-      <View>
-        <Text>index works</Text>
-      </View>
-    )
+    const {
+      loading, errMsg,
+      complaints, complaintsLoadMoreStatus
+    } = this.state;
+
+    return loading || errMsg
+      ? (
+        <LoadingPage errMsg={errMsg}/>
+      )
+      : (
+        <View>
+          {complaints.map((c, idx) => <ComplaintCard key={idx} complaint={c}/>)}
+
+          <AtLoadMore
+            moreBtnStyle={StyleHelper.loadMoreBtnStyle}
+            onClick={this.onLoadMoreHistoryComplaints}
+            status={complaintsLoadMoreStatus}
+          />
+        </View>
+      );
   }
+
+  private onError = createSimpleErrorHandler('complaint', this);
 }
