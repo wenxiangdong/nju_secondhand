@@ -13,6 +13,10 @@ class StyleHelper {
     textOverflow: "ellipsis"
   };
 
+  static readonly BREAK_ALL_TEXT: CSSProperties = {
+    wordBreak: "break-all"
+  };
+
   static readonly loadMoreBtnStyle:CSSProperties = {
     // TODO 优先级 低 增加样式
     // 加载更多按钮样式
