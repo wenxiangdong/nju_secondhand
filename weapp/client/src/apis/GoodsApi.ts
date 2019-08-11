@@ -1,7 +1,7 @@
 import "@tarojs/async-await"
-import { httpRequest, mockHttpRequest, VO, db, command } from "./HttpRequest";
-import { MockUserApi, UserVO, userApi } from "./UserApi";
-import {copy, createRandomNumberStr} from "./Util";
+import { httpRequest, mockHttpRequest, VO, db} from "./HttpRequest";
+import { MockUserApi, UserVO } from "./UserApi";
+import {createRandomNumberStr} from "./Util";
 import localConfig from "../utils/local-config";
 
 export interface IGoodsApi {
@@ -81,43 +81,19 @@ class GoodsApi implements IGoodsApi {
   }
 
   async searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
-    let goodsVOs: GoodsVO[] = await this.searchGoodsByCategory(categoryID, lastIndex, size);
-
-    let goodsWithSellerVOs: GoodsWithSellerVO[] = [];
-    for (let goodsVO of goodsVOs) {
-      goodsWithSellerVOs.push({
-        goods: goodsVO,
-        seller: await userApi.getUserInfo(goodsVO.sellerID)
-      })
-    }
-    return goodsWithSellerVOs;
+    return await httpRequest.callFunction<GoodsWithSellerVO[]>('goodsApi', { $url: 'searchGoodsWithSellerByCategory', categoryID, lastIndex, size })
   }
 
   async searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
-    let goodsVOs: GoodsVO[] = await this.searchGoodsByKeyword(keyword, lastIndex, size);
-
-    let goodsWithSellerVOs: GoodsWithSellerVO[] = [];
-    for (let goodsVO of goodsVOs) {
-      goodsWithSellerVOs.push({
-        goods: goodsVO,
-        seller: await userApi.getUserInfo(goodsVO.sellerID)
-      })
-    }
-    return goodsWithSellerVOs;
+    return await httpRequest.callFunction<GoodsWithSellerVO[]>('goodsApi', { $url: 'searchGoodsWithSellerByKeyword', keyword, lastIndex, size })
   }
 
-  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO> {
-    // TODO 优先级 低 接口添加
-    // 求后端小哥加通过 id 获取 VO 的接口
-    // 加完记得顺便改一下文档 ❤❤❤
-    // 其他用 id 获取 VO 的接口暂时还不急
-    throw new Error("Method not implemented." + goodsID);
+  async getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO> {
+    return await httpRequest.callFunction<GoodsWithSellerVO>("goodsApi", { $url: 'getGoodsWithSeller', goodsID })
   }
 
-  getGoods(goodsID: string): Promise<GoodsVO> {
-    // TODO 优先级 低 接口添加
-    // 同上
-    throw new Error("Method not implemented." + goodsID);
+  async  getGoods(goodsID: string): Promise<GoodsVO> {
+    return await httpRequest.callFunction<GoodsVO>("goodsApi", { $url: "getGoods", goodsID })
   }
 
   getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]> {
