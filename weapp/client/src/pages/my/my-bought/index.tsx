@@ -163,7 +163,7 @@ export default class index extends Component<any, IState> {
       historyOrders, historyOrdersLoadMoreStatus
     } = this.state;
 
-    return loading || errMsg
+    return (loading || (!acceptLoading && errMsg))
       ? (
         <LoadingPage errMsg={errMsg}/>
       )
