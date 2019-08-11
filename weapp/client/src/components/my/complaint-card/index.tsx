@@ -16,7 +16,7 @@ interface IProp {
  */
 function ComplaintCard(props: IProp) {
   const {complaint = MockComplaintApi.createMockComplaint()} = props;
-  const {orderID, complainTime, complaintName, desc, state, handling, pictures} = complaint;
+  const {orderID, complainTime, desc, state, handling, pictures} = complaint;
 
   const complainTimeString = timeToString(complainTime);
 
@@ -37,7 +37,6 @@ function ComplaintCard(props: IProp) {
         <Text style={stateInfoStyle}>{state}</Text>
       </View>
       <Text>时间：{complainTimeString}</Text>
-      <Text>反馈：{complaintName}</Text>
       <Text style={StyleHelper.BREAK_ALL_TEXT}>描述：{desc}</Text>
       {
         (pictures && pictures.length)

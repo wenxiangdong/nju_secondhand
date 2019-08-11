@@ -12,6 +12,7 @@ import WhiteSpace from '../../common/white-space';
 interface IProp {
   order: OrderVO,
   onAccept?: () => void,
+  isComplaint?: boolean,
   isBuyer: boolean
 }
 
@@ -21,7 +22,7 @@ interface IProp {
  * @create 2019/8/11 10:20
  */
 function BoughtOrderCard(props: IProp) {
-  const {order = MockOrderApi.createMockOrder(), onAccept, isBuyer} = props;
+  const {order = MockOrderApi.createMockOrder(), onAccept, isBuyer, isComplaint} = props;
 
   const onError = createSimpleErrorHandler('BoughtOrderCard');
 
@@ -49,14 +50,20 @@ function BoughtOrderCard(props: IProp) {
       </View>
       <View style={subColumnStyle}>
         <Text style={dateStringStyle}>订单状态：{state}</Text>
-        <View style={atButtonGroupStyle}>
-          <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onComplaint()}>反馈</AtButton>
-          {
-            state === OrderState.Ongoing && isBuyer && onAccept !== undefined
-              ? <AtButton circle type='primary' customStyle={atButtonStyle} onClick={() => onAccept()}>收货</AtButton>
-              : null
-          }
-        </View>
+        {
+          isComplaint
+            ? null
+            : (
+              <View style={atButtonGroupStyle}>
+                <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onComplaint()}>反馈</AtButton>
+                {
+                  state === OrderState.Ongoing && isBuyer && onAccept !== undefined
+                    ? <AtButton circle type='primary' customStyle={atButtonStyle} onClick={() => onAccept()}>收货</AtButton>
+                    : null
+                }
+              </View>
+            )
+        }
       </View>
     </View>
   )

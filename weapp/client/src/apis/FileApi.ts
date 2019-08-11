@@ -91,6 +91,7 @@ class MockFileApi implements IFileApi {
   }
 
   deleteFile(fileList: string[]): Promise<DeleteFileResultItem[]> {
+    console.log('deleteFile', fileList);
     return mockHttpRequest.success([]);
   }
 }

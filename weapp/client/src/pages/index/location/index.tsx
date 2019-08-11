@@ -17,7 +17,7 @@ interface IState {
  */
 export default class index extends Component<any, IState> {
 
-  private readonly NOT_FIND_LOCATION_ERROR:Error = new Error('未找到该地点请重试');
+  private readonly NOT_FIND_LOCATION_ERROR:Error = new Error('未找到该地点\n请重试');
 
   config: Config = {
     navigationBarTitleText: '地图'

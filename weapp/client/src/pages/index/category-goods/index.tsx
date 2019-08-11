@@ -25,7 +25,7 @@ interface IState {
  */
 export default class CategoryGoods extends Component<any, IState> {
 
-  private readonly NOT_FIND_CATEGORY_ERROR:Error = new Error('未找到类别请重试');
+  private readonly NOT_FIND_CATEGORY_ERROR:Error = new Error('未找到类别\n请重试');
 
   constructor(props) {
     super(props);

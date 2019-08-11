@@ -1,15 +1,27 @@
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View, Text} from '@tarojs/components'
 
+interface IState {
+
+}
+
 /**
- * 用户信息
- * @create 2019/7/25 11:49
+ * index
+ * @author 张李承
+ * @create 2019/8/11 23:18
  */
-export class index extends Component {
+export default class index extends Component<any, IState> {
+
+  private readonly NOT_FIND_USER_ID_ERROR:Error = new Error('登录已失效');
 
   config: Config = {
     navigationBarTitleText: '用户信息'
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
 
   componentWillMount() {
   }
@@ -29,7 +41,7 @@ export class index extends Component {
   render() {
     return (
       <View>
-        <Text>用户信息 works</Text>
+        <Text>index works</Text>
       </View>
     )
   }

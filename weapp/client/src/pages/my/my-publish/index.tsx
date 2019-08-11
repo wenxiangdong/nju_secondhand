@@ -6,6 +6,7 @@ import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
 import ConfirmModal from "../../../components/common/confirm-modal";
 import SoldGoodsCard from "../../../components/my/sold-goods-card";
+import {RelaunchTimeout} from "../../../utils/date-util";
 
 interface IState {
   loading: boolean,
@@ -85,7 +86,7 @@ export default class index extends Component<any, IState> {
           const goodsArr = that.state.goodsArr;
           const sucMsg = `商品名：${goods.name}\n已下架成功`;
           that.setState({sucMsg, deleteLoading: false, goodsArr: goodsArr.slice(0, deleteIdx).concat(goodsArr.slice(deleteIdx + 1))}, function() {
-            that.cancelTimeout = setTimeout(() => that.setState({...that.defaultDeleteState}), 1000);
+            that.cancelTimeout = setTimeout(() => that.setState({...that.defaultDeleteState}), RelaunchTimeout);
           });
         })
         .catch(that.onError)

@@ -15,7 +15,7 @@ import localConfig from "../../../utils/local-config";
 interface IState {
   loading: boolean,
   errMsg?: string,
-  goodsWithSeller?: GoodsWithSellerVO,
+  goodsWithSeller: GoodsWithSellerVO,
 }
 
 /**
@@ -24,7 +24,7 @@ interface IState {
  */
 export class index extends Component<any, IState> {
 
-  private readonly NOT_FIND_GOODS_ID_ERROR:Error = new Error('未找到选择的商品请重试');
+  private readonly NOT_FIND_GOODS_ID_ERROR:Error = new Error('未找到商品\n请重试');
   private readonly GOODS_DELETED_ERROR:Error = new Error('商品已经被抢走了\nQwQ');
 
   config: Config = {
@@ -34,7 +34,8 @@ export class index extends Component<any, IState> {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      loading: true,
+      goodsWithSeller: MockGoodsApi.createMockGoodsWithSeller()
     };
   }
 
@@ -73,7 +74,7 @@ export class index extends Component<any, IState> {
   };
 
   render() {
-    const {goodsWithSeller = MockGoodsApi.createMockGoodsWithSeller(), loading, errMsg} = this.state;
+    const {goodsWithSeller, loading, errMsg} = this.state;
     const {seller, goods} = goodsWithSeller;
 
     return (loading || errMsg

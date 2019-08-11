@@ -25,7 +25,7 @@ interface IState {
  */
 export default class SearchResult extends Component<any, IState> {
 
-  private readonly NOT_FIND_CATEGORY_ERROR:Error = new Error('未找到搜索关键词请重试');
+  private readonly NOT_FIND_CATEGORY_ERROR:Error = new Error('未找到搜索关键词\n请重试');
 
   private beforeSearchValue: string;
 
@@ -109,6 +109,7 @@ export default class SearchResult extends Component<any, IState> {
             value={searchValue}
             onChange={(searchValue) => this.setState({searchValue})}
             onActionClick={this.reSearch}
+            onConfirm={this.reSearch}
           />
           <View>
             {goodsWithSeller.map((g, idx) => <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)}

@@ -7,6 +7,8 @@ export interface IOrderApi {
 
   accept(orderID: string): Promise<void>;
 
+  getOrderById(orderId: string): Promise<OrderVO>;
+
   getBuyerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
   getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
@@ -31,6 +33,12 @@ class OrderApi implements IOrderApi {
   }
   async getSellerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
     return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getSellerOrders", lastIndex, size, state: OrderState.Finished });
+  }
+
+  getOrderById(orderId: string): Promise<OrderVO> {
+    // TODO 优先级 中
+    // 添加通过 id 获取订单的方法
+    throw new Error("Method not implemented.");
   }
 }
 
@@ -58,6 +66,12 @@ class MockOrderApi implements IOrderApi {
     let orders: OrderVO[] = this.createMockOrders(lastIndex, size);
     orders.forEach((o) => o.state = OrderState.Finished);
     return mockHttpRequest.success(orders);
+  }
+
+  getOrderById(orderId: string): Promise<OrderVO> {
+    let order = MockOrderApi.createMockOrder();
+    order._id = orderId;
+    return mockHttpRequest.success(order);
   }
 
   private createMockOrders(lastIndex: number, size: number = 10): OrderVO[] {

@@ -8,6 +8,7 @@ import {AtButton, AtCard} from "taro-ui";
 import {MockUserApi, UserVO} from "../../../apis/UserApi";
 import urlList from "../../../utils/url-list";
 import ConfirmModal from "../../../components/common/confirm-modal";
+import {RelaunchTimeout} from "../../../utils/date-util";
 
 interface IState {
   loading: boolean,
@@ -87,7 +88,7 @@ export class index extends Component<any, IState> {
                 Taro.reLaunch({
                   url: urlList.MY
                 }).catch(that.onError);
-              }, 1000);
+              },  RelaunchTimeout);
             });
             localConfig.setWithdrawTime(Date.now());
           })

@@ -98,6 +98,7 @@ export default class index extends Component<any, IState> {
             value={searchValue}
             onChange={(searchValue) => this.setState({searchValue})}
             onActionClick={this.onSearch}
+            onConfirm={this.onSearch}
           />
           <DSwiper srcs={swiperSrcs}/>
           <AtGrid hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>

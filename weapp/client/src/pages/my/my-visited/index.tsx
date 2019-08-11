@@ -91,6 +91,7 @@ export default class index extends Component<any, IState> {
             value={searchValue}
             onChange={(searchValue) => this.setState({searchValue})}
             onActionClick={this.reSearch}
+            onConfirm={this.reSearch}
           />
           <View>
             {goodsWithSeller.map((g, idx) => <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)}
