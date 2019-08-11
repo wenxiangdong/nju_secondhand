@@ -9,12 +9,12 @@ const db = cloud.database()
 const command = db.command
 
 // 云函数入口函数
-exports.main = async (event, context) => {
+exports.main = async(event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async (ctx, next) => {
+  app.use(async(ctx, next) => {
     console.log('----------> 进入 goodsApi 全局中间件')
     ctx.data = {}
     ctx.data.openid = cloud.getWXContext().OPENID
@@ -27,7 +27,7 @@ exports.main = async (event, context) => {
 
   app.router(['publishGoods', 'getOngoingGoods', 'deleteGoods',
     'purchase'
-  ], async (ctx, next) => {
+  ], async(ctx, next) => {
     let loginResult = (await cloud.callFunction({
       name: 'userApi',
       data: {
@@ -57,16 +57,16 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('getCategories', async (ctx) => {
+  app.router('getCategories', async(ctx) => {
     let categories = [];
     let skip = 0;
     const limit = 20;
 
     let data;
     while (data = (await ctx.data.categoryCollection
-      .skip(skip)
-      .limit(limit)
-      .get())
+        .skip(skip)
+        .limit(limit)
+        .get())
       .data) {
 
       categories = categories.concat(data);
@@ -84,7 +84,7 @@ exports.main = async (event, context) => {
     };
   })
 
-  app.router('searchGoodsByKeyword', async (ctx) => {
+  app.router('searchGoodsByKeyword', async(ctx) => {
     let goodsList = await searchGoodsByKeyword(event.keyword, event.lastIndex, event.size)
     ctx.body = {
       code: HttpCode.Success,
@@ -92,7 +92,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('searchGoodsByCategory', async (ctx) => {
+  app.router('searchGoodsByCategory', async(ctx) => {
     let goodsList = await searchGoodsByCategory(event.categoryID, event.lastIndex, event.size)
     ctx.body = {
       code: HttpCode.Success,
@@ -100,7 +100,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('searchGoodsWithSellerByKeyword', async (ctx) => {
+  app.router('searchGoodsWithSellerByKeyword', async(ctx) => {
     let goodsList = await searchGoodsByKeyword(event.keyword, event.lastIndex, event.size)
 
     let goodsWithSellers = []
@@ -116,7 +116,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('searchGoodsWithSellerByCategory', async (ctx) => {
+  app.router('searchGoodsWithSellerByCategory', async(ctx) => {
     let goodsList = await searchGoodsByCategory(event.categoryID, event.lastIndex, event.size)
 
     let goodsWithSellers = []
@@ -132,7 +132,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('getGoodsWithSeller', async (ctx) => {
+  app.router('getGoodsWithSeller', async(ctx) => {
     try {
       let goods = await getGoods(event.goodsID)
 
@@ -150,7 +150,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('getGoods', async (ctx) => {
+  app.router('getGoods', async(ctx) => {
     try {
       let goods = await getGoods(event.goodsID)
 
@@ -163,7 +163,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('publishGoods', async (ctx) => {
+  app.router('publishGoods', async(ctx) => {
     let goods = event.goods;
 
     goods.sellerID = ctx.data.self._id;
@@ -208,7 +208,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('getOngoingGoods', async (ctx) => {
+  app.router('getOngoingGoods', async(ctx) => {
     let goodsList = [];
     let data = [];
     let skip = 0;
@@ -235,7 +235,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('deleteGoods', async (ctx) => {
+  app.router('deleteGoods', async(ctx) => {
     await ctx.data.goodsCollection
       .where({
         _id: event.goodsID,
@@ -251,7 +251,7 @@ exports.main = async (event, context) => {
     }
   })
 
-  app.router('deleteGoodsByAdmin', async (ctx) => {
+  app.router('deleteGoodsByAdmin', async(ctx) => {
     await ctx.data.goodsCollection
       .where({
         _id: event.goodsID,
@@ -261,9 +261,13 @@ exports.main = async (event, context) => {
           state: GoodsState.Deleted
         }
       })
+
+    return {
+      code: HttpCode.Success
+    }
   })
 
-  app.router('purchase', async (ctx) => {
+  app.router('purchase', async(ctx) => {
 
   })
 
@@ -312,27 +316,27 @@ async function searchGoodsByKeyword(keyword, lastIndex, size) {
   let result = await db.collection('goods')
     .where(
       keyword ?
-        command
-          .or([{
+      command
+      .or([{
+          name: db.RegExp({
+            regexp: keyword,
+            options: 'i',
+          })
+        },
+        {
+          category: {
             name: db.RegExp({
               regexp: keyword,
-              options: 'i',
+              options: 'i'
             })
-          },
-          {
-            category: {
-              name: db.RegExp({
-                regexp: keyword,
-                options: 'i'
-              })
-            }
           }
-          ])
-          .and({
-            state: GoodsState.InSale
-          }) : {
-          state: GoodsState.InSale
         }
+      ])
+      .and({
+        state: GoodsState.InSale
+      }) : {
+        state: GoodsState.InSale
+      }
     )
     .skip(lastIndex)
     .limit(size)

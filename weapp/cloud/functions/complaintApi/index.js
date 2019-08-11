@@ -102,7 +102,10 @@ exports.main = async(event, context) => {
       .limit(event.size)
       .get()
 
-    ctx.body = result.data
+    ctx.body = {
+      code: HttpCode.Success,
+      data: result.data
+    }
   })
 
   app.router('handle', async(ctx) => {
@@ -119,6 +122,10 @@ exports.main = async(event, context) => {
           state: ComplaintState.Handled
         }
       })
+
+    ctx.body = {
+      code: HttpCode.Success,
+    }
   })
 
   return app.serve();
