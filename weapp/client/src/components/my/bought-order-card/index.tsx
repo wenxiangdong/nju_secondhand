@@ -11,7 +11,7 @@ import WhiteSpace from '../../common/white-space';
 
 interface IProp {
   order: OrderVO,
-  onAccept: () => void,
+  onAccept?: () => void,
   isBuyer: boolean
 }
 
@@ -52,7 +52,7 @@ function BoughtOrderCard(props: IProp) {
         <View style={atButtonGroupStyle}>
           <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onComplaint()}>反馈</AtButton>
           {
-            state === OrderState.Ongoing && isBuyer
+            state === OrderState.Ongoing && isBuyer && onAccept
               ? <AtButton circle type='primary' customStyle={atButtonStyle} onClick={() => onAccept()}>收货</AtButton>
               : null
           }

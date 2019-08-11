@@ -6,6 +6,13 @@ import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
 import SoldGoodsCard from "../../../components/my/sold-goods-card";
 import ConfirmModal from "../../../components/common/confirm-modal";
+import {OrderVO} from "../../../apis/OrderApi";
+import {AtLoadMore, AtTabs, AtTabsPane} from "taro-ui";
+import WhiteSpace from "../../../components/common/white-space";
+
+import '../../../styles/tab-title-fixed.scss';
+import {StyleHelper} from "../../../styles/style-helper";
+import BoughtOrderCard from "../../../components/my/bought-order-card";
 
 interface IState {
   loading: boolean,
@@ -15,7 +22,12 @@ interface IState {
   errMsg?: string,
   sucMsg?: string,
   deleteIdx: number,
-  atModalContent: string
+  atModalContent: string,
+  ongoingOrders: Array<OrderVO>,
+  ongoingOrdersLoadMoreStatus?: 'more' | 'loading' | 'noMore',
+  historyOrders: Array<OrderVO>,
+  historyOrdersLoadMoreStatus?: 'more' | 'loading' | 'noMore',
+  currentTabIndex: number
 }
 
 /**
@@ -33,7 +45,7 @@ export default class index extends Component<any, IState> {
     errMsg: undefined,
     sucMsg: undefined,
     deleteIdx: -1,
-    atModalContent: this.defaultAtModalContent
+    atModalContent: this.defaultAtModalContent,
   };
 
   private cancelTimeout;
@@ -41,6 +53,8 @@ export default class index extends Component<any, IState> {
   config: Config = {
     navigationBarTitleText: '我卖出的'
   };
+
+  private readonly tabList = [{ title: '正在出售' }, { title: '待送达' }, { title: '历史订单' }];
 
   constructor(props) {
     super(props);
@@ -50,14 +64,26 @@ export default class index extends Component<any, IState> {
       isDelete: false,
       deleteLoading: false,
       deleteIdx: -1,
-      atModalContent: this.defaultAtModalContent
+      atModalContent: this.defaultAtModalContent,
+      ongoingOrders: [],
+      historyOrders: [],
+      currentTabIndex: 0,
     };
   }
 
   componentWillMount() {
-    apiHub.goodsApi.getOngoingGoods()
-      .then(goodsArr => {
-        this.setState({goodsArr, loading: false});
+    Promise.all([
+      apiHub.goodsApi.getOngoingGoods(),
+      apiHub.orderApi.getSellerOngoingOrders(0),
+      apiHub.orderApi.getSellerHistoryOrders(0)
+    ])
+      .then(([goodsArr, ongoingOrders, historyOrders]) => {
+        this.setState({
+          goodsArr, ongoingOrders, historyOrders,
+          ongoingOrdersLoadMoreStatus: ongoingOrders.length? 'more': 'noMore',
+          historyOrdersLoadMoreStatus: historyOrders.length? 'more': 'noMore',
+          loading: false
+        });
       })
       .catch(this.onError);
   }
@@ -93,8 +119,54 @@ export default class index extends Component<any, IState> {
     });
   };
 
+  private onLoadMoreOngoingOrders = () => {
+    this.setState({ongoingOrdersLoadMoreStatus: 'loading'},
+      this.loadMoreOngoingOrders);
+  };
+
+  private loadMoreOngoingOrders = () => {
+    const lastIndex = this.state.ongoingOrders.length;
+    apiHub.orderApi.getSellerOngoingOrders(lastIndex)
+      .then((ongoingOrders) => {
+        if (ongoingOrders && ongoingOrders.length) {
+          this.setState({ongoingOrders: this.state.ongoingOrders.concat(ongoingOrders), ongoingOrdersLoadMoreStatus: 'more'});
+        } else {
+          this.setState({ongoingOrdersLoadMoreStatus: 'noMore'});
+        }
+      });
+  };
+
+  private onLoadMoreHistoryOrders = () => {
+    this.setState({historyOrdersLoadMoreStatus: 'loading'},
+      this.loadMoreHistoryOrders);
+  };
+
+  private loadMoreHistoryOrders = () => {
+    const lastIndex = this.state.historyOrders.length;
+    apiHub.orderApi.getSellerHistoryOrders(lastIndex)
+      .then((historyOrders) => {
+        if (historyOrders && historyOrders.length) {
+          this.setState({historyOrders: this.state.historyOrders.concat(historyOrders), historyOrdersLoadMoreStatus: 'more'});
+        } else {
+          this.setState({historyOrdersLoadMoreStatus: 'noMore'});
+        }
+      });
+  };
+
+  private handleClick = (value) => {
+    this.setState({
+      currentTabIndex: value
+    });
+  };
+
   render() {
-    const {loading, errMsg, goodsArr, isDelete, deleteLoading, sucMsg, atModalContent} = this.state;
+    const {
+      loading, errMsg,
+      goodsArr, isDelete, deleteLoading, sucMsg, atModalContent,
+      currentTabIndex,
+      ongoingOrders, ongoingOrdersLoadMoreStatus,
+      historyOrders, historyOrdersLoadMoreStatus
+    } = this.state;
 
     return loading || errMsg
       ? (
@@ -117,7 +189,36 @@ export default class index extends Component<any, IState> {
               : null
           }
 
-          {goodsArr.map((g, idx) => <SoldGoodsCard key={idx} goods={g} onDeleteGoods={() => this.onDeleteGoods(idx)}/>)}
+          <AtTabs current={currentTabIndex} tabList={this.tabList} onClick={this.handleClick}>
+            <WhiteSpace/>
+
+            <AtTabsPane current={currentTabIndex} index={0} >
+              {goodsArr.map((g, idx) => <SoldGoodsCard key={idx} goods={g} onDeleteGoods={() => this.onDeleteGoods(idx)}/>)}
+            </AtTabsPane>
+
+            <AtTabsPane current={currentTabIndex} index={1}>
+              <View>
+                {ongoingOrders.map((o, idx) => <BoughtOrderCard key={idx} isBuyer={false} order={o}/>)}
+              </View>
+              <AtLoadMore
+                moreBtnStyle={StyleHelper.loadMoreBtnStyle}
+                onClick={this.onLoadMoreOngoingOrders}
+                status={ongoingOrdersLoadMoreStatus}
+              />
+            </AtTabsPane>
+
+            <AtTabsPane current={currentTabIndex} index={2}>
+              <View>
+                {historyOrders.map((o, idx) => <BoughtOrderCard key={idx} isBuyer={false} order={o}/>)}
+              </View>
+              <AtLoadMore
+                moreBtnStyle={StyleHelper.loadMoreBtnStyle}
+                onClick={this.onLoadMoreHistoryOrders}
+                status={historyOrdersLoadMoreStatus}
+              />
+            </AtTabsPane>
+
+          </AtTabs>
 
         </View>
       );
