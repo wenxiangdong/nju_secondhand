@@ -1,4 +1,5 @@
-import { VO, httpRequest } from "./HttpRequest";
+import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
+import {Location, MockUserApi} from "./UserApi";
 
 export interface IOrderApi {
   getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
@@ -33,26 +34,66 @@ class OrderApi implements IOrderApi {
 }
 
 class MockOrderApi implements IOrderApi {
+  private ordersCount = 20;
+
   getBuyerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-    throw new Error("Method not implemented.");
+    let orders: OrderVO[] = this.createMockOrders(lastIndex, size);
+    return mockHttpRequest.success(orders);
   }
   accept(orderID: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('accept', orderID);
+    return mockHttpRequest.success();
   }
   getBuyerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-    throw new Error("Method not implemented.");
+    let orders: OrderVO[] = this.createMockOrders(lastIndex, size);
+    orders.forEach((o) => o.state = OrderState.Finished);
+    return mockHttpRequest.success(orders);
   }
   getSellerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-    throw new Error("Method not implemented.");
+    let orders: OrderVO[] = this.createMockOrders(lastIndex, size);
+    return mockHttpRequest.success(orders);
   }
   getSellerHistoryOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
-    throw new Error("Method not implemented.");
+    let orders: OrderVO[] = this.createMockOrders(lastIndex, size);
+    orders.forEach((o) => o.state = OrderState.Finished);
+    return mockHttpRequest.success(orders);
+  }
+
+  private createMockOrders(lastIndex: number, size: number = 10): OrderVO[] {
+    let orders: OrderVO[] = [];
+    if (lastIndex < this.ordersCount) {
+      orders = new Array(size).fill(null)
+        .map(() => MockOrderApi.createMockOrder());
+    }
+    return orders;
+  }
+
+  static createMockOrder(): OrderVO {
+    return {
+      _id: '1',
+      buyerID: 'buyerID',
+      buyerName: 'buyerName',
+
+      sellerID: 'sellerID',
+      sellerName: 'sellerName',
+
+      goodsID: 'goodsID',
+      goodsName: 'goodsName',
+      goodsPrice: 'goodsPrice',
+
+      address: MockUserApi.createMockLocation(),
+
+      orderTime: Date.now(),
+      deliveryTime: Date.now(),
+
+      state: OrderState.Ongoing,
+    }
   }
 }
 
 let orderApi: IOrderApi = new OrderApi();
 let mockOrderApi: IOrderApi = new MockOrderApi();
-export { orderApi, mockOrderApi }
+export { orderApi, mockOrderApi, MockOrderApi }
 
 
 export interface OrderDTO {
@@ -82,6 +123,6 @@ export interface OrderVO extends VO {
 }
 
 export enum OrderState {
-  Ongoing,
-  Finished,
+  Ongoing = '送货中',
+  Finished = '已送达',
 }

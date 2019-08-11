@@ -1,4 +1,4 @@
-const createSimpleErrorHandler = function (name:string, that){
+const createSimpleErrorHandler = function (name: string, that?: any){
   return function (e: Error) {
     console.error(name, e);
     if (this) {

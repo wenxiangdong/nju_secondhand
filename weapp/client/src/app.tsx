@@ -41,6 +41,7 @@ class App extends Component {
       'pages/my/index',
       'pages/my/complaint/index',
       'pages/my/my-bought/index',
+      'pages/my/my-bought/send-complaint/index',
       'pages/my/my-publish/index',
       'pages/my/my-sold/index',
       'pages/my/my-visited/index',

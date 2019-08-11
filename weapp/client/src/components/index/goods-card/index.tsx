@@ -8,7 +8,7 @@ import {CSSProperties} from "react";
 import {goodsInfoUrlConfig} from "../../../utils/url-list";
 
 import "taro-ui/dist/style/components/flex.scss";
-import {StyleHelper} from "../../../utils/style-helper";
+import {StyleHelper} from "../../../styles/style-helper";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO

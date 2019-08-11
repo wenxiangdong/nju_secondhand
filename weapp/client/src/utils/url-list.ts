@@ -14,6 +14,7 @@ const urlList = {
   MY: '/pages/my/index',
   MY_VISITED:'/pages/my/my-visited/index',
   MY_BOUGHT:'/pages/my/my-bought/index',
+  MY_BOUGHT_SEND_COMPLAINT: '/pages/my/my-bought/send-complaint/index',
   MY_PUBLISH:'/pages/my/my-publish/index',
   MY_SOLD:'/pages/my/my-sold/index',
   MY_PLATFORM_ACCOUNT:'/pages/my/platform-account/index',
@@ -97,10 +98,29 @@ class ChatUrlConfig {
 
 const chatUrlConfig = new ChatUrlConfig();
 
+class SendComplaintUrlConfig {
+  private readonly ORDER_ID = 'ORDER_id';
+
+  public createUrl(id): string {
+    return encodeURI(`${urlList.MY_BOUGHT_SEND_COMPLAINT}?${this.ORDER_ID}=${id}`);
+  }
+
+  public getOrderId(that): string|undefined {
+    try {
+      return that.$router.params[this.ORDER_ID];
+    } catch (e) {
+      console.error('SendComplaintUrlConfig getOrderId', e);
+    }
+  }
+}
+
+const sendComplaintUrlConfig = new SendComplaintUrlConfig();
+
 export default urlList;
 export {
   indexSearchUrlConfig,
   goodsInfoUrlConfig,
   chatUrlConfig,
   locationUrlConfig,
+  sendComplaintUrlConfig,
 };

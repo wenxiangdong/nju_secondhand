@@ -8,7 +8,7 @@ import LoadingPage from "../../../components/common/loading-page";
 import {AtLoadMore} from "taro-ui";
 import {apiHub} from "../../../apis/ApiHub";
 import GoodsCard from "../../../components/index/goods-card";
-import {loadMoreBtnStyle} from "../../../styles/style-objects";
+import {StyleHelper} from "../../../styles/style-helper";
 
 interface IState {
   category?: CategoryVO,
@@ -92,7 +92,7 @@ export default class CategoryGoods extends Component<any, IState> {
             })}
           </View>
           <AtLoadMore
-            moreBtnStyle={loadMoreBtnStyle}
+            moreBtnStyle={StyleHelper.loadMoreBtnStyle}
             onClick={this.onLoadMore}
             status={loadMoreStatus}
           />

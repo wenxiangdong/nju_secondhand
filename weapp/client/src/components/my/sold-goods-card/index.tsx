@@ -2,9 +2,10 @@ import Taro from '@tarojs/taro'
 import {View, Text, Image} from '@tarojs/components'
 import {GoodsVO, MockGoodsApi} from "../../../apis/GoodsApi";
 import localConfig from "../../../utils/local-config";
-import {StyleHelper} from "../../../utils/style-helper";
+import {StyleHelper} from "../../../styles/style-helper";
 import {CSSProperties} from "react";
 import {AtButton} from "taro-ui";
+import {timeToString} from "../../../utils/date-util";
 
 interface IProp {
   goods: GoodsVO,
@@ -22,7 +23,7 @@ function SoldGoodsCard(props: IProp) {
   const picSrc = goods.pictures[0];
   const {name, publishTime, price} = goods;
 
-  const publishTimeDateString = new Date(publishTime).toLocaleDateString();
+  const publishTimeString = timeToString(publishTime);
 
   const {baseCardStyle, picStyle, atButtonStyle, mainColumnStyle, subColumnStyle, dateStringStyle} = createStyles();
 
@@ -34,7 +35,7 @@ function SoldGoodsCard(props: IProp) {
         <Text>￥ {price}</Text>
       </View>
       <View style={subColumnStyle}>
-        <Text style={dateStringStyle}>{publishTimeDateString}</Text>
+        <Text style={dateStringStyle}>{publishTimeString}</Text>
         <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onDeleteGoods()}>下架</AtButton>
       </View>
     </View>

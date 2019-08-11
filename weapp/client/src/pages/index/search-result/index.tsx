@@ -5,9 +5,9 @@ import LoadingPage from "../../../components/common/loading-page";
 import {AtLoadMore, AtSearchBar} from "taro-ui";
 import {GoodsWithSellerVO} from "../../../apis/GoodsApi";
 import {indexSearchUrlConfig} from "../../../utils/url-list";
-import {loadMoreBtnStyle} from "../../../styles/style-objects";
 import {apiHub} from "../../../apis/ApiHub";
 import GoodsCard from "../../../components/index/goods-card";
+import {StyleHelper} from "../../../styles/style-helper";
 
 interface IState {
   searchValue: string,
@@ -112,7 +112,7 @@ export default class SearchResult extends Component<any, IState> {
             {goodsWithSeller.map((g, idx) => <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)}
           </View>
           <AtLoadMore
-            moreBtnStyle={loadMoreBtnStyle}
+            moreBtnStyle={StyleHelper.loadMoreBtnStyle}
             onClick={this.onLoadMore}
             status={loadMoreStatus}
           />
