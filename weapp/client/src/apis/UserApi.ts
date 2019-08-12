@@ -1,6 +1,8 @@
 import "@tarojs/async-await";
 import {VO, httpRequest, db, Fail, HttpCode, mockHttpRequest} from "./HttpRequest";
 import {AccountVO, MockAccountApi} from "./AccountApi";
+import {Debugger} from "inspector";
+import Location = module
 
 export interface IUserApi {
   // 检查用户状态
@@ -104,13 +106,23 @@ class MockUserApi implements IUserApi {
       _openid: 'openid',
       phone: 'phone',
       nickname: 'nickname',
-      avatar: '',
+      avatar: 'https://jdc.jd.com/img/200',
       address: MockUserApi.createMockLocation(),
       email: 'email',
       account: MockAccountApi.createMockAccount(),
       signUpTime: Date.now(),
       state: UserState.Normal
     };
+  }
+
+  static createMockUserDTO(): UserDTO {
+    return {
+      phone: '',
+      avatar: '',
+      nickname: '',
+      address: {},
+      email: '',
+    }
   }
 }
 

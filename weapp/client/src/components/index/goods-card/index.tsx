@@ -62,6 +62,8 @@ function createStyles() {
   };
 }
 
+const styles = createStyles();
+
 /**
  * GoodsCard
  * @author 张李承
@@ -80,8 +82,6 @@ function GoodsCard(props: IProp) {
     const goodsName = goods.name;
     const goodsPrice = goods.price;
 
-    let { goodsCardViewStyle, imageStyle, dividerHeight, goodsNameStyle } = createStyles();
-
     const onError = createSimpleErrorHandler('GoodsCard', undefined);
 
     const onClick = function () {
@@ -91,11 +91,11 @@ function GoodsCard(props: IProp) {
     };
 
     card = (
-      <View onClick={onClick} style={goodsCardViewStyle}>
-        <Image style={imageStyle} src={goodsPictureSrc}/>
-        <Text style={goodsNameStyle}>{goodsName}</Text>
+      <View onClick={onClick} style={styles.goodsCardViewStyle}>
+        <Image style={styles.imageStyle} src={goodsPictureSrc}/>
+        <Text style={styles.goodsNameStyle}>{goodsName}</Text>
         <Text space={'nbsp'}>￥ {goodsPrice}</Text>
-        <AtDivider height={dividerHeight}/>
+        <AtDivider height={styles.dividerHeight}/>
         <View className='at-row at-row__align--center'>
           <View className='at-col at-col-3'>
             <AtAvatar circle size={'small'} image={sellerImage}/>

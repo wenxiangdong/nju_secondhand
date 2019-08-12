@@ -8,12 +8,12 @@ import {AtButton, AtCard} from "taro-ui";
 import {MockUserApi, UserVO} from "../../../apis/UserApi";
 import urlList from "../../../utils/url-list";
 import ConfirmModal from "../../../components/common/confirm-modal";
-import {RelaunchTimeout} from "../../../utils/date-util";
+import {relaunchTimeout} from "../../../utils/date-util";
 
 interface IState {
   loading: boolean,
   withdrawAvailable: boolean,
-  user?: UserVO,
+  user: UserVO,
   isWithdrawing: boolean,
   withdrawLoading: boolean,
   errMsg?: string,
@@ -45,6 +45,7 @@ export class index extends Component<any, IState> {
     super(props);
     this.state = {
       loading: true,
+      user: MockUserApi.createMockUser(),
       withdrawLoading: false,
       isWithdrawing: false,
       withdrawAvailable: new Date(localConfig.getWithdrawTime() || 0).toDateString()
@@ -88,7 +89,7 @@ export class index extends Component<any, IState> {
                 Taro.reLaunch({
                   url: urlList.MY
                 }).catch(that.onError);
-              },  RelaunchTimeout);
+              },  relaunchTimeout);
             });
             localConfig.setWithdrawTime(Date.now());
           })
@@ -101,10 +102,16 @@ export class index extends Component<any, IState> {
 
   private onNotLogin = () => {
     this.onError(this.NOT_FIND_USER_ID_ERROR);
+    setTimeout(() => {
+      Taro.reLaunch({
+        url: urlList.LOGIN
+      })
+        .catch(this.onError);
+    }, relaunchTimeout);
   };
 
   render() {
-    const {loading, errMsg, withdrawAvailable, user = MockUserApi.createMockUser(), isWithdrawing, withdrawLoading, sucMsg} = this.state;
+    const {loading, errMsg, withdrawAvailable, user, isWithdrawing, withdrawLoading, sucMsg} = this.state;
     const {nickname, account} = user;
     const {balance} = account;
 

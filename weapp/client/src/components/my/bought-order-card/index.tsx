@@ -9,68 +9,6 @@ import {AtButton} from 'taro-ui';
 import {timeToString} from '../../../utils/date-util';
 import WhiteSpace from '../../common/white-space';
 
-interface IProp {
-  order: OrderVO,
-  onAccept?: () => void,
-  isComplaint?: boolean,
-  isBuyer: boolean
-}
-
-/**
- * BoughtOrderCard
- * @author 张李承
- * @create 2019/8/11 10:20
- */
-function BoughtOrderCard(props: IProp) {
-  const {order = MockOrderApi.createMockOrder(), onAccept, isBuyer, isComplaint} = props;
-
-  const onError = createSimpleErrorHandler('BoughtOrderCard');
-
-  const onComplaint = function () {
-    Taro.navigateTo({
-      url: sendComplaintUrlConfig.createUrl(order._id)
-    }).catch(onError);
-  };
-
-  const {goodsName, goodsPrice, orderTime, deliveryTime, state} = order;
-
-  const orderTimeString = timeToString(orderTime);
-  const deliveryTimeString = deliveryTime > 0? timeToString(deliveryTime): '暂未送达';
-
-  const {baseCardStyle, atButtonGroupStyle, atButtonStyle, mainColumnStyle, subColumnStyle, dateStringStyle} = createStyles();
-
-  return (
-    <View style={baseCardStyle}>
-      <View style={mainColumnStyle}>
-        <Text>{goodsName}</Text>
-        <Text>￥ {goodsPrice}</Text>
-        <WhiteSpace height={10}/>
-        <Text style={dateStringStyle}>下单日期: {orderTimeString}</Text>
-        <Text style={dateStringStyle}>收货日期: {deliveryTimeString}</Text>
-      </View>
-      <View style={subColumnStyle}>
-        <Text style={dateStringStyle}>订单状态：{state}</Text>
-        {
-          isComplaint
-            ? null
-            : (
-              <View style={atButtonGroupStyle}>
-                <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onComplaint()}>反馈</AtButton>
-                {
-                  state === OrderState.Ongoing && isBuyer && onAccept !== undefined
-                    ? <AtButton circle type='primary' customStyle={atButtonStyle} onClick={() => onAccept()}>收货</AtButton>
-                    : null
-                }
-              </View>
-            )
-        }
-      </View>
-    </View>
-  )
-}
-
-export default BoughtOrderCard;
-
 function createStyles() {
   const numberToPxStr = StyleHelper.numberToPxStr;
 
@@ -128,3 +66,65 @@ function createStyles() {
 
   return {baseCardStyle, atButtonGroupStyle, atButtonStyle, mainColumnStyle, subColumnStyle, dateStringStyle};
 }
+
+const styles = createStyles();
+
+interface IProp {
+  order: OrderVO,
+  onAccept?: () => void,
+  isComplaint?: boolean,
+  isBuyer: boolean
+}
+
+/**
+ * BoughtOrderCard
+ * @author 张李承
+ * @create 2019/8/11 10:20
+ */
+function BoughtOrderCard(props: IProp) {
+  const {order = MockOrderApi.createMockOrder(), onAccept, isBuyer, isComplaint} = props;
+
+  const onError = createSimpleErrorHandler('BoughtOrderCard');
+
+  const onComplaint = function () {
+    Taro.navigateTo({
+      url: sendComplaintUrlConfig.createUrl(order._id)
+    }).catch(onError);
+  };
+
+  const {goodsName, goodsPrice, orderTime, deliveryTime, state} = order;
+
+  const orderTimeString = timeToString(orderTime);
+  const deliveryTimeString = deliveryTime > 0? timeToString(deliveryTime): '暂未送达';
+
+  return (
+    <View style={styles.baseCardStyle}>
+      <View style={styles.mainColumnStyle}>
+        <Text>{goodsName}</Text>
+        <Text>￥ {goodsPrice}</Text>
+        <WhiteSpace height={10}/>
+        <Text style={styles.dateStringStyle}>下单日期: {orderTimeString}</Text>
+        <Text style={styles.dateStringStyle}>收货日期: {deliveryTimeString}</Text>
+      </View>
+      <View style={styles.subColumnStyle}>
+        <Text style={styles.dateStringStyle}>订单状态：{state}</Text>
+        {
+          isComplaint
+            ? null
+            : (
+              <View style={styles.atButtonGroupStyle}>
+                <AtButton circle type='secondary' customStyle={styles.atButtonStyle} onClick={() => onComplaint()}>反馈</AtButton>
+                {
+                  state === OrderState.Ongoing && isBuyer && onAccept !== undefined
+                    ? <AtButton circle type='primary' customStyle={styles.atButtonStyle} onClick={() => onAccept()}>收货</AtButton>
+                    : null
+                }
+              </View>
+            )
+        }
+      </View>
+    </View>
+  )
+}
+
+export default BoughtOrderCard;

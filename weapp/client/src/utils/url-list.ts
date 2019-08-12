@@ -23,6 +23,7 @@ const urlList = {
   MY_PLATFORM_RULES:'/pages/my/platform-rules/index',
   MY_USER_INFO: '/pages/my/user-info/index',
   MY_COMPLAINT: '/pages/my/complaint/index',
+  LOGIN: '/pages/login/index',
   ERROR: ''
 };
 

@@ -11,7 +11,7 @@ import BoughtOrderCard from "../../../components/my/bought-order-card";
 import {StyleHelper} from "../../../styles/style-helper";
 
 import '../../../styles/tab-title-fixed.scss';
-import {RelaunchTimeout} from "../../../utils/date-util";
+import {relaunchTimeout} from "../../../utils/date-util";
 
 interface IState {
   loading: boolean,
@@ -107,7 +107,7 @@ export default class index extends Component<any, IState> {
           const orderArr = that.state.ongoingOrders;
           const sucMsg = `商品名：${order.goodsName}\n已收货成功`;
           that.setState({sucMsg, acceptLoading: false, ongoingOrders: orderArr.slice(0, acceptIdx).concat(orderArr.slice(acceptIdx + 1))}, function() {
-            that.cancelTimeout = setTimeout(() => that.setState({...that.defaultAcceptState}),  RelaunchTimeout);
+            that.cancelTimeout = setTimeout(() => that.setState({...that.defaultAcceptState}),  relaunchTimeout);
           });
         })
         .catch(that.onError)

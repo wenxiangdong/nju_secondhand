@@ -11,7 +11,7 @@ import "taro-ui/dist/style/components/flex.scss";
 import "taro-ui/dist/style/components/modal.scss";
 import {apiHub} from "../../../apis/ApiHub";
 import ConfirmModal from "../../common/confirm-modal";
-import {RelaunchTimeout} from "../../../utils/date-util";
+import {relaunchTimeout} from "../../../utils/date-util";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO
@@ -73,7 +73,7 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
               Taro.reLaunch({
                 url: urlList.INDEX
               }).catch(that.onError);
-            },  RelaunchTimeout);
+            },  relaunchTimeout);
           });
         })
         .catch(that.onError);

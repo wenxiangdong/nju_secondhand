@@ -7,7 +7,7 @@ import DLocation from "../../../components/common/d-location/DLocation";
 interface IState {
   loading: boolean,
   errMsg?: string,
-  location?: Location
+  location: Location
 }
 
 /**
@@ -26,7 +26,8 @@ export default class index extends Component<any, IState> {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      loading: true,
+      location: MockUserApi.createMockLocation()
     };
   }
 
@@ -46,7 +47,7 @@ export default class index extends Component<any, IState> {
   };
 
   render() {
-    const {location = MockUserApi.createMockLocation()} = this.state;
+    const {location} = this.state;
 
     return (
       <DLocation location={location}/>

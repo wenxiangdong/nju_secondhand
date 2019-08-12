@@ -5,6 +5,36 @@ import {StyleHelper} from "../../../styles/style-helper";
 import {CSSProperties} from "react";
 import {timeToString} from "../../../utils/date-util";
 
+function createStyles() {
+  const baseCardStyle: CSSProperties = {
+    padding: '1vw 2vw',
+    margin: '1vw 2vw',
+    border: StyleHelper.NORMAL_BORDER,
+    width: '92vw',
+    display: 'inline-flex',
+    flexDirection: 'column',
+    lineHeight: StyleHelper.numberToPxStr(20),
+    fontSize: 'small'
+  };
+
+  const topRowViewStyle: CSSProperties = {
+    display: 'inline-flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  };
+
+  const stateInfoStyle: CSSProperties = {
+    fontSize: 'x-small',
+    fontWeight: 'lighter',
+  };
+
+  return {baseCardStyle, topRowViewStyle, stateInfoStyle};
+}
+
+const styles = createStyles();
+
 interface IProp {
   complaint: ComplaintVO
 }
@@ -20,8 +50,6 @@ function ComplaintCard(props: IProp) {
 
   const complainTimeString = timeToString(complainTime);
 
-  const {baseCardStyle, topRowViewStyle, stateInfoStyle} = createStyles();
-
   let handlingTimeString;
   let handlingResult;
 
@@ -31,10 +59,10 @@ function ComplaintCard(props: IProp) {
   }
 
   return (
-    <View style={baseCardStyle}>
-      <View style={topRowViewStyle}>
+    <View style={styles.baseCardStyle}>
+      <View style={styles.topRowViewStyle}>
         <Text>编号：{orderID}</Text>
-        <Text style={stateInfoStyle}>{state}</Text>
+        <Text style={styles.stateInfoStyle}>{state}</Text>
       </View>
       <Text>时间：{complainTimeString}</Text>
       <Text style={StyleHelper.BREAK_ALL_TEXT}>描述：{desc}</Text>
@@ -66,31 +94,3 @@ function ComplaintCard(props: IProp) {
 }
 
 export default ComplaintCard;
-
-function createStyles() {
-  const baseCardStyle: CSSProperties = {
-    padding: '1vw 2vw',
-    margin: '1vw 2vw',
-    border: StyleHelper.NORMAL_BORDER,
-    width: '92vw',
-    display: 'inline-flex',
-    flexDirection: 'column',
-    lineHeight: StyleHelper.numberToPxStr(20),
-    fontSize: 'small'
-  };
-
-  const topRowViewStyle: CSSProperties = {
-    display: 'inline-flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-  };
-
-  const stateInfoStyle: CSSProperties = {
-    fontSize: 'x-small',
-    fontWeight: 'lighter',
-  };
-
-  return {baseCardStyle, topRowViewStyle, stateInfoStyle};
-}

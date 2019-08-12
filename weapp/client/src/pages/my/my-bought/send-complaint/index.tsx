@@ -9,7 +9,7 @@ import LoadingPage from "../../../../components/common/loading-page";
 import {AtButton, AtForm, AtImagePicker, AtTextarea} from "taro-ui";
 import WhiteSpace from "../../../../components/common/white-space";
 import urlList, {sendComplaintUrlConfig} from "../../../../utils/url-list";
-import {RelaunchTimeout} from "../../../../utils/date-util";
+import {relaunchTimeout} from "../../../../utils/date-util";
 
 interface FileItem {
   path: string
@@ -75,7 +75,9 @@ export default class index extends Component<any, IState> {
   };
 
   private handleDescChange = (event) => {
-    this.setState({desc: event.target.value});
+    const desc = event.target.value;
+    this.setState({desc});
+    return desc;
   };
 
   private handlePictureChange = (pictures) => {
@@ -135,7 +137,7 @@ export default class index extends Component<any, IState> {
               function () {
                 setTimeout(function () {
                   Taro.reLaunch({url: urlList.MY}).catch(that.onError);
-                },  RelaunchTimeout);
+                },  relaunchTimeout);
               }
             );
           })

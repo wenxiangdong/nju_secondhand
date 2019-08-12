@@ -1,21 +1,33 @@
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
-import UserInfoBar from "../../components/common/user-info-bar/index";
 import {createSimpleErrorHandler} from "../../utils/function-factory";
 import {AtList, AtListItem} from "taro-ui";
 import {AtListItemProps} from "taro-ui/@types/list";
 import urlList from "../../utils/url-list";
+import DUserInfoBar from "../../components/common/d-user-info-bar";
+import {MockUserApi, UserVO} from "../../apis/UserApi";
+import localConfig from "../../utils/local-config";
+import {apiHub} from "../../apis/ApiHub";
+import {relaunchTimeout} from "../../utils/date-util";
+import LoadingPage from "../../components/common/loading-page";
 
 interface IState {
-  mounted: boolean
+  loading: boolean,
+  errMsg?: string,
+  mounted: boolean,
+  user: UserVO,
 }
 
 /**
  * 个人
  * @create 2019/7/25 11:49
  */
-export class My extends Component<any, IState> {
+export default class My extends Component<any, IState> {
+
+  private readonly NOT_FIND_USER_ID_ERROR:Error = new Error('登录已失效');
+
+  private userId:string;
 
   config: Config = {
     navigationBarTitleText: '个人'
@@ -73,7 +85,9 @@ export class My extends Component<any, IState> {
     super(props);
 
     this.state = {
-      mounted: false
+      loading: true,
+      mounted: false,
+      user: MockUserApi.createMockUser(),
     };
 
     this.navigatorBarPropArr.forEach((prop) => {
@@ -84,7 +98,30 @@ export class My extends Component<any, IState> {
     });
   }
 
-  private onError = createSimpleErrorHandler('my', this);
+  componentWillMount() {
+    this.userId = localConfig.getUserId();
+    this.refreshUserInfo();
+  }
+
+  private refreshUserInfo = () => {
+    if (this.userId && this.userId.length) {
+      apiHub.userApi.getUserInfo(this.userId)
+        .then(user => this.setState({user, loading: false}))
+        .catch(this.onError);
+    } else {
+      this.onNotLogin();
+    }
+  };
+
+  private onNotLogin = () => {
+    this.onError(this.NOT_FIND_USER_ID_ERROR);
+    setTimeout(() => {
+      Taro.reLaunch({
+        url: urlList.LOGIN
+      })
+        .catch(this.onError);
+    }, relaunchTimeout);
+  };
 
   private onUserInfoClick = () => {
     Taro.navigateTo({url: urlList.MY_USER_INFO})
@@ -99,12 +136,18 @@ export class My extends Component<any, IState> {
   };
 
   render() {
-    const {mounted} = this.state;
+    const {loading, user, errMsg, mounted} = this.state;
+    const {avatar, nickname} = user;
 
-    return (
+    return (loading || errMsg)
+      ? (
+        <LoadingPage errMsg={errMsg}/>
+      )
+      : (
       <View className={'center-view'}>
         <View onClick={this.onUserInfoClick} className={`user-bar-box ${mounted ? `fly-in-1`: ``}`}>
-          <UserInfoBar/>
+          {/* TODO 应该使用 DUserInfoBar */}
+          <DUserInfoBar avatar={avatar} nickname={nickname}/>
         </View>
         <AtList hasBorder={false}>
           {this.navigatorBarPropArr.map(
@@ -118,4 +161,6 @@ export class My extends Component<any, IState> {
       </View>
     )
   }
+
+  private onError = createSimpleErrorHandler('my', this);
 }

@@ -7,43 +7,6 @@ import {CSSProperties} from "react";
 import {AtButton} from "taro-ui";
 import {timeToString} from "../../../utils/date-util";
 
-interface IProp {
-  goods: GoodsVO,
-  onDeleteGoods: () => void
-}
-
-/**
- * SoldGoodsCard
- * @author 张李承
- * @create 2019/8/10 21:37
- */
-function SoldGoodsCard(props: IProp) {
-  const {goods = MockGoodsApi.createMockGoods(), onDeleteGoods} = props;
-
-  const picSrc = goods.pictures[0];
-  const {name, publishTime, price} = goods;
-
-  const publishTimeString = timeToString(publishTime);
-
-  const {baseCardStyle, picStyle, atButtonStyle, mainColumnStyle, subColumnStyle, dateStringStyle} = createStyles();
-
-  return (
-    <View style={baseCardStyle}>
-      <Image src={picSrc} style={picStyle} />
-      <View style={mainColumnStyle}>
-        <Text>{name}</Text>
-        <Text>￥ {price}</Text>
-      </View>
-      <View style={subColumnStyle}>
-        <Text style={dateStringStyle}>{publishTimeString}</Text>
-        <AtButton circle type='secondary' customStyle={atButtonStyle} onClick={() => onDeleteGoods()}>下架</AtButton>
-      </View>
-    </View>
-  )
-}
-
-export default SoldGoodsCard;
-
 function createStyles() {
   const numberToPxStr = StyleHelper.numberToPxStr;
 
@@ -99,3 +62,40 @@ function createStyles() {
 
   return {baseCardStyle, picStyle, atButtonStyle, mainColumnStyle, subColumnStyle, dateStringStyle};
 }
+
+const styles = createStyles();
+
+interface IProp {
+  goods: GoodsVO,
+  onDeleteGoods: () => void
+}
+
+/**
+ * SoldGoodsCard
+ * @author 张李承
+ * @create 2019/8/10 21:37
+ */
+function SoldGoodsCard(props: IProp) {
+  const {goods = MockGoodsApi.createMockGoods(), onDeleteGoods} = props;
+
+  const picSrc = goods.pictures[0];
+  const {name, publishTime, price} = goods;
+
+  const publishTimeString = timeToString(publishTime);
+
+  return (
+    <View style={styles.baseCardStyle}>
+      <Image src={picSrc} style={styles.picStyle} />
+      <View style={styles.mainColumnStyle}>
+        <Text>{name}</Text>
+        <Text>￥ {price}</Text>
+      </View>
+      <View style={styles.subColumnStyle}>
+        <Text style={styles.dateStringStyle}>{publishTimeString}</Text>
+        <AtButton circle type='secondary' customStyle={styles.atButtonStyle} onClick={() => onDeleteGoods()}>下架</AtButton>
+      </View>
+    </View>
+  )
+}
+
+export default SoldGoodsCard;
