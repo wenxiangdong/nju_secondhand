@@ -4,7 +4,7 @@
     "value": {
       "$url": "pay",
       "payTitle": "test",
-      "payAmount": "1.0"
+      "payAmount": "0.01"
     }
   },
   {

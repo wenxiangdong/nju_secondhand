@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sigodenjs/wechatpay": "^2.1.1",
     "tcb-router": "latest",
     "tenpay": "^2.1.18",
     "wechat-jssdk": "^5.0.2",

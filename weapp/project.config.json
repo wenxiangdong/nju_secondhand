@@ -3,7 +3,7 @@
 	"cloudfunctionRoot": "cloud/functions/",
 	"projectname": "weapp",
 	"description": "南大小书童",
-	"appid": "wxc4e156082fbd97ba",
+	"appid": "wx5b54b56253641b80",
 	"setting": {
 		"urlCheck": true,
 		"es6": false,
