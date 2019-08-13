@@ -79,7 +79,7 @@ class FileApi implements IFileApi {
 class MockFileApi implements IFileApi {
 
   uploadFile(cloudPath: string, filePath: string): Promise<string> {
-    return mockHttpRequest.success(cloudPath + filePath);
+    return mockHttpRequest.success(filePath);
   }
 
   downloadFile(fileID: string): Promise<string> {

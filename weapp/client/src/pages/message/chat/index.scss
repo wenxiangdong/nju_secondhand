@@ -1,0 +1,33 @@
+.chat-page {
+    box-sizing: border-box;
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+
+    .message-list {
+        flex: 1;
+        overflow: auto;
+    }
+
+
+    .bottom-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 5Px;
+        padding-top: 10Px;
+        border-top: rgba(0,0,0,0.1) 1Px solid;
+
+
+        .input {
+            border: rgba(0,0,0,0.05) 1Px solid;
+            padding: 5Px;
+            flex: 1;
+            margin-right: 1em;
+        }
+    }
+}
