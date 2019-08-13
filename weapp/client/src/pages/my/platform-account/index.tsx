@@ -120,7 +120,7 @@ export class index extends Component<any, IState> {
 
     return (loading || (!withdrawLoading && errMsg))
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
         <View>

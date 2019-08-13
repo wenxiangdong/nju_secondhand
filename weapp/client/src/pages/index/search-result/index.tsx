@@ -98,7 +98,7 @@ export default class SearchResult extends Component<any, IState> {
 
     return loading || errMsg
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
         <View>

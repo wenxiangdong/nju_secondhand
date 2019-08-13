@@ -83,7 +83,7 @@ export default class CategoryGoods extends Component<any, IState> {
 
     return loading || errMsg
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
         <View>

@@ -88,7 +88,7 @@ export default class index extends Component<any, IState> {
 
     return loading || errMsg
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
         <View>

@@ -69,7 +69,7 @@ interface IState {
 }
 
 /**
- * index
+ * 用户信息
  * @author 张李承
  * @create 2019/8/11 23:18
  */
@@ -270,7 +270,7 @@ export default class index extends Component<any, IState> {
 
     return (loading || (!isModifying && errMsg))
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
       <View style={styles.rootViewStyle}>

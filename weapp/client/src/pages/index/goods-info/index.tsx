@@ -79,7 +79,7 @@ export class index extends Component<any, IState> {
 
     return (loading || errMsg
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
           <View style={{padding: '30px'}}>

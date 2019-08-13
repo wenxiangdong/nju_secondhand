@@ -24,6 +24,7 @@ const urlList = {
   MY_USER_INFO: '/pages/my/user-info/index',
   MY_COMPLAINT: '/pages/my/complaint/index',
   LOGIN: '/pages/login/index',
+  REGISTER: '/pages/register/index',
   ERROR: ''
 };
 

@@ -16,7 +16,7 @@ interface IState {
 }
 
 /**
- * index
+ * 订单反馈
  * @author 张李承
  * @create 2019/8/10 20:51
  */
@@ -64,7 +64,7 @@ export default class index extends Component<any, IState> {
 
     return loading || errMsg
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
         <View>

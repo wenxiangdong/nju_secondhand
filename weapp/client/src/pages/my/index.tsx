@@ -141,7 +141,7 @@ export default class My extends Component<any, IState> {
 
     return (loading || errMsg)
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
       <View className={'center-view'}>
