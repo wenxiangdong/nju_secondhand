@@ -44,8 +44,8 @@ export default class index extends Component<any, IState> {
   private readonly defaultAcceptState = {
     isAccept: false,
     acceptLoading: false,
-    errMsg: undefined,
-    sucMsg: undefined,
+    errMsg: '',
+    sucMsg: '',
     acceptIdx: -1,
     atModalContent: this.defaultAtModalContent,
   };

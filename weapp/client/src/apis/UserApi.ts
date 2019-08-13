@@ -83,7 +83,8 @@ class MockUserApi implements IUserApi {
     throw new Error("Method not implemented.");
   }
   modifyInfo(user: UserDTO): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('modifyInfo', user);
+    return mockHttpRequest.success();
   }
   getUserInfo(userID: string): Promise<UserVO> {
     let userInfo = MockUserApi.createMockUser();

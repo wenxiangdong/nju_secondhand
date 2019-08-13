@@ -1,4 +1,6 @@
-const createSimpleErrorHandler = function (name: string, that?: any){
+import {relaunchTimeout} from "./date-util";
+
+export const createSimpleErrorHandler = function (name: string, that?: any){
   return function (e: Error) {
     console.error(name, e);
     if (this) {
@@ -8,6 +10,12 @@ const createSimpleErrorHandler = function (name: string, that?: any){
   }.bind(that);
 };
 
-export {
-  createSimpleErrorHandler
-}
+export const throttle = function (func:Function, that) {
+  let timeout;
+  return function () {
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+      func.apply(that, arguments);
+    }, relaunchTimeout);
+  }
+};

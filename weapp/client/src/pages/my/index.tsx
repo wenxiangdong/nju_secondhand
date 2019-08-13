@@ -146,7 +146,6 @@ export default class My extends Component<any, IState> {
       : (
       <View className={'center-view'}>
         <View onClick={this.onUserInfoClick} className={`user-bar-box ${mounted ? `fly-in-1`: ``}`}>
-          {/* TODO 应该使用 DUserInfoBar */}
           <DUserInfoBar avatar={avatar} nickname={nickname}/>
         </View>
         <AtList hasBorder={false}>

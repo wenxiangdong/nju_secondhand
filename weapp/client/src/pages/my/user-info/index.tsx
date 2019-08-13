@@ -14,6 +14,7 @@ import WechatUserInfoBar from "../../../components/common/wechat-user-info-bar";
 import WhiteSpace from "../../../components/common/white-space";
 import DLocation from "../../../components/common/d-location/DLocation";
 import DUserInfoBar from "../../../components/common/d-user-info-bar";
+import {isInvalidEmail, isInvalidPhone} from "../../../utils/valid-util";
 
 function createStyles() {
   const rootViewStyle: CSSProperties = {
@@ -43,7 +44,14 @@ function createStyles() {
     marginLeft: '2vw'
   };
 
-  return {rootViewStyle, inputStyle, buttonViewStyle, locationStyle};
+  const buttonStyle: CSSProperties = {
+    width: '80vw',
+    height: '30px',
+    lineHeight: '30px',
+    margin: '1vw 0'
+  };
+
+  return {rootViewStyle, inputStyle, buttonViewStyle, locationStyle, buttonStyle};
 }
 
 const styles = createStyles();
@@ -55,7 +63,9 @@ interface IState {
   user: UserVO,
   modifyInfo: UserDTO,
   isModifying: boolean,
-  modifyLoading: boolean
+  modifyLoading: boolean,
+  invalidEmail: boolean,
+  invalidPhone: boolean,
 }
 
 /**
@@ -66,14 +76,15 @@ interface IState {
 export default class index extends Component<any, IState> {
 
   private readonly NOT_FIND_USER_ID_ERROR:Error = new Error('登录已失效');
+  private readonly INVALID_MODIFY_INFO:Error = new Error('修改信息非法\n请检查');
 
   private userId:string;
 
   private readonly defaultModifyState = {
     isModifying: false,
     modifyLoading: false,
-    errMsg: undefined,
-    sucMsg: undefined,
+    errMsg: '',
+    sucMsg: '',
   };
 
   config: Config = {
@@ -87,7 +98,9 @@ export default class index extends Component<any, IState> {
       user: MockUserApi.createMockUser(),
       modifyInfo: MockUserApi.createMockUserDTO(),
       isModifying: false,
-      modifyLoading: false
+      modifyLoading: false,
+      invalidEmail: false,
+      invalidPhone: false,
     };
   }
 
@@ -117,7 +130,7 @@ export default class index extends Component<any, IState> {
   };
 
   private onReset = () => {
-    this.setState({modifyInfo: MockUserApi.createMockUserDTO()});
+    this.setState({modifyInfo: MockUserApi.createMockUserDTO(), invalidPhone: false, invalidEmail: false});
   };
 
   private onSubmit = () => {
@@ -130,10 +143,18 @@ export default class index extends Component<any, IState> {
 
   private handleConfirm = () => {
     const that = this;
-    this.setState({modifyLoading: true}, function() {
-      const {modifyInfo} = that.state;
-      if (modifyInfo) {
-        apiHub.userApi.modifyInfo(modifyInfo)
+    if (this.validModify()) {
+      this.setState({modifyLoading: true}, function () {
+        const {avatar, nickname, address, email, phone} = that.state.user;
+        const {modifyInfo} = that.state;
+        let userDTO: UserDTO = {
+          address: modifyInfo.address.name ? modifyInfo.address : address,
+          nickname: modifyInfo.nickname ? modifyInfo.nickname : nickname,
+          avatar: modifyInfo.avatar ? modifyInfo.avatar : avatar,
+          phone: modifyInfo.phone ? modifyInfo.phone : phone,
+          email: modifyInfo.email ? modifyInfo.email : email
+        };
+        apiHub.userApi.modifyInfo(userDTO)
           .then(function () {
             const sucMsg = '信息修改完成';
             that.setState({sucMsg, modifyLoading: false}, function () {
@@ -141,14 +162,14 @@ export default class index extends Component<any, IState> {
                 Taro.reLaunch({
                   url: urlList.MY
                 }).catch(that.onError);
-              },  relaunchTimeout);
+              }, relaunchTimeout);
             });
           })
           .catch(that.onError);
-      } else {
-        that.onNotLogin();
-      }
-    });
+      });
+    } else {
+      that.onError(that.INVALID_MODIFY_INFO);
+    }
   };
 
   private handleEmailChange = (email) => {
@@ -160,6 +181,12 @@ export default class index extends Component<any, IState> {
     return email
   };
 
+  private checkEmailValid = () => {
+    const {email} = this.state.modifyInfo;
+    let invalidEmail = !!(email && isInvalidEmail(email));
+    this.setState({invalidEmail});
+  };
+
   private handlePhoneChange = (phone) => {
     const modifyInfo = {
       ...this.state.modifyInfo,
@@ -169,21 +196,77 @@ export default class index extends Component<any, IState> {
     return phone
   };
 
+  private checkPhoneValid = () => {
+    const {phone} = this.state.modifyInfo;
+    let invalidPhone = !!(phone && isInvalidPhone(phone));
+    this.setState({invalidPhone});
+  };
+
+  private setModifyUserInfo = (result) => {
+    if (result && result.detail) {
+      const {errMsg, rawData} = result.detail;
+      if (errMsg === 'getUserInfo:ok') {
+        try {
+          const data = JSON.parse(rawData);
+          const {nickName, avatarUrl} = data;
+          const modifyInfo:UserDTO = {
+            ...this.state.modifyInfo,
+            nickname: nickName,
+            avatar: avatarUrl
+          };
+          this.setState({modifyInfo})
+        } catch (e) {
+          this.onError(e);
+        }
+      } else {
+        console.error(errMsg);
+      }
+    }
+  };
+
+  private onChooseLocation = () => {
+    Taro.chooseLocation()
+      .then(location => {
+        console.log(location);
+        const errMsg = location['errMsg'];
+        if (errMsg === 'chooseLocation:ok') {
+          let address: Location = {
+            name: location.name,
+            longitude: location.longitude,
+            latitude: location.latitude,
+            address: location.address
+          };
+          const modifyInfo:UserDTO = {
+            ...this.state.modifyInfo,
+            address
+          };
+          this.setState({modifyInfo});
+        } else {
+          this.onError(new Error(errMsg));
+        }
+      })
+      .catch((e) => {
+        if (e.errMsg !== 'chooseLocation:fail cancel')
+          this.onError(e);
+      });
+  };
+
   private validModify = () => {
-    const {email, phone, address} = this.state.modifyInfo;
-    return email || phone || address.name;
+    const {invalidEmail, invalidPhone} = this.state;
+    const {avatar, nickname, email, phone, address} = this.state.modifyInfo;
+    return (avatar || nickname || email || phone || address.name)
+      && (!(invalidEmail || invalidPhone));
   };
 
   render() {
     const {
       loading, errMsg,
       sucMsg, isModifying, modifyLoading,
-      user, modifyInfo
+      user, modifyInfo,
+      invalidEmail, invalidPhone
     } = this.state;
 
     const {avatar, nickname, address, email, phone} = user;
-
-    let location: Location = modifyInfo.address.name? modifyInfo.address: address;
 
     return (loading || (!isModifying && errMsg))
       ? (
@@ -201,14 +284,21 @@ export default class index extends Component<any, IState> {
                             errMsg={errMsg}
                             sucMsg={sucMsg}
                             title="修改信息"
-                            content={'信息修改中'}/>
+                            content={'确认修改前\n请确认提交的信息是否正确'}/>
             )
             : null
         }
 
-        <WechatUserInfoBar/>
-        <DUserInfoBar avatar={avatar} nickname={nickname}/>
-        {/*TODO*/}
+        {
+          modifyInfo.avatar
+            ? <WechatUserInfoBar/>
+            : <DUserInfoBar avatar={avatar} nickname={nickname}/>
+        }
+        <AtButton type='primary' openType='getUserInfo'
+                  customStyle={styles.buttonStyle}
+                  onGetUserInfo={this.setModifyUserInfo}>
+          授权头像昵称
+        </AtButton>
 
         <AtForm
           onSubmit={this.onSubmit}
@@ -223,6 +313,9 @@ export default class index extends Component<any, IState> {
             placeholder={email}
             value={modifyInfo.email}
             onChange={this.handleEmailChange}
+            onBlur={this.checkEmailValid}
+            error={invalidEmail}
+            clear
           />
 
           <AtInput
@@ -233,19 +326,29 @@ export default class index extends Component<any, IState> {
             placeholder={phone}
             value={modifyInfo.phone}
             onChange={this.handlePhoneChange}
+            onBlur={this.checkPhoneValid}
+            error={invalidPhone}
+            clear
           />
 
-          <DLocation location={location} style={styles.locationStyle}/>
-
-          <AtButton type='primary'>选择地点</AtButton>
-          {/*TODO*/}
-
-          <WhiteSpace height={80}/>
           <View style={styles.buttonViewStyle}>
             <AtButton type='primary' formType='submit' disabled={!this.validModify()}>提交反馈</AtButton>
             <AtButton type='secondary' formType='reset'>重置反馈</AtButton>
           </View>
         </AtForm>
+
+        <AtButton type='primary' customStyle={styles.buttonStyle}
+                  onClick={this.onChooseLocation}>
+          选择地点
+        </AtButton>
+
+        {
+          modifyInfo.address.name
+            ? <DLocation location={modifyInfo.address} style={styles.locationStyle}/>
+            : <DLocation location={address} style={styles.locationStyle}/>
+        }
+
+        <WhiteSpace height={80}/>
 
       </View>
     )

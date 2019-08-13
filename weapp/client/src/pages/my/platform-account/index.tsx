@@ -33,8 +33,8 @@ export class index extends Component<any, IState> {
   private readonly defaultWithdrawState = {
     isWithdrawing: false,
     withdrawLoading: false,
-    errMsg: undefined,
-    sucMsg: undefined,
+    errMsg: '',
+    sucMsg: '',
   };
 
   config: Config = {

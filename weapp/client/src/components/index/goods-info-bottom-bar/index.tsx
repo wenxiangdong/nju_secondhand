@@ -36,8 +36,8 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
   private readonly defaultBuyingState = {
     isBuying: false,
     buyingLoading: false,
-    errMsg: undefined,
-    sucMsg: undefined
+    errMsg: '',
+    sucMsg: ''
   };
 
   constructor(props) {

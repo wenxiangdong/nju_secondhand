@@ -35,8 +35,8 @@ export default class index extends Component<any, IState> {
   private readonly defaultDeleteState = {
     isDelete: false,
     deleteLoading: false,
-    errMsg: undefined,
-    sucMsg: undefined,
+    errMsg: '',
+    sucMsg: '',
     deleteIdx: -1,
     atModalContent: this.defaultAtModalContent,
   };
