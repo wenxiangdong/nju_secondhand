@@ -1,8 +1,8 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\I354990\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add taro-ui/dist/style/index.scss --silent --no-progress
+  C:\Program Files\nodejs\node.exe C:\Users\文向东\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add src/components/message/system-notification --silent --no-progress
 
 PATH: 
-  C:\Program Files\nodejs\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;C:\Users\I354990\projects\nju_secondhand\weapp\client\node_modules\.bin;C:\Users\I354990\AppData\Local\Temp\yarn--1563772419419-0.3361804921135312;C:\Users\I354990\projects\nju_secondhand\weapp\client\node_modules\.bin;C:\Users\I354990\AppData\Local\Yarn\Data\link\node_modules\.bin;C:\Program Files\libexec\lib\node_modules\npm\bin\node-gyp-bin;C:\Program Files\lib\node_modules\npm\bin\node-gyp-bin;C:\Program Files\nodejs\node_modules\npm\bin\node-gyp-bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\I354990\AppData\Local\Yarn\bin;C:\Users\I354990\AppData\Local\Microsoft\WindowsApps;C:\Users\I354990\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\I354990\AppData\Roaming\npm;C:\Program Files\JetBrains\WebStorm 2019.1.3\bin;;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1.3\bin;;C:\Users\I354990\AppData\Local\Yarn\bin;
+  C:\Program Files\nodejs\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;C:\projects\nju_secondhand\weapp\client\node_modules\.bin;C:\Program Files\nodejs\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;C:\projects\nju_secondhand\weapp\client\node_modules\.bin;C:\Program Files (x86)\NetSarang\Xftp 6\;C:\Program Files (x86)\NetSarang\Xshell 6\;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Docker\Docker\Resources\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\AndroidSdk\platform-tools\;C:\AndroidSdk\platforms\;C:\chromedriver\;C:\MinGW\bin\;C:\Program Files\Java\jdk1.8.0_211\bin\;C:\Users\文向东\AppData\Local\Programs\Python\Python37\Scripts\;C:\Users\文向东\AppData\Local\Programs\Python\Python37\;C:\Users\文向东\AppData\Local\Microsoft\WindowsApps;C:\Users\文向东\AppData\Roaming\npm;C:\Users\文向东\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\JetBrains\WebStorm 2019.1.3\bin;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1.3\bin;C:\Program Files\JetBrains\PyCharm Community Edition 2019.1.3\bin;;C:\flutter\bin\;
 
 Yarn version: 
   1.16.0
@@ -14,13 +14,13 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/taro-ui%2fdist/style/index.scss: Request "https://registry.yarnpkg.com/taro-ui%2fdist/style/index.scss" returned a 405
-      at Request.params.callback [as _callback] (C:\Users\I354990\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66100:18)
-      at Request.self.callback (C:\Users\I354990\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:129590:22)
+  Error: https://registry.npmjs.org/src%2fcomponents/message/system-notification: Request "https://registry.npmjs.org/src%2fcomponents/message/system-notification" returned a 405
+      at Request.params.callback [as _callback] (C:\Users\文向东\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66100:18)
+      at Request.self.callback (C:\Users\文向东\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:129590:22)
       at Request.emit (events.js:198:13)
-      at Request.<anonymous> (C:\Users\I354990\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:130562:10)
+      at Request.<anonymous> (C:\Users\文向东\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:130562:10)
       at Request.emit (events.js:198:13)
-      at IncomingMessage.<anonymous> (C:\Users\I354990\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:130484:12)
+      at IncomingMessage.<anonymous> (C:\Users\文向东\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:130484:12)
       at Object.onceWrapper (events.js:286:20)
       at IncomingMessage.emit (events.js:203:15)
       at endReadableNT (_stream_readable.js:1129:12)
@@ -56,6 +56,7 @@ npm manifest:
     "author": "",
     "license": "MIT",
     "dependencies": {
+      "@tarojs/async-await": "^1.3.10",
       "@tarojs/components": "1.3.10",
       "@tarojs/router": "1.3.10",
       "@tarojs/taro": "1.3.10",
@@ -64,29 +65,30 @@ npm manifest:
       "@tarojs/taro-swan": "1.3.10",
       "@tarojs/taro-tt": "1.3.10",
       "@tarojs/taro-weapp": "1.3.10",
+      "nerv-devtools": "^1.4.0",
       "nervjs": "^1.4.0",
-      "nerv-devtools": "^1.4.0"
+      "taro-ui": "^2.2.1"
     },
     "devDependencies": {
-      "@types/react": "^16.4.6",
-      "@types/webpack-env": "^1.13.6",
       "@tarojs/plugin-babel": "1.3.10",
       "@tarojs/plugin-csso": "1.3.10",
       "@tarojs/plugin-sass": "1.3.10",
       "@tarojs/plugin-uglifyjs": "1.3.10",
       "@tarojs/webpack-runner": "1.3.10",
+      "@types/react": "^16.4.6",
+      "@types/webpack-env": "^1.13.6",
+      "@typescript-eslint/parser": "^1.6.0",
+      "babel-eslint": "^8.2.3",
       "babel-plugin-transform-class-properties": "^6.24.1",
       "babel-plugin-transform-decorators-legacy": "^1.3.4",
       "babel-plugin-transform-jsx-stylesheet": "^0.6.5",
       "babel-plugin-transform-object-rest-spread": "^6.26.0",
       "babel-preset-env": "^1.6.1",
-      "babel-eslint": "^8.2.3",
       "eslint": "^4.19.1",
       "eslint-config-taro": "1.3.10",
-      "eslint-plugin-react": "^7.8.2",
       "eslint-plugin-import": "^2.12.0",
+      "eslint-plugin-react": "^7.8.2",
       "eslint-plugin-taro": "1.3.10",
-      "@typescript-eslint/parser": "^1.6.0",
       "typescript": "^3.0.1"
     }
   }
@@ -183,6 +185,14 @@ Lockfile:
       esutils "^2.0.2"
       lodash "^4.2.0"
       to-fast-properties "^2.0.0"
+  
+  "@tarojs/async-await@^1.3.10":
+    version "1.3.10"
+    resolved "https://registry.yarnpkg.com/@tarojs/async-await/-/async-await-1.3.10.tgz#f3260a64d29e57cc5cb951bcedede4b83f555db0"
+    integrity sha512-B/HURKFYL25Ye5lGOSuc/osvfO5Kw9B07P5fA0yJy/UkFfQVMRWzgaRs0bGbPLFUV6yZiIBQBaQUD0EA9JYjvA==
+    dependencies:
+      promise-polyfill "^7.1.2"
+      regenerator-runtime "^0.11.1"
   
   "@tarojs/components@1.3.10":
     version "1.3.10"
@@ -386,7 +396,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.1.tgz#f1a11e7babb0c3cad68100be381d1e064c68f1f6"
     integrity sha512-CFzn9idOEpHrgdw8JsoTkaDDyRWk1jrzIV8djzcgpq0y9tG4B4lFT+Nxh52DVpDXV+n4+NPNv7M1Dj5uMp6XFg==
   
-  "@types/react@^16.4.6":
+  "@types/react@^16.4.6", "@types/react@^16.7.3":
     version "16.8.23"
     resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.23.tgz#ec6be3ceed6353a20948169b6cb4c97b65b97ad2"
     integrity sha512-abkEOIeljniUN9qB5onp++g0EY38h7atnDHxwKUFz1r3VH1+yG1OKi2sNPTyObL40goBmfKFpdii2lEzwLX1cA==
@@ -1605,6 +1615,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.13.1.tgz#598afe54755b2868a5330d2aff9d4ebb53209b65"
     integrity sha512-Un7MIEDdUC5gNpcGDV97op1Ywk748MpHcFTHoYs6qnj1Z3j7I53VG3nwZhKzoBZmbdRNnb6WRdFlwl7tSDuZGw==
   
+  bind-decorator@^1.0.11:
+    version "1.0.11"
+    resolved "https://registry.yarnpkg.com/bind-decorator/-/bind-decorator-1.0.11.tgz#e41bc06a1f65dd9cec476c91c5daf3978488252f"
+    integrity sha1-5BvAah9l3ZzsR2yRxdrzl4SIJS8=
+  
   block-stream@*:
     version "0.0.9"
     resolved "https://registry.yarnpkg.com/block-stream/-/block-stream-0.0.9.tgz#13ebfe778a03205cfe03751481ebb4b3300c126a"
@@ -2005,7 +2020,7 @@ Lockfile:
       isobject "^3.0.0"
       static-extend "^0.1.1"
   
-  classnames@^2.2.5:
+  classnames@^2.2.5, classnames@^2.2.6:
     version "2.2.6"
     resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
     integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
@@ -2505,6 +2520,11 @@ Lockfile:
     version "0.1.4"
     resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
     integrity sha1-6vQ5/U1ISK105cx9vvIAZyueNFs=
+  
+  dayjs@^1.7.7:
+    version "1.8.15"
+    resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.15.tgz#7121bc04e6a7f2621ed6db566be4a8aaf8c3913e"
+    integrity sha512-HYHCI1nohG52B45vCQg8Re3hNDZbMroWPkhz50yaX7Lu0ATyjGsTdoYZBpjED9ar6chqTx2dmSmM8A51mojnAg==
   
   debug@*, debug@^4.1.0:
     version "4.1.1"
@@ -5996,6 +6016,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
     integrity sha1-mEcocL8igTL8vdhoEputEsPAKeM=
   
+  promise-polyfill@^7.1.2:
+    version "7.1.2"
+    resolved "https://registry.yarnpkg.com/promise-polyfill/-/promise-polyfill-7.1.2.tgz#ab05301d8c28536301622d69227632269a70ca3b"
+    integrity sha512-FuEc12/eKqqoRYIGBrUptCBRhobL19PS2U31vMNTfyck1FxPyMfgsXyW4Mav85y/ZN1hop3hOwRlUDok23oYfQ==
+  
   promise@^7.1.1:
     version "7.3.1"
     resolved "https://registry.yarnpkg.com/promise/-/promise-7.3.1.tgz#064b72602b18f90f29192b8b1bc418ffd1ebd3bf"
@@ -6010,7 +6035,7 @@ Lockfile:
     dependencies:
       asap "~2.0.6"
   
-  prop-types@^15.6.1, prop-types@^15.7.2:
+  prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
     version "15.7.2"
     resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
     integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -6249,7 +6274,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.0.tgz#4a856ec4b56e4077c557589cae85e7a4c8869a11"
     integrity sha512-1G6jJVDWrt0rK99kBjvEtziZNCICAuvIPkSiUFIQxVP06RCVpq3dmDo2oi6ABpYaDYaTRr67BEhL8r1wgEZZKg==
   
-  regenerator-runtime@^0.11.0:
+  regenerator-runtime@^0.11.0, regenerator-runtime@^0.11.1:
     version "0.11.1"
     resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
     integrity sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
@@ -7230,6 +7255,18 @@ Lockfile:
       mkdirp "^0.5.0"
       safe-buffer "^5.1.2"
       yallist "^3.0.3"
+  
+  taro-ui@^2.2.1:
+    version "2.2.1"
+    resolved "https://registry.yarnpkg.com/taro-ui/-/taro-ui-2.2.1.tgz#26f74f1f5e278888a87ee921ac71f33dffcb8601"
+    integrity sha512-m75rwo3HDBW3lcRj8cwzPXYw5komdnttdMn4nzI+npvYF9fjFT2h+DVCX2+vUUm7OkRRo+SrJRGFiBK9K+cqZA==
+    dependencies:
+      "@types/react" "^16.7.3"
+      bind-decorator "^1.0.11"
+      classnames "^2.2.6"
+      dayjs "^1.7.7"
+      lodash "^4.17.10"
+      prop-types "^15.6.2"
   
   terser-webpack-plugin@^1.1.0:
     version "1.3.0"

@@ -32,7 +32,7 @@ export default class System extends Taro.Component {
     }
   }
 
-  async onPullDownRefresh(): void {
+  async onPullDownRefresh() {
     let {messageList} = this.state;
     console.log("pull down");
     try {

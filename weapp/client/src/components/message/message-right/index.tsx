@@ -1,9 +1,9 @@
 import Taro from "@tarojs/taro";
-import {View} from "@tarojs/components";
+import {View, OpenData} from "@tarojs/components";
 import MessageAvatar from "../message-avatar";
 import MessageContent from "../message-content";
 export default function MessageRight({name, avatar = null, content, time}) {
-  const avatarSection = <MessageAvatar alt={name} backgroundColor={"#84B1ED"} src={avatar}/>;
+  const avatarSection = <MessageAvatar self={true} />;
   const RADIUS = "10Px";
 
 
