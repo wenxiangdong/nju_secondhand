@@ -2,7 +2,7 @@
 const cloud = require('wx-server-sdk')
 const TcbRounter = require('tcb-router')
 const fs = require("fs");
-const {LitePay, utils} = require("@sigodenjs/wechatpay");
+const {LitePay, utils, Bank} = require("@sigodenjs/wechatpay");
 
 cloud.init()
 const db = cloud.database()
@@ -52,12 +52,12 @@ exports.main = async (event, context) => {
     let {balance = 0} = account;
     amount = parseFloat(amount);
     balance = parseFloat(balance);
-    if (balance < amount) {
-      throw {
-        code: HttpCode.Conflict,
-        message: "账户余额不足"
-      }
-    }
+    // if (balance < amount) {
+    //   throw {
+    //     code: HttpCode.Conflict,
+    //     message: "账户余额不足"
+    //   }
+    // }
 
     // 微信企业付款
     await withdraw({
@@ -94,7 +94,32 @@ exports.main = async (event, context) => {
 
 
 const withdraw = async ({openID = "", amount = 0}) => {
-
+  const bank = new Bank({
+    appId: APP_CONFIG.APP_ID,
+    mchId: APP_CONFIG.ACCOUNT,
+    key: APP_CONFIG.KEY,
+    pfx: APP_CONFIG.CERT
+  });
+  // 转换成分
+  amount = parseFloat(amount);
+  amount = amount * 100;
+  try {
+    const res = await bank.transfers({
+      openid: openID,
+      check_name: "NO_CHECK",
+      amount: amount,
+      partner_trade_no: utils.nonceStr(),
+      desc: "南大小书童提现",
+      spbill_create_ip: "127.0.0.1"
+    });
+    console.log(res);
+  } catch (error) {
+    console.error(error);
+    throw {
+      code: HttpCode.Fail,
+      message: "提现失败，如果出现资金异常请进行投诉或直接联系客服"
+    };
+  }
 }
 
 
@@ -103,10 +128,11 @@ const pay = async ({openID, payTitle = "南大小书童闲置物品", payAmount 
     appId: APP_CONFIG.APP_ID,
     mchId: APP_CONFIG.ACCOUNT,
     key: APP_CONFIG.KEY,
-    pfx: APP_CONFIG.CERT,
 
   };
   const pay = new LitePay(config);
+
+ 
 
   // 转换成分
   payAmount = parseFloat(payAmount);
@@ -114,17 +140,22 @@ const pay = async ({openID, payTitle = "南大小书童闲置物品", payAmount 
 
   try {
     const orderInfo = {
-      body: payTitle,
+      body: `${payTitle}`,
       out_trade_no: orderID || utils.nonceStr(),
-      total_fee: payAmount,
-      spbill_create_ip: "127.0.0.1",
+      total_fee: payAmount + '',
+      spbill_create_ip: "192.168.0.1",
       notify_url: "https://github.wenxiangdong.io",
-      openid: openID,
-      trade_type: "JSAPI"
+      openid: openID
     };
     console.log(orderInfo, config);
+    pay.setDebug(true);
     const result = await pay.unifiedOrder(orderInfo);
     console.log(result);
+    if (result.result_code === "SUCCESS") {
+      const {prepay_id, nonce_str} = result;
+      // 再次签名
+      
+    }
   } catch (error) {
     console.error(error);
     throw {

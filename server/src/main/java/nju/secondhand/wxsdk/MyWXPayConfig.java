@@ -30,7 +30,7 @@ public class MyWXPayConfig extends WXPayConfig {
 
     @Override
     public String getKey() {
-        return "key";
+        return "NanjingdunshudianzishangwuYXXL18";
     }
 
     @Override
