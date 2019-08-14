@@ -190,7 +190,8 @@ exports.main = async (event, context) => {
            */
           payTitle: goods.name,
           payAmount: order.price,
-          orderID: order._id
+          orderID: order._id,
+          $url: "pay",
         })
       ).result;
   })

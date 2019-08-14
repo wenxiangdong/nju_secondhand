@@ -2,6 +2,7 @@
 const cloud = require('wx-server-sdk')
 const TcbRounter = require('tcb-router')
 const fs = require("fs");
+const Tenpay = require("tenpay");
 const {LitePay, utils, Bank} = require("@sigodenjs/wechatpay");
 
 cloud.init()
@@ -86,7 +87,8 @@ exports.main = async (event, context) => {
   app.router('pay', async(ctx) => {
     console.log("进入 pay route", ctx.data);
     const {payTitle, payAmount, orderID} = event;
-    await pay({openID: ctx.data.openid, payTitle, payAmount, orderID});
+    const result = await pay({openID: ctx.data.openid, payTitle, payAmount, orderID});
+    ctx.body = result;
   })
 
   return app.serve();
@@ -94,87 +96,57 @@ exports.main = async (event, context) => {
 
 
 const withdraw = async ({openID = "", amount = 0}) => {
-  const bank = new Bank({
-    appId: APP_CONFIG.APP_ID,
-    mchId: APP_CONFIG.ACCOUNT,
-    key: APP_CONFIG.KEY,
-    pfx: APP_CONFIG.CERT
+  console.log(TENPAY_CONFIG);
+  const tenpay = new Tenpay(TENPAY_CONFIG, true);
+  tenpay.transfers({
+    // todo 转账
   });
-  // 转换成分
-  amount = parseFloat(amount);
-  amount = amount * 100;
-  try {
-    const res = await bank.transfers({
-      openid: openID,
-      check_name: "NO_CHECK",
-      amount: amount,
-      partner_trade_no: utils.nonceStr(),
-      desc: "南大小书童提现",
-      spbill_create_ip: "127.0.0.1"
-    });
-    console.log(res);
-  } catch (error) {
-    console.error(error);
-    throw {
-      code: HttpCode.Fail,
-      message: "提现失败，如果出现资金异常请进行投诉或直接联系客服"
-    };
-  }
 }
 
 
 const pay = async ({openID, payTitle = "南大小书童闲置物品", payAmount = 0, orderID = ""}) => {
-  const config = {
-    appId: APP_CONFIG.APP_ID,
-    mchId: APP_CONFIG.ACCOUNT,
-    key: APP_CONFIG.KEY,
-
-  };
-  const pay = new LitePay(config);
-
- 
-
+  console.log(TENPAY_CONFIG);
+  const tenpay = new Tenpay(TENPAY_CONFIG, true);
   // 转换成分
   payAmount = parseFloat(payAmount);
   payAmount = payAmount * 100;
-
   try {
-    const orderInfo = {
-      body: `${payTitle}`,
-      out_trade_no: orderID || utils.nonceStr(),
-      total_fee: payAmount + '',
-      spbill_create_ip: "192.168.0.1",
-      notify_url: "https://github.wenxiangdong.io",
-      openid: openID
-    };
-    console.log(orderInfo, config);
-    pay.setDebug(true);
-    const result = await pay.unifiedOrder(orderInfo);
+    const result = await tenpay.getPayParams({
+      out_trade_no: orderID || `order${+new Date()}`,
+      body: payTitle,
+      total_fee: payAmount, //订单金额(分),
+      openid: openID,
+    });
     console.log(result);
-    if (result.result_code === "SUCCESS") {
-      const {prepay_id, nonce_str} = result;
-      // 再次签名
-      
-    }
+    return result;
   } catch (error) {
     console.error(error);
     throw {
       code: HttpCode.Fail,
       message: "预下单失败"
-    }
+    };
   }
-  
 }
 
 
 
 const APP_CONFIG = {
-  APP_ID: "wx5b54b56253641b80",
-  APP_SECRET: "9a68b7d1de471d54457fd650e960e3fd",
-  ACCOUNT: "1524825661",
+  APP_ID: "wxc4e156082fbd97ba",
+  APP_SECRET: "b67831c61b8af414d031fe209a30c683",
+  ACCOUNT: "1521513131",
   KEY: "NanjingdunshudianzishangwuYXXL18",
-  CERT: fs.readFileSync('cert.p12')
+  CERT: fs.readFileSync('cert.p12'),
+  
 };
+
+const TENPAY_CONFIG = {
+  appid: APP_CONFIG.APP_ID,
+  mchid: APP_CONFIG.ACCOUNT,
+  partnerKey: APP_CONFIG.KEY,
+  pfx: APP_CONFIG.CERT,
+  notify_url: "https://wenxiangdong.github.io",
+  spbill_create_ip: "127.0.0.1"
+}
 
 // const APP_CONFIG = {
 //   APP_ID: "wx8e5c5b550a9d9874",
