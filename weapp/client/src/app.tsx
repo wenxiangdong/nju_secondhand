@@ -54,6 +54,7 @@ class App extends Component {
       'pages/my/user-info/index',
 
       'pages/register/index',
+      'pages/publish/index',
     ],
     window: {
       backgroundTextStyle: 'light',

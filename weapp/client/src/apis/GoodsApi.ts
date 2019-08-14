@@ -238,7 +238,9 @@ class MockGoodsApi implements IGoodsApi {
       name: 'name',
       desc: 'desc',
       price: '1.01',
-      pictures: ['', ''],
+      pictures: [
+        'http://img1.imgtn.bdimg.com/it/u=2565994761,3746514896&fm=26&gp=0.jpg', 
+        'http://img1.imgtn.bdimg.com/it/u=2565994761,3746514896&fm=26&gp=0.jpg'],
       category: MockGoodsApi.createMockCateGory(),
       publishTime: Date.now(),
       state: GoodsState.InSale

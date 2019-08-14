@@ -55,6 +55,9 @@ export default class index extends Component<any, IState> {
         });
         const sellerInfo = await apiHub.userApi.getUserInfo(sellerId);
         console.log(sellerInfo);
+        Taro.setNavigationBarTitle({
+          title: sellerInfo.nickname
+        });
         this.setState({
           sellerInfo
         }, () => {
@@ -181,6 +184,7 @@ export default class index extends Component<any, IState> {
 
   private sendMessage = (vo: MessageVO) => {
     console.log("发送消息", vo);
+    vo.time = +new Date();
     messageHub.sendMessage(vo);
     this.setState(pre => ({
       messageList: [...pre.messageList, vo],
