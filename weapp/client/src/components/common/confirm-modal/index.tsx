@@ -41,7 +41,7 @@ function ConfirmModal(props: IProp) {
   );
 
   const modalAction = (
-    errMsg || sucMsg
+    errMsg
       ? (
         <AtModalAction>
           <Button onClick={onCancel}>确定</Button>
@@ -61,15 +61,15 @@ function ConfirmModal(props: IProp) {
       <AtModalHeader>{errMsg? '出错了': title}</AtModalHeader>
       <AtModalContent>
         {
-          loading
+          loading && !errMsg
             ? loadingNode
             : (textNode)
         }
       </AtModalContent>
       {
-        loading
-          ? null
-          : (modalAction)
+        errMsg || (!(loading || sucMsg))
+          ? (modalAction)
+          : null
       }
     </AtModal>
   )

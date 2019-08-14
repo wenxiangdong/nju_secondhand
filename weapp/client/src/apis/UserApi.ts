@@ -3,6 +3,7 @@ import {VO, httpRequest, db, Fail, HttpCode, mockHttpRequest} from "./HttpReques
 import {AccountVO, MockAccountApi} from "./AccountApi";
 import {Debugger} from "inspector";
 import Location = module
+import localConfig from "../utils/local-config";
 
 export interface IUserApi {
   // 检查用户状态
@@ -74,13 +75,14 @@ class UserApi implements IUserApi {
 
 class MockUserApi implements IUserApi {
   checkState(): Promise<UserState> {
-    throw new Error("Method not implemented.");
+    return mockHttpRequest.success(UserState.UnRegistered);
   }
   signUp(user: UserDTO): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('signUp', user);
+    return mockHttpRequest.success();
   }
   login(): Promise<UserVO> {
-    throw new Error("Method not implemented.");
+    return mockHttpRequest.success(MockUserApi.createMockUser());
   }
   modifyInfo(user: UserDTO): Promise<void> {
     console.log('modifyInfo', user);

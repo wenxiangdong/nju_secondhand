@@ -54,7 +54,7 @@ function createStyles() {
   return {rootViewStyle, inputStyle, buttonViewStyle, locationStyle, buttonStyle};
 }
 
-const styles = createStyles();
+export const styles = createStyles();
 
 interface IState {
   loading: boolean,
@@ -332,8 +332,8 @@ export default class index extends Component<any, IState> {
           />
 
           <View style={styles.buttonViewStyle}>
-            <AtButton type='primary' formType='submit' disabled={!this.validModify()}>提交反馈</AtButton>
-            <AtButton type='secondary' formType='reset'>重置反馈</AtButton>
+            <AtButton type='primary' formType='submit' disabled={!this.validModify()}>提交修改</AtButton>
+            <AtButton type='secondary' formType='reset'>重置修改</AtButton>
           </View>
         </AtForm>
 
