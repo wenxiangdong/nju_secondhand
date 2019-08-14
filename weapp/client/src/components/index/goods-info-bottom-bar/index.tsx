@@ -10,6 +10,7 @@ import {CSSProperties} from "react";
 import "taro-ui/dist/style/components/flex.scss";
 import "taro-ui/dist/style/components/modal.scss";
 import {apiHub} from "../../../apis/ApiHub";
+import {MessageVO} from "../../../apis/MessageApi";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO
@@ -40,6 +41,14 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
   }
 
   private chat = () => {
+    // 预设一个 商品信息 的消息
+    const {goodsWithSeller} = this.props;
+    const {goods} = goodsWithSeller;
+    const message: MessageVO = {
+      receiverID: goods._id,
+      content: `text://物品名称：${goods.name},物品价格：￥${goods.price}，物品描述：${goods.desc}`
+    };
+    chatUrlConfig.setPreMessage(message);
     Taro.navigateTo({
       url: chatUrlConfig.createUrl(this.props.goodsWithSeller.seller._id)
     }).catch(this.onError);

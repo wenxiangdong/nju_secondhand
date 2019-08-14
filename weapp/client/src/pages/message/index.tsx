@@ -6,9 +6,11 @@ import messageHub, { MessageVO } from '../../apis/MessageApi';
 import MessageRow from '../../components/message/message-row';
 import "./index.scss";
 import { chatUrlConfig } from '../../utils/url-list';
+import {apiHub} from "../../apis/ApiHub";
 
 interface IState {
-  conservationList: MessageVO[]
+  conservationList: MessageVO[],
+  avatarMap: Map<string, string>, // 存储聊天列表的用户头像
 }
 
 /**
@@ -22,14 +24,35 @@ export class index extends Component<any, IState> {
   };
 
   state = {
-    conservationList: []
+    conservationList: [],
+    avatarMap: new Map()
   };
 
   componentDidShow() {
     const list = messageHub.getLastMessageList();
     this.setState({
       conservationList: [...list]
+    }, () => {
+      this.loadUserInfo()
     });
+  }
+
+  loadUserInfo() {
+    // 加载列表的头像信息
+    const {conservationList, avatarMap} = this.state;
+    conservationList.forEach((msg: MessageVO) => {
+      const userID = msg.senderID || msg.receiverID;
+      if (!avatarMap.get(userID)) {
+        apiHub.userApi.getUserInfo(userID)
+          .then(res => {
+            avatarMap.set(userID, res.avatar);
+            console.log(avatarMap);
+            this.setState({
+              avatarMap: avatarMap
+            })
+          });
+      }
+    })
   }
 
   handleClickConservation = (vo: MessageVO) => {
@@ -38,20 +61,21 @@ export class index extends Component<any, IState> {
     Taro.navigateTo({
       url
     });
-  }
+  };
 
   render() {
-    const {conservationList} = this.state;
+    const {conservationList, avatarMap} = this.state;
     return (
       <View>
         <View>
           <SystemNotification />
-          <View className="message-list">
+          <View className="message-list" >
             {
               conservationList.map((vo: MessageVO) => (
-                <MessageRow 
+                <MessageRow
                   onClick={() => this.handleClickConservation(vo)}
-                  name={vo.senderName} 
+                  avatar={avatarMap.get(vo.senderID || vo.receiverID)}
+                  name={vo.senderName || vo.receiverName}
                   extra={this.parseMessage(vo.content)} />
               ))
             }

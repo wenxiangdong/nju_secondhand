@@ -47,9 +47,9 @@ class MessageHub {
   }
 
   /**
-   * 
+   *
    * @param key 往记录里加消息
-   * @param vo 
+   * @param vo
    */
   private addMessageToList(key: string, vo: MessageVO) {
     let messageList = this.messageHistory.get(key);
@@ -122,7 +122,7 @@ class MockSocket {
           })
         }
       )
-    }, 3000);
+    }, 1000);
   }
 
 }

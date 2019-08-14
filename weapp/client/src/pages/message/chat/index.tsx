@@ -57,6 +57,8 @@ export default class index extends Component<any, IState> {
         console.log(sellerInfo);
         this.setState({
           sellerInfo
+        }, () => {
+          this.initPreMessage();
         });
         messageHub.subscribe(this.handleReceiveNewMessage);
       } else {
@@ -76,6 +78,11 @@ export default class index extends Component<any, IState> {
     messageHub.unsubscribe(this.handleReceiveNewMessage);
   }
 
+  initPreMessage() {
+    const vo = chatUrlConfig.getPreMessage();
+    vo && this.sendMessage(vo);
+  }
+
   handleReceiveNewMessage = (vo: MessageVO) => {
     const {sellerInfo} = this.state;
     // 消息是该会话的
@@ -85,39 +92,41 @@ export default class index extends Component<any, IState> {
         lastId: `id-${pre.messageList.length}`
       }));
     }
-  }
+  };
 
   render() {
-    const {loading, errMsg, messageList, lastId, inputValue} = this.state;
+    const {loading, errMsg, messageList, lastId, inputValue, sellerInfo} = this.state;
 
     const listSection = (
           messageList.map((message: MessageVO, idx) => (
             message.senderID
-              ? <MessageLeft key={idx} id={`id-${idx}`} name={message.senderName} content={message.content} time={message.time} />
+              ? <MessageLeft avatar={(sellerInfo && sellerInfo.avatar) || ""} key={idx} id={`id-${idx}`} name={message.senderName} content={message.content} time={message.time} />
               : <MessageRight key={idx} id={`id-${idx}`} content={message.content} time={message.time} />
           ))
     );
 
     return (loading || errMsg
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage errMsg={errMsg} />
       )
       : (
-        <View className="chat-page">
-          <ScrollView className="message-list" 
+        <View className='chat-page'>
+          <ScrollView className='message-list'
             scrollIntoView={lastId}
-            scrollY>
+            scrollY
+          >
             {listSection}
           </ScrollView>
-          <View className="bottom-bar">
-            <Input 
-             placeholder="输入消息"
-             value={inputValue}
-             onInput={e => {this.setState({inputValue: e.detail.value})}}
-             className="input" 
-             confirmType="send" 
-             onConfirm={this.handleConfirmInput}/>
-            <AtIcon value="image" onClick={this.handleClickImageIcon}/>
+          <View className='bottom-bar'>
+            <Input
+              placeholder='输入消息'
+              value={inputValue}
+              onInput={e => {this.setState({inputValue: e.detail.value})}}
+              className='input'
+              confirmType='send'
+              onConfirm={this.handleConfirmInput}
+            />
+            <AtIcon value='image' onClick={this.handleClickImageIcon} />
           </View>
         </View>
       )
@@ -131,15 +140,16 @@ export default class index extends Component<any, IState> {
     console.log(value);
     const vo: MessageVO = {
       content: "text://" + value,
-      receiverID: sellerInfo && sellerInfo._id || ""
+      receiverID: sellerInfo && sellerInfo._id || "",
+      receiverName: sellerInfo && sellerInfo.nickname || ""
     };
     this.sendMessage(vo);
-    this.setState(pre => ({
+    this.setState({
       inputValue: "",
-      messageList: [...pre.messageList, vo],
-      lastId: `id-${pre.messageList.length}`
-    }));
-  }
+      // messageList: [...pre.messageList, vo],
+      // lastId: `id-${pre.messageList.length}`
+    });
+  };
 
   private handleClickImageIcon = async () => {
     const CLOUD_DIR = "chat/images/";
@@ -155,13 +165,11 @@ export default class index extends Component<any, IState> {
       );
       const vo: MessageVO = {
         content: "image://" + url,
-        receiverID: sellerInfo && sellerInfo._id || ""
-      }
+        receiverID: sellerInfo && sellerInfo._id || "",
+        receiverName: sellerInfo && sellerInfo.nickname || ""
+      };
       this.sendMessage(vo);
-      this.setState(pre => ({
-        messageList: [...pre.messageList, vo],
-        lastId: `id-${pre.messageList.length}`
-      }));
+
     } catch (error) {
       console.error(error);
       Taro.showToast({
@@ -169,10 +177,14 @@ export default class index extends Component<any, IState> {
         icon: "none"
       });
     }
-  }
+  };
 
   private sendMessage = (vo: MessageVO) => {
     console.log("发送消息", vo);
     messageHub.sendMessage(vo);
+    this.setState(pre => ({
+      messageList: [...pre.messageList, vo],
+      lastId: `id-${pre.messageList.length}`
+    }));
   }
 }

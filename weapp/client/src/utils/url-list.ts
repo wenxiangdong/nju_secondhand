@@ -1,4 +1,5 @@
 import {Location} from "../apis/UserApi";
+import {MessageVO} from "../apis/MessageApi";
 
 const urlList = {
   CIRCLE: '/pages/circle/index',
@@ -82,8 +83,19 @@ const locationUrlConfig = new LocationUrlConfig();
 class ChatUrlConfig {
   private readonly USER_ID = 'user_id';
 
+  private preMessage: MessageVO | undefined;
+
   public createUrl(id): string {
     return encodeURI(`${urlList.MESSAGE_CHAT}?${this.USER_ID}=${id}`);
+  }
+
+  /**
+   * 预设消息，作用是跳转到聊天页面时可以附带一条消息，马上发送，
+   * 比如从商品那边过来的话，可以预设一条 商品信息 的消息
+   * @param vo
+   */
+  public setPreMessage(vo: MessageVO) {
+    this.preMessage = vo;
   }
 
   public getUserId(that): string|undefined {
@@ -92,6 +104,16 @@ class ChatUrlConfig {
     } catch (e) {
       console.error('ChatUrlConfig getUserId', e);
     }
+  }
+
+  /**
+   * 获取传递过来的消息
+   * 注意，只能拿一次，然后清空
+   */
+  public getPreMessage(): MessageVO | undefined {
+    const vo = this.preMessage;
+    this.preMessage = undefined;
+    return vo;
   }
 }
 
