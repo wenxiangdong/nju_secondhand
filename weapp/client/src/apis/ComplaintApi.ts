@@ -1,4 +1,4 @@
-import { VO, httpRequest } from "./HttpRequest";
+import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
 
 export interface IComplaintApi {
   complain(complaint: ComplaintDTO): Promise<void>;
@@ -18,17 +18,51 @@ class ComplaintApi implements IComplaintApi {
 }
 
 class MockComplaintApi implements IComplaintApi {
+  private readonly complaintCount = 20;
   complain(complaint: ComplaintDTO): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('complain', complaint);
+    return mockHttpRequest.success();
   }
   getComplaints(lastIndex: number, size: number = 10): Promise<ComplaintVO[]> {
-    throw new Error("Method not implemented.");
+    let complaints: ComplaintVO[] = [];
+    if (lastIndex < this.complaintCount) {
+      complaints = new Array(size).fill(null)
+        .map(() => MockComplaintApi.createMockComplaint());
+    }
+    return mockHttpRequest.success(complaints);
+  }
+
+  static createMockComplaint(): ComplaintVO {
+    const handled = Math.random() > 0.5;
+    return {
+      _id: '1',
+      orderID: 'orderID',
+      desc: 'descdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdesc',
+
+      complaintID: 'complaintID',
+      complaintName: 'complaintName',
+
+      pictures: ['','',''],
+
+      complainTime: Date.now(),
+
+      handling: handled? this.createMockHandling(): null,
+
+      state: handled? ComplaintState.Handled: ComplaintState.Ongoing,
+    };
+  }
+
+  static createMockHandling(): Handling {
+    return {
+      time: Date.now(),
+      result: 'resultresultresultresultresultresultresultresultresultresultresultresultresultresultresultresultresultresultresultresultresultresultresult'
+    }
   }
 }
 
 let complainApi: IComplaintApi = new ComplaintApi();
 let mockComplaintApi: IComplaintApi = new MockComplaintApi();
-export { complainApi, mockComplaintApi }
+export { complainApi, mockComplaintApi, MockComplaintApi }
 
 
 export interface ComplaintDTO {
@@ -42,8 +76,8 @@ export interface ComplaintVO extends VO {
   orderID: string // 订单编号
   desc: string
 
-  complainantID: string;
-  complainantName: string;
+  complaintID: string;
+  complaintName: string;
 
   pictures: Array<string>;
 
@@ -60,6 +94,6 @@ export interface Handling {
 }
 
 export enum ComplaintState {
-  Ongoing,
-  Handled
+  Ongoing = '处理中',
+  Handled = '已处理'
 }

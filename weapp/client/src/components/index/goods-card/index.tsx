@@ -2,13 +2,13 @@ import Taro from '@tarojs/taro'
 import {View, Text, Image} from '@tarojs/components'
 import {GoodsWithSellerVO} from "../../../apis/GoodsApi";
 import localConfig from "../../../utils/local-config";
-import {styleHelper} from "../../../utils/style-helper";
 import {AtAvatar, AtDivider} from "taro-ui";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import {CSSProperties} from "react";
 import {goodsInfoUrlConfig} from "../../../utils/url-list";
 
 import "taro-ui/dist/style/components/flex.scss";
+import {StyleHelper} from "../../../styles/style-helper";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO
@@ -21,18 +21,17 @@ function createStyles() {
   const width = Math.floor(localConfig.getSystemSysInfo().windowWidth / 4 - margin - padding - borderWidth) * 2;
   const imageBorderRadius = 4;
 
-  const numberToPxStr = styleHelper.numberToPxStr;
+  const numberToPxStr = StyleHelper.numberToPxStr;
   const widthAndHeightPx = numberToPxStr(width);
   const marginPx = numberToPxStr(margin);
   const paddingPx = numberToPxStr(padding);
-  const borderWidthPx = numberToPxStr(borderWidth);
   const imageBorderRadiusPx = numberToPxStr(imageBorderRadius);
 
   const goodsCardViewStyle: CSSProperties = {
     width: widthAndHeightPx,
     margin: marginPx,
     padding: paddingPx,
-    border: `${borderWidthPx} solid lightgray`,
+    border: StyleHelper.NORMAL_BORDER,
     display: 'inline-block'
   };
 
@@ -41,7 +40,7 @@ function createStyles() {
     height: widthAndHeightPx,
     // TODO 优先级 低
     // 检查样式
-    border: 'thin sold transparent',
+    border: 'thin solid transparent',
     borderRadius: imageBorderRadiusPx
   };
 
@@ -63,6 +62,8 @@ function createStyles() {
   };
 }
 
+const styles = createStyles();
+
 /**
  * GoodsCard
  * @author 张李承
@@ -81,8 +82,6 @@ function GoodsCard(props: IProp) {
     const goodsName = goods.name;
     const goodsPrice = goods.price;
 
-    let { goodsCardViewStyle, imageStyle, dividerHeight, goodsNameStyle } = createStyles();
-
     const onError = createSimpleErrorHandler('GoodsCard', undefined);
 
     const onClick = function () {
@@ -92,11 +91,11 @@ function GoodsCard(props: IProp) {
     };
 
     card = (
-      <View onClick={onClick} style={goodsCardViewStyle}>
-        <Image style={imageStyle} src={goodsPictureSrc}/>
-        <Text style={goodsNameStyle}>{goodsName}</Text>
+      <View onClick={onClick} style={styles.goodsCardViewStyle}>
+        <Image style={styles.imageStyle} src={goodsPictureSrc}/>
+        <Text style={styles.goodsNameStyle}>{goodsName}</Text>
         <Text space={'nbsp'}>￥ {goodsPrice}</Text>
-        <AtDivider height={dividerHeight}/>
+        <AtDivider height={styles.dividerHeight}/>
         <View className='at-row at-row__align--center'>
           <View className='at-col at-col-3'>
             <AtAvatar circle size={'small'} image={sellerImage}/>

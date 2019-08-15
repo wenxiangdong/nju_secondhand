@@ -1,12 +1,164 @@
-import Taro from "@tarojs/taro";
-import {View} from "@tarojs/components";
+import Taro, {Config, useEffect, useState} from "@tarojs/taro";
+import {Picker, Text, View} from "@tarojs/components";
+import {AtButton, AtForm, AtImagePicker, AtInput, AtTextarea} from "taro-ui";
+import {CategoryVO, GoodsDTO} from "../../apis/GoodsApi";
+import {CSSProperties} from "react";
+import LoadingPage from "../../components/common/loading-page";
+import {apiHub} from "../../apis/ApiHub";
+import urlList, {resultUrlConfig} from "../../utils/url-list";
+
+// export interface GoodsDTO {
+//   name: string;
+//   desc: string;
+//   price: string;
+//   pictures: Array<string>;
+//   categoryID: string; // -> Category._id
+// }
 
 function Publish() {
-    return (
-        <View>
-            publish works
-        </View>
+  // states
+  const [goods, setGoods] = useState({} as GoodsDTO);
+  const [categories, setCategories] = useState([] as CategoryVO[]);
+  const [selectedCateName, setCateName] = useState("");
+  const [pictures, setPictures] = useState([]);
+  const [loading, setLoading] = useState(true);
+  // effects
+  useEffect(() => {
+    initCategories();
+  }, []);
+  // methods
+  const initCategories = async () => {
+    try {
+      const res = await apiHub.goodsApi.getCategories();
+      setCategories([...res]);
+      setLoading(false);
+    } catch (e) {
+      Taro.showToast({
+        title: "加载分类失败，请重试",
+        icon: "none",
+        complete: () => {
+          Taro.navigateBack();
+        }
+      });
+    }
+  };
+  const isFormValid = () => {
+    return goods.name && goods.price && goods.desc && goods.categoryID;
+  };
+  const uploadFiles = (files: {url: string}[]) => {
+    console.log("上传中", files);
+    const CLOUD_DIR = "goods";
+    const now = Date.now();
+    // 上传文件
+    return files.map(
+      (p, index) => apiHub.fileApi.uploadFile(`${CLOUD_DIR}/${goods.name}/${now}/goods_${index}`, p.url)
     );
+  };
+  // handlers
+  const handleChangeForm = (key: string, value: any) => {
+    setGoods({
+      ...goods,
+      [key]: value
+    });
+  };
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const paths = await Promise.all(uploadFiles(pictures));
+      console.log("上传文件成功", paths);
+      goods.pictures = [...paths];
+      await apiHub.goodsApi.publishGoods(goods);
+      resultUrlConfig.go({
+        title: "发布商品成功",
+        status: "success",
+        link: urlList.MY_PUBLISH,
+        tip: "去【我的发布】看看"
+      });
+    } catch (e) {
+      Taro.showToast({
+        icon: "none",
+        title: "发布失败，请重试"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  // styles
+  const commonStyles: CSSProperties = {
+    width: "96vw",
+    margin: "2vh 2vw 0 2vw",
+    fontSize: "32rpx"
+  };
+  // components
+  const form = (
+    <AtForm onSubmit={handleSubmit}>
+      <AtInput
+        customStyle={{...commonStyles}}
+        value={goods.name}
+        name='name'
+        title='商品名称'
+        onChange={(value) => handleChangeForm("name", value.toString())}
+      />
+      <View style={{...commonStyles}}>商品描述</View>
+      <AtTextarea
+        customStyle={{width: "96vw", margin: "1vh 2vw"}}
+        value={goods.desc}
+        onChange={event => handleChangeForm("desc", event.detail.value)}
+      />
+      <Picker
+        mode='selector'
+        range={categories}
+        rangeKey='name'
+        onChange={event => {
+          const index = event.detail.value;
+          const category = categories[index];
+          console.log("选中", category);
+          category && handleChangeForm("categoryID", category._id);
+          category && setCateName(category.name);
+        }}
+      >
+        <AtInput
+          title='商品类别'
+          customStyle={{...commonStyles}}
+          value={selectedCateName}
+          name='category'
+        />
+      </Picker>
+      <AtInput
+        customStyle={{...commonStyles}}
+        title='价格'
+        type='digit'
+        value={goods.price}
+        onChange={value => handleChangeForm("price", value)}
+      />
+      <View style={{...commonStyles}}>图片</View>
+      <AtImagePicker
+        files={pictures}
+        onChange={(files) => setPictures([...files])}
+      />
+      <View style={{position: 'fixed', bottom: 0, width: '100vw', zIndex: 9}}>
+        <AtButton
+          type='primary'
+          formType='submit'
+          disabled={!isFormValid()}
+        >提交商品信息</AtButton>
+      </View>
+    </AtForm>
+  );
+  const loadingPage = (
+    <LoadingPage />
+  );
+  return (
+    <View>
+      {
+        loading ? loadingPage : form
+      }
+    </View>
+  );
 }
+
+Publish.config = {
+  navigationBarTitleText: "发布闲置"
+} as Config;
 
 export default Publish;

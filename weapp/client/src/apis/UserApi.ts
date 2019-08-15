@@ -1,6 +1,9 @@
 import "@tarojs/async-await";
 import {VO, httpRequest, db, Fail, HttpCode, mockHttpRequest} from "./HttpRequest";
 import {AccountVO, MockAccountApi} from "./AccountApi";
+import {Debugger} from "inspector";
+import Location = module
+import localConfig from "../utils/local-config";
 
 export interface IUserApi {
   // 检查用户状态
@@ -31,6 +34,9 @@ class UserApi implements IUserApi {
       throw new Fail(HttpCode.Forbidden, "该用户已注册")
     }
 
+    user['signUpTime'] = Date.now()
+    user['state'] = UserState.Normal
+
     if ((await userCollection
       .where({
         email: user.email
@@ -48,8 +54,14 @@ class UserApi implements IUserApi {
   async modifyInfo(user: UserDTO): Promise<void> {
     let userVO: UserVO = await this.login();
 
-    if (userVO.state === UserState.Forzen) {
-      throw new Fail(HttpCode.Forbidden, "你已被冻结，无法修改个人信息");
+    if (userVO.state === UserState.Frozen) {
+      throw new Fail(HttpCode.Forbidden, "您的帐户被冻结，无法修改个人信息");
+    }
+
+    for (let key in user) {
+      if (!user[key]) {
+        user[key] = userVO[key]
+      }
     }
 
     await userCollection
@@ -63,16 +75,18 @@ class UserApi implements IUserApi {
 
 class MockUserApi implements IUserApi {
   checkState(): Promise<UserState> {
-    throw new Error("Method not implemented.");
+    return mockHttpRequest.success(UserState.UnRegistered);
   }
   signUp(user: UserDTO): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('signUp', user);
+    return mockHttpRequest.success();
   }
   login(): Promise<UserVO> {
-    throw new Error("Method not implemented.");
+    return mockHttpRequest.success(MockUserApi.createMockUser());
   }
   modifyInfo(user: UserDTO): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('modifyInfo', user);
+    return mockHttpRequest.success();
   }
   getUserInfo(userID: string): Promise<UserVO> {
     let userInfo = MockUserApi.createMockUser();
@@ -95,13 +109,23 @@ class MockUserApi implements IUserApi {
       _openid: 'openid',
       phone: 'phone',
       nickname: 'nickname',
-      avatar: 'https://static.segmentfault.com/sponsor/20190814.png',
+      avatar: 'https://jdc.jd.com/img/200',
       address: MockUserApi.createMockLocation(),
       email: 'email',
-      account: MockAccountApi.createMockAccount(0.01),
+      account: MockAccountApi.createMockAccount(),
       signUpTime: Date.now(),
       state: UserState.Normal
     };
+  }
+
+  static createMockUserDTO(): UserDTO {
+    return {
+      phone: '',
+      avatar: '',
+      nickname: '',
+      address: {},
+      email: '',
+    }
   }
 }
 

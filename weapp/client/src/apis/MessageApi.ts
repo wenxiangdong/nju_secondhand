@@ -32,7 +32,13 @@ class MessageHub {
       // console.log("onmessage", ev);
       const vo: MessageVO = JSON.parse(ev.data);
       // notify
-      this.observers.forEach(ob => ob(vo));
+      this.observers.forEach(ob => {
+        try {
+          ob(vo)
+        } catch (e) {
+          console.error("监听消息出错", e, ob);
+        }
+      });
       // store
       this.addMessageToList(vo.senderID, vo);
     })
@@ -122,7 +128,7 @@ class MockSocket {
           })
         }
       )
-    }, 10000);
+    }, 5000);
   }
 
 }

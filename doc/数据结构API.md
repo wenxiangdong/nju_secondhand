@@ -159,7 +159,7 @@ enum ComplaintState {
 // 圈子
 interface PostDTO {
     desc: string;
-    picture: Array<string>;
+    pictures: Array<string>;
 }
 
 interface PostVO extends VO {
@@ -212,6 +212,7 @@ interface MessageVO extends VO {
 }
 
 export enum HttpCode {
+  Success = 200,
   Forbidden = 403, // 403
   Not_Found = 404, // 404
   Conflict = 409, // 409 冲突
@@ -308,6 +309,12 @@ export interface IGoodsApi {
 
   // 种类搜索商品和销售者信息
   searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
+  
+  // 通过 id 获取商品和销售者信息
+  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO>; // 不需要
+
+  // 通过 Id 获取商品信息
+  getGoods(goodsID: string): Promise<GoodsVO>; // 不需要
 
     // 购买商品
     purchase(goodsID: string): Promise<void>;

@@ -4,7 +4,8 @@ import {AtActivityIndicator, AtToast} from "taro-ui";
 import localConfig from "../../../utils/local-config";
 
 interface IProp {
-  errMsg?: string
+  loadingMsg?: string,
+  loadingContent?: string,
 }
 
 /**
@@ -14,15 +15,15 @@ interface IProp {
  * @create 2019/7/26 10:02
  */
 function LoadingPage(props: IProp) {
-  const {errMsg} = props;
+  const {loadingMsg, loadingContent = '加载中...'} = props;
   const sysInfo = localConfig.getSystemSysInfo();
   const {windowHeight, windowWidth} = sysInfo;
   return (
-    errMsg
-      ? (<AtToast isOpened text={errMsg}/>)
+    loadingMsg
+      ? (<AtToast isOpened text={loadingMsg}/>)
       : (
         <View style={{position: 'absolute', left: '0', top: '0', zIndex: 1000, width: `${windowWidth}px`, height: `${windowHeight}px`}}>
-          <AtActivityIndicator content='加载中...' size={32} mode='center'/>
+          <AtActivityIndicator content={loadingContent} size={32} mode='center'/>
         </View>
       )
   );

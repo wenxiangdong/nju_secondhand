@@ -1,10 +1,13 @@
 import {Location} from "../apis/UserApi";
 import {MessageVO} from "../apis/MessageApi";
+import {ResultProp} from "../pages/result";
+import Taro from "@tarojs/taro";
 
 const urlList = {
+  // DEV: "/pages/dev/index",
+  INDEX:  '/pages/index/index',
   CIRCLE: '/pages/circle/index',
   CIRCLE_SEND_POST: '/pages/circle/send-post/index',
-  INDEX:  '/pages/index/index',
   INDEX_SEARCH_RESULT: '/pages/index/search-result/index',
   INDEX_CATEGORY_GOODS: '/pages/index/category-goods/index',
   INDEX_GOODS_INFO: '/pages/index/goods-info/index',
@@ -16,6 +19,7 @@ const urlList = {
   MY: '/pages/my/index',
   MY_VISITED:'/pages/my/my-visited/index',
   MY_BOUGHT:'/pages/my/my-bought/index',
+  MY_BOUGHT_SEND_COMPLAINT: '/pages/my/my-bought/send-complaint/index',
   MY_PUBLISH:'/pages/my/my-publish/index',
   MY_SOLD:'/pages/my/my-sold/index',
   MY_PLATFORM_ACCOUNT:'/pages/my/platform-account/index',
@@ -23,8 +27,12 @@ const urlList = {
   MY_PRIVACY_POLICY:'/pages/my/privacy-policy/index',
   MY_PLATFORM_RULES:'/pages/my/platform-rules/index',
   MY_USER_INFO: '/pages/my/user-info/index',
-  ERROR: '',
+  MY_COMPLAINT: '/pages/my/complaint/index',
+  LOGIN: '/pages/login/index',
+  REGISTER: '/pages/register/index',
   PUBLISH_GOODS: '/pages/publish/index',
+  RESULT: '/pages/result/index',
+  ERROR: '',
 };
 
 class IndexSearchUrlConfig {
@@ -120,10 +128,48 @@ class ChatUrlConfig {
 
 const chatUrlConfig = new ChatUrlConfig();
 
+class SendComplaintUrlConfig {
+  private readonly ORDER_ID = 'ORDER_id';
+
+  public createUrl(id): string {
+    return encodeURI(`${urlList.MY_BOUGHT_SEND_COMPLAINT}?${this.ORDER_ID}=${id}`);
+  }
+
+  public getOrderId(that): string|undefined {
+    try {
+      return that.$router.params[this.ORDER_ID];
+    } catch (e) {
+      console.error('SendComplaintUrlConfig getOrderId', e);
+    }
+  }
+}
+
+const sendComplaintUrlConfig = new SendComplaintUrlConfig();
+
+class ResultUrlConfig {
+  public createUrl(params: ResultProp) {
+    const paramString = Object
+      .keys(params)
+      .map(key => `${key}=${params[key]}`)
+      .join("&");
+    return `${urlList.RESULT}?${paramString}`;
+  }
+
+  public go(params: ResultProp) {
+    Taro.redirectTo({
+      url: this.createUrl(params)
+    });
+  }
+}
+
+const resultUrlConfig = new ResultUrlConfig();
+
 export default urlList;
 export {
   indexSearchUrlConfig,
   goodsInfoUrlConfig,
   chatUrlConfig,
   locationUrlConfig,
+  sendComplaintUrlConfig,
+  resultUrlConfig
 };

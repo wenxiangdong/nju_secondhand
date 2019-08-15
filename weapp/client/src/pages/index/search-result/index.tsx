@@ -5,9 +5,9 @@ import LoadingPage from "../../../components/common/loading-page";
 import {AtLoadMore, AtSearchBar} from "taro-ui";
 import {GoodsWithSellerVO} from "../../../apis/GoodsApi";
 import {indexSearchUrlConfig} from "../../../utils/url-list";
-import {loadMoreBtnStyle} from "../../../styles/style-objects";
 import {apiHub} from "../../../apis/ApiHub";
 import GoodsCard from "../../../components/index/goods-card";
+import {StyleHelper} from "../../../styles/style-helper";
 
 interface IState {
   searchValue: string,
@@ -25,7 +25,7 @@ interface IState {
  */
 export default class SearchResult extends Component<any, IState> {
 
-  private readonly NOT_FIND_CATEGORY_ERROR:Error = new Error('未找到搜索关键词请重试');
+  private readonly NOT_FIND_CATEGORY_ERROR:Error = new Error('未找到搜索关键词\n请重试');
 
   private beforeSearchValue: string;
 
@@ -48,7 +48,8 @@ export default class SearchResult extends Component<any, IState> {
       .then(searchValue => {
         this.setState({searchValue, loading: false, loadMoreStatus: 'loading'},
           this.searchGoodsWithSeller)
-    }).catch(this.onError);
+      })
+      .catch(this.onError);
   }
 
   private initSearchValue = async (): Promise<string> => {
@@ -72,7 +73,8 @@ export default class SearchResult extends Component<any, IState> {
           } else {
             this.setState({loadMoreStatus: 'noMore', searchDisabled: false});
           }
-        });
+        })
+        .catch(this.onError);
     } else {
       throw this.NOT_FIND_CATEGORY_ERROR;
     }
@@ -96,7 +98,7 @@ export default class SearchResult extends Component<any, IState> {
 
     return loading || errMsg
       ? (
-        <LoadingPage errMsg={errMsg}/>
+        <LoadingPage loadingMsg={errMsg}/>
       )
       : (
         <View>
@@ -107,12 +109,13 @@ export default class SearchResult extends Component<any, IState> {
             value={searchValue}
             onChange={(searchValue) => this.setState({searchValue})}
             onActionClick={this.reSearch}
+            onConfirm={this.reSearch}
           />
           <View>
             {goodsWithSeller.map((g, idx) => <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)}
           </View>
           <AtLoadMore
-            moreBtnStyle={loadMoreBtnStyle}
+            moreBtnStyle={StyleHelper.loadMoreBtnStyle}
             onClick={this.onLoadMore}
             status={loadMoreStatus}
           />

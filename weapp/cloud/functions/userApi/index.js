@@ -9,15 +9,16 @@ const db = cloud.database()
 const command = db.command
 
 // 云函数入口函数
-exports.main = async (event, context) => {
+exports.main = async(event, context) => {
   const app = new TcbRounter({
     event
   })
 
-  app.use(async (ctx, next) => {
+  app.use(async(ctx, next) => {
     console.log('----------> 进入 userApi 全局中间件')
     ctx.data = {}
-    ctx.data.openid = event.openid | cloud.getWXContext().OPENID
+    ctx.data.openid = event.openid || cloud.getWXContext().OPENID
+    console.log(ctx.data.openid)
     ctx.data.userCollection = db.collection('user')
 
     await next();
@@ -26,81 +27,93 @@ exports.main = async (event, context) => {
 
 
   // 用于在某些接口方法前检查用户是否处于正常状态（已注册，未冻结......）
-  app.router(['getUserInfo'], async (ctx, next) => {
-    let self = await getNormalSelf(ctx.data.openid);
-    ctx.data.self = self;
-
-    await next();
-  })
-
-  app.router('checkState', async (ctx) => {
-    let result = await ctx.data.userCollection
-      .where({
-        _openid: ctx.data.openid
-      })
-      .limit(1)
-      .get();
-
-
-    let data = result.data;
-
-    if (!data.length) {
-      ctx.body = UserState.UnRegistered;
-    }
-
-    ctx.body = data[0].state;
-  })
-
-  app.router('login', async (ctx) => {
-    let result = await ctx.data.userCollection
-      .where({
-        _openid: ctx.data.openid
-      })
-      .limit(1)
-      .get();
-
-    let data = result.data;
-
-    if (!data.length) {
-      throw {
-        code: 404,
-        message: '找不到您的用户信息'
+  app.router([], async(ctx, next) => {
+    try {
+      let self = await login(ctx.data.openid);
+      switch (self.state) {
+        case UserState.Frozen:
+          ctx.body = {
+            code: HttpCode.Forbidden,
+            message: '您的帐户被冻结'
+          }
+          break
+        default:
+          ctx.data.self = self;
+          await next();
       }
+    } catch (e) {
+      ctx.body = e
     }
-
-    let self = data[0];
-
-    delete self._openid;
-
-    ctx.body = self;
   })
 
-  app.router('getUserInfo', async (ctx) => {
+  app.router('checkState', async(ctx) => {
+    let result = await ctx.data.userCollection
+      .where({
+        _openid: ctx.data.openid
+      })
+      .limit(1)
+      .get();
+
+
+    let data = result.data;
+
+    if (!data.length) {
+      ctx.body = {
+        code: HttpCode.Success,
+        data: UserState.UnRegistered
+      };
+    } else {
+      ctx.body = {
+        code: HttpCode.Success,
+        data: data[0].state
+      };
+    }
+  })
+
+  app.router('login', async(ctx) => {
+    try {
+      let self = await login(ctx.data.openid)
+      ctx.body = {
+        code: HttpCode.Success,
+        data: self
+      }
+    } catch (e) {
+      ctx.body = e
+    }
+  })
+
+  app.router('getUserInfo', async(ctx) => {
     const userID = event.userID;
 
-    let result = ctx.data.userCollection
-      .doc(userID)
-      .get()
+    try {
+      let result = await ctx.data.userCollection
+        .doc(userID)
+        .get()
 
-    let data = result.data;
+      if (!result) {
+        ctx.body = {
+          code: HttpCode.Not_Found,
+          message: '找不到该用户信息',
+        }
+      } else {
+        let user = result.data;
 
-    if (!data.length) {
-      throw {
+        delete user._openid;
+        ctx.body = {
+          code: HttpCode.Success,
+          data: user
+        }
+      }
+
+    } catch (e) {
+      ctx.body = {
         code: HttpCode.Not_Found,
         message: '找不到该用户信息',
       }
     }
-
-    let user = data[0];
-    delete user._openid;
-    ctx.body = user;
   })
 
-  app.router('getNormalSelf', async (ctx) => {
-    ctx.body = await getNormalSelf(ctx.data.openid)
-  })
-
-  app.router('getUsersByAdmin', async (ctx) => {
+  app.router('getUsersByAdmin', async(ctx) => {
     let result = await ctx.data.userCollection
       .where(command
         .or([{
@@ -125,10 +138,13 @@ exports.main = async (event, context) => {
       .limit(event.size)
       .get()
 
-    ctx.body = result.data
+    ctx.body = {
+      code: HttpCode.Success,
+      data: result.data
+    }
   })
 
-  app.router("updateUserByAdmin", async (ctx) => {
+  app.router("updateUserByAdmin", async(ctx) => {
     await ctx.data.userCollection
       .where({
         _id: event.userID,
@@ -138,14 +154,16 @@ exports.main = async (event, context) => {
           state: event.state
         }
       })
+
+    ctx.body = {
+      code: HttpCode.Success
+    }
   })
 
   return app.serve();
 }
 
-async function getNormalSelf(openid) {
-  const openid = cloud.getWXContext().OPENID
-
+async function login(openid) {
   let result = await db.collection('user')
     .where({
       _openid: openid
@@ -158,18 +176,11 @@ async function getNormalSelf(openid) {
   if (!data.length) {
     throw {
       code: HttpCode.Not_Found,
-      message: '找不到您的用户信息'
+      message: '找不到您的个人信息'
     }
   }
 
   let self = data[0];
-
-  if (self.state === UserState.Frozen) {
-    throw {
-      code: HttpCode.Forbidden,
-      message: '您的帐号已被冻结，请联系管理员解冻'
-    }
-  }
 
   delete self._openid;
 
@@ -183,6 +194,7 @@ const UserState = {
 }
 
 const HttpCode = {
+  Success: 200,
   Forbidden: 403, // 403
   Not_Found: 404, // 404
   Conflict: 409, // 409 冲突

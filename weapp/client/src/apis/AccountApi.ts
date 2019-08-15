@@ -1,5 +1,6 @@
 import "@tarojs/async-await";
-import { httpRequest } from "./HttpRequest";
+import {httpRequest, mockHttpRequest} from "./HttpRequest";
+import {createRandomNumberStr} from "./Util";
 
 export interface IAccountApi {
   // 取款
@@ -17,13 +18,12 @@ class AccountApi implements IAccountApi {
 class MockAccountApi implements IAccountApi {
   withdraw(amount: String): Promise<void> {
     console.log(`withdraw success ${amount}`);
-    return Promise.resolve();
+    return mockHttpRequest.success();
   }
 
-  static createMockAccount(account?:number|string): AccountVO {
-    account = account || '1.01';
+  static createMockAccount(): AccountVO {
     return {
-      balance: Number(account).toFixed(2)
+      balance: createRandomNumberStr()
     };
   }
 }
