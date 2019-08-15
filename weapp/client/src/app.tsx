@@ -27,6 +27,7 @@ class App extends Component {
 
       'pages/circle/index',
       'pages/circle/send-post/index',
+      'pages/circle/post/index',
 
       'pages/index/search-result/index',
       'pages/index/category-goods/index',

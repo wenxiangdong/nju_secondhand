@@ -2,6 +2,7 @@ import {Location} from "../apis/UserApi";
 
 const urlList = {
   CIRCLE: '/pages/circle/index',
+  CIRCLE_POST: '/pages/circle/post/index',
   CIRCLE_SEND_POST: '/pages/circle/send-post/index',
   INDEX:  '/pages/index/index',
   INDEX_SEARCH_RESULT: '/pages/index/search-result/index',
@@ -101,7 +102,7 @@ class ChatUrlConfig {
 const chatUrlConfig = new ChatUrlConfig();
 
 class SendComplaintUrlConfig {
-  private readonly ORDER_ID = 'ORDER_id';
+  private readonly ORDER_ID = 'order_id';
 
   public createUrl(id): string {
     return encodeURI(`${urlList.MY_BOUGHT_SEND_COMPLAINT}?${this.ORDER_ID}=${id}`);
@@ -118,6 +119,24 @@ class SendComplaintUrlConfig {
 
 const sendComplaintUrlConfig = new SendComplaintUrlConfig();
 
+class CirclePostUrlConfig {
+  private readonly CIRCLE_ID = 'circle_id';
+
+  public createUrl(id): string {
+    return encodeURI(`${urlList.CIRCLE_POST}?${this.CIRCLE_ID}=${id}`);
+  }
+
+  public getCircleId(that): string|undefined {
+    try {
+      return that.$router.params[this.CIRCLE_ID];
+    } catch (e) {
+      console.error('SendComplaintUrlConfig getOrderId', e);
+    }
+  }
+}
+
+const circlePostUrlConfig = new CirclePostUrlConfig();
+
 export default urlList;
 export {
   indexSearchUrlConfig,
@@ -125,4 +144,5 @@ export {
   chatUrlConfig,
   locationUrlConfig,
   sendComplaintUrlConfig,
+  circlePostUrlConfig,
 };

@@ -1,5 +1,5 @@
 import "@tarojs/async-await";
-import { VO, httpRequest, db } from "./HttpRequest";
+import {VO, httpRequest, db, mockHttpRequest} from "./HttpRequest";
 import { copy } from "./Util";
 
 export interface ICircleApi {
@@ -36,16 +36,39 @@ class MockCircleApi implements ICircleApi {
     throw new Error("Method not implemented.");
   }
   getPosts(lastIndex: number, size: number = 10): Promise<PostVO[]> {
-    throw new Error("Method not implemented.");
+    console.log('getPosts', lastIndex, size);
+    let posts = new Array(size).fill(null).map(() => MockCircleApi.createMockPost());
+    return mockHttpRequest.success(posts)
   }
   comment(postID: string, content: string): Promise<void> {
     throw new Error("Method not implemented.");
+  }
+  static createMockPost(): PostVO {
+    return {
+      _id: '1',
+      comments: this.createMockComments(),
+      desc: 'descdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdesc',
+      ownerID: '1',
+      ownerName: 'ownerName',
+      picture: ['', '', ''],
+      publishTime: Date.now()
+    }
+  }
+  static createMockComments(): Comment[] {
+    return new Array(5).fill(null).map(() => this.createMockComment());
+  }
+  static createMockComment(): Comment {
+    return {
+      nickname: 'nickname',
+      commentTime: Date.now(),
+      content: 'content'
+    }
   }
 }
 
 let circleApi: ICircleApi = new CircleApi();
 let mockCircleApi: ICircleApi = new MockCircleApi();
-export { circleApi, mockCircleApi }
+export { circleApi, mockCircleApi, MockCircleApi }
 
 export interface PostDTO {
   desc: string;
