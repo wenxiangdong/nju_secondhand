@@ -8,7 +8,7 @@ import java.util.List;
  * @author cst
  */
 @Data
-public class ComplaintVO {
+public class ComplaintVO extends VO {
     String orderID;
     String desc;
 
@@ -17,15 +17,7 @@ public class ComplaintVO {
 
     List<String> pictures;
 
-    Integer complainTime;
-
-    Handling handling;
+    Long complainTime;
 
     Integer state;
-
-    @Data
-    private static class Handling {
-        Integer time;
-        String result;
-    }
 }

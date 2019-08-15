@@ -29,7 +29,6 @@ public interface CloudService {
      * @param <T>            对象泛型
      * @return 查询结果集
      */
-    @SuppressWarnings("all")
     <T> List<T> databaseQuery(Class<T> tClass, String collectionName, int skip, int limit, Map<String, Object>... conditions);
 
     /**
@@ -40,4 +39,12 @@ public interface CloudService {
      * @param newObject      新对象
      */
     void databaseUpdateOne(String collectionName, String id, Object newObject);
+
+    /**
+     * 根据文件 ID 换取真实链接
+     *
+     * @param fileID 文件 ID
+     * @return 文件真实链接
+     */
+    String batchDownloadFile(String fileID);
 }

@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 public class GoodsVO extends VO {
     String sellerID;
+    String sellerName;
 
     String name;
     String desc;
@@ -17,7 +18,7 @@ public class GoodsVO extends VO {
     List<String> pictures;
     CategoryVO categoryVO;
 
-    Integer publishTime;
+    Long publishTime;
 
     Integer state;
 }

@@ -1,17 +1,17 @@
 package nju.secondhand.service.impl;
 
-import com.google.gson.Gson;
 import lombok.Builder;
-import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import nju.secondhand.config.MiniProgramConfig;
 import nju.secondhand.exception.FailException;
+import nju.secondhand.exception.SystemException;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.service.HttpService;
+import nju.secondhand.util.JsonUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,19 +41,18 @@ public class CloudServiceImpl implements CloudService {
                 miniProgramConfig.getEnv(),
                 name);
 
-        FunctionResult result = httpService.post(url, new Gson().toJson(object), FunctionResult.class);
-
-        log.info("Function Result: " + result);
+        FunctionResult result = httpService.post(url, JsonUtil.toJson(object), FunctionResult.class);
 
         if (result.invalid()) {
             throw new FailException(result.errmsg);
         }
 
-        HttpResponse<T> httpResponse = new Gson().fromJson(result.resp_data, HttpResponse.class);
+        @SuppressWarnings("unchecked")
+        CloudHttpResponse<T> httpResponse = JsonUtil.fromJson(result.resp_data, CloudHttpResponse.class);
         if (httpResponse.code == 200) {
             return httpResponse.data;
         } else {
-            throw new FailException(httpResponse.message);
+            throw new SystemException(httpResponse.code, httpResponse.message);
         }
     }
 
@@ -67,7 +66,7 @@ public class CloudServiceImpl implements CloudService {
         String query = String.format("db.collection('%s')%s.skip(%d).limit(%d).get()",
                 collectionName,
                 conditions.length != 0 ?
-                        String.format(".where(_or(%s))", new Gson().toJson(conditions)) : "",
+                        String.format(".where(_or(%s))", JsonUtil.toJson(conditions)) : "",
                 skip,
                 limit);
 
@@ -76,9 +75,7 @@ public class CloudServiceImpl implements CloudService {
                 .query(query)
                 .build();
 
-        QueryResult result = httpService.post(url, new Gson().toJson(databaseParam), QueryResult.class);
-
-        log.info("Query Result: " + result);
+        QueryResult result = httpService.post(url, JsonUtil.toJson(databaseParam), QueryResult.class);
 
         if (result.invalid()) {
             throw new FailException(result.errmsg);
@@ -86,13 +83,13 @@ public class CloudServiceImpl implements CloudService {
 
         return result.data
                 .stream()
-                .map(json -> new Gson().fromJson(json, tClass))
+                .map(json -> JsonUtil.fromJson(json, tClass))
                 .collect(Collectors.toList());
     }
 
     @Override
     public void databaseUpdateOne(String collectionName, String id, Object newObject) {
-        log.info(String.format("UpdateOne: %s-%s", collectionName, id));
+        log.info("UpdateOne: " + collectionName + "-" + id);
 
         String url = String.format("https://api.weixin.qq.com/tcb/databaseupdate?access_token=%s",
                 getAccessToken());
@@ -100,20 +97,43 @@ public class CloudServiceImpl implements CloudService {
         String query = String.format("db.collection('%s').doc('%s').update(%s)",
                 collectionName,
                 id,
-                new Gson().toJson(newObject));
+                JsonUtil.toJson(newObject));
 
         DatabaseParam databaseParam = DatabaseParam.builder()
                 .env(miniProgramConfig.getEnv())
                 .query(query)
                 .build();
 
-        UpdateResult result = httpService.post(url, new Gson().toJson(databaseParam), UpdateResult.class);
-
-        log.info("Update Result: " + result.toString());
+        UpdateResult result = httpService.post(url, JsonUtil.toJson(databaseParam), UpdateResult.class);
 
         if (result.invalid()) {
             throw new FailException(result.errmsg);
         }
+    }
+
+    @Override
+    public String batchDownloadFile(String fileID) {
+        log.info("batchDownloadFile: " + fileID);
+
+        String url = String.format("https://api.weixin.qq.com/tcb/batchdownloadfile?access_token=%s",
+                getAccessToken());
+
+        DownLoadFileParam downLoadFileParam = DownLoadFileParam.builder()
+                .env(miniProgramConfig.getEnv())
+                .file_list(
+                        Collections.singletonList(DownLoadFileParam.FileList.builder()
+                                .fileid(fileID)
+                                .max_age(7200)
+                                .build()))
+                .build();
+
+        DownLoadFileResult downLoadFileResult = httpService.post(url, JsonUtil.toJson(downLoadFileParam), DownLoadFileResult.class);
+
+        if (downLoadFileResult.invalid()) {
+            throw new FailException(downLoadFileResult.errmsg);
+        }
+
+        return downLoadFileResult.file_list.download_url;
     }
 
     private String getAccessToken() {
@@ -143,8 +163,18 @@ class DatabaseParam {
     String query;
 }
 
-@ToString
-@Setter
+@Builder
+class DownLoadFileParam {
+    String env;
+    List<FileList> file_list;
+
+    @Builder
+    static class FileList {
+        String fileid;
+        int max_age;
+    }
+}
+
 class WechatError {
     Integer errcode;
     String errmsg;
@@ -154,31 +184,25 @@ class WechatError {
     }
 }
 
-@ToString(callSuper = true)
-@Setter
 class AccessToken extends WechatError {
     String access_token;
     Integer expires_in;
 }
 
-class HttpResponse<T> {
+class CloudHttpResponse<T> {
     Integer code;
     String message;
     T data;
 }
 
-@ToString(callSuper = true)
-@Setter
 class FunctionResult extends WechatError {
     String resp_data;
 }
 
-@ToString(callSuper = true)
-@Setter
 class QueryResult extends WechatError {
     Pager pager;
 
-    private static class Pager {
+    static class Pager {
         Integer Offset;
         Integer Limit;
         Integer Total;
@@ -187,10 +211,19 @@ class QueryResult extends WechatError {
     List<String> data;
 }
 
-@ToString(callSuper = true)
-@Setter
 class UpdateResult extends WechatError {
     Integer matched;
     Integer modified;
     String id;
+}
+
+class DownLoadFileResult extends WechatError {
+    FileList file_list;
+
+    static class FileList {
+        String fileid;
+        String download_url;
+        Integer status;
+        String errmsg;
+    }
 }

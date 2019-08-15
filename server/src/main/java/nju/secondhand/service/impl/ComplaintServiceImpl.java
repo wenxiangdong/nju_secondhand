@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.service.ComplaintService;
 import nju.secondhand.vo.ComplaintVO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +15,8 @@ import java.util.Map;
 @Service
 public class ComplaintServiceImpl implements ComplaintService {
     private static final String COMPLAINT_API = "complaintApi";
-    private static final String COMPLAINT_COLLECTION_NAME = "complaint";
     private final CloudService cloudService;
 
-    @Autowired
     public ComplaintServiceImpl(CloudService cloudService) {
         this.cloudService = cloudService;
     }

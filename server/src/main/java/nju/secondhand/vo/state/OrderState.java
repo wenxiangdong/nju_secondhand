@@ -7,4 +7,5 @@ package nju.secondhand.vo.state;
 public enum OrderState {
     Ongoing,
     Finished,
+    Paying
 }

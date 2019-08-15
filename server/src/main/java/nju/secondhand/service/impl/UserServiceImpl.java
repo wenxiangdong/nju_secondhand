@@ -5,7 +5,6 @@ import nju.secondhand.service.CloudService;
 import nju.secondhand.service.UserService;
 import nju.secondhand.vo.UserVO;
 import nju.secondhand.vo.state.UserState;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +18,6 @@ public class UserServiceImpl implements UserService {
     private static final String USER_API = "userApi";
     private final CloudService cloudService;
 
-    @Autowired
     public UserServiceImpl(CloudService cloudService) {
         this.cloudService = cloudService;
     }
@@ -27,7 +25,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserVO> getNormalUsers(String keyword, int lastIndex, int size) {
         return getUsers(UserState.Normal, keyword, lastIndex, size);
-
     }
 
     @Override

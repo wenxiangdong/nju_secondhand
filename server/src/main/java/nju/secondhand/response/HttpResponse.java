@@ -11,22 +11,28 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class HttpResponse<T> {
     T data;
-    HttpCode code;
+    int code;
     String message;
 
     public HttpResponse() {
         this.data = null;
-        this.code = HttpCode.SUCCESS;
+        this.code = HttpCode.SUCCESS.code;
         this.message = "";
     }
 
     public HttpResponse(T data) {
         this.data = data;
-        this.code = HttpCode.SUCCESS;
+        this.code = HttpCode.SUCCESS.code;
         this.message = "";
     }
 
     public HttpResponse(HttpCode code, String message) {
+        this.data = null;
+        this.code = code.code;
+        this.message = message;
+    }
+
+    public HttpResponse(int code, String message) {
         this.data = null;
         this.code = code;
         this.message = message;

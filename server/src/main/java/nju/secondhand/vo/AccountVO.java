@@ -6,6 +6,6 @@ import lombok.Data;
  * @author cst
  */
 @Data
-public abstract class VO {
-    String _id;
+public class AccountVO {
+    String balance;
 }

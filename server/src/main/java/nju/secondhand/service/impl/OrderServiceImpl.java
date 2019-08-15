@@ -17,8 +17,7 @@ import java.util.Map;
 public class OrderServiceImpl implements OrderService {
     private static final String ORDER_API = "orderApi";
     private final CloudService cloudService;
-
-    @Autowired
+    
     public OrderServiceImpl(CloudService cloudService) {
         this.cloudService = cloudService;
     }
