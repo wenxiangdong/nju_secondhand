@@ -8,6 +8,8 @@ export interface ICircleApi {
   getPosts(lastIndex: number, size?: number): Promise<PostVO[]>;
 
   comment(postID: string, content: string): Promise<void>;
+
+  getPostById(postId: string): Promise<PostVO>;
 }
 
 const postCollection = db.collection('post');
@@ -29,6 +31,10 @@ class CircleApi implements ICircleApi {
   async comment(postID: string, content: string): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "comment", postID, content });
   }
+
+  getPostById(postId: string): Promise<PostVO> {
+    throw new Error("Method not implemented.");
+  }
 }
 
 class MockCircleApi implements ICircleApi {
@@ -41,7 +47,14 @@ class MockCircleApi implements ICircleApi {
     return mockHttpRequest.success(posts)
   }
   comment(postID: string, content: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    console.log('comment', postID, content)
+    return mockHttpRequest.success();
+  }
+
+  getPostById(postId: string): Promise<PostVO> {
+    let post = MockCircleApi.createMockPost();
+    post._id = postId;
+    return mockHttpRequest.success(post);
   }
   static createMockPost(): PostVO {
     return {
@@ -59,9 +72,9 @@ class MockCircleApi implements ICircleApi {
   }
   static createMockComment(): Comment {
     return {
-      nickname: 'nickname',
+      nickname: '',
       commentTime: Date.now(),
-      content: 'content'
+      content: ''
     }
   }
 }

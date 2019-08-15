@@ -39,9 +39,6 @@ function createStyles() {
     margin: '1vw 2vw',
     wordBreak: "break-all",
   };
-  const pictures:CSSProperties = {
-
-  };
   const picture:CSSProperties = {
     width: '28vw',
     height: '28vw',
@@ -63,7 +60,6 @@ function createStyles() {
     headerBar,
     topic,
     desc,
-    pictures,
     picture,
     bottomBar
   }
@@ -116,7 +112,7 @@ function PostCard(props: IProp) {
       {
         pictures && pictures.length
           ? (
-            <View style={styles.pictures}>
+            <View>
               {pictures.map((p, idx) => <Image src={p} key={idx} style={styles.picture} mode='aspectFill' />)}
             </View>
           )
