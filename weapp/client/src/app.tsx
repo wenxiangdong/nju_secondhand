@@ -52,6 +52,8 @@ class App extends Component {
       'pages/my/privacy-policy/index',
       'pages/my/software-license-agreement/index',
       'pages/my/user-info/index',
+      'pages/my/complaint/index',
+      'pages/my/complaint/new-complaint/index',
 
       'pages/register/index',
 

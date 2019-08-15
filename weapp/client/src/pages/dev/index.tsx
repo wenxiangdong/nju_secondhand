@@ -1,7 +1,6 @@
 import Taro from '@tarojs/taro';
 import {View, Text, Button} from "@tarojs/components";
 import './index.scss'
-import MessageRight from '../../components/message/message-right';
 import "@tarojs/async-await";
 import urlList, {resultUrlConfig} from "../../utils/url-list";
 
@@ -33,7 +32,6 @@ function Dev() {
   return (
     <View>
       <Text>Dev works</Text>
-      <MessageRight content="text://hello world"/>
       <Button onClick={handleClick}>go</Button>
     </View>
   )

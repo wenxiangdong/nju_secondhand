@@ -4,9 +4,10 @@ import {ComplaintVO} from "../../../apis/ComplaintApi";
 import {apiHub} from "../../../apis/ApiHub";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
-import {AtLoadMore} from "taro-ui";
+import {AtFab, AtIcon, AtLoadMore} from "taro-ui";
 import {StyleHelper} from "../../../styles/style-helper";
 import ComplaintCard from "../../../components/my/complaint-card";
+import urlList from "../../../utils/url-list";
 
 interface IState {
   loading: boolean,
@@ -75,6 +76,12 @@ export default class index extends Component<any, IState> {
             onClick={this.onLoadMoreHistoryComplaints}
             status={complaintsLoadMoreStatus}
           />
+
+          <View style={{position: "fixed", bottom: "16px", right: "16px"}}>
+            <AtFab onClick={() => Taro.navigateTo({url: urlList.MY_COMPLAINT_NEW})}>
+              <AtIcon value='edit' />
+            </AtFab>
+          </View>
         </View>
       );
   }
