@@ -2,7 +2,7 @@
  * 用户类型
  * @type {{FROZEN: string, NORMAL: string}}
  */
-import {httpMock, USE_MOCK} from "./base";
+import {http, httpMock, USE_MOCK} from "./base";
 
 export const USER_TYPES = {
     NORMAL: "normal",
@@ -96,9 +96,37 @@ class MockUserApi implements IUserApi {
     }// 发通知
 }
 
+class UserApi implements IUserApi {
+    getFrozenUsers(keyword, lastIndex, size) {
+        return http.get("/getFrozenUsers", {
+            keyword,
+            lastIndex,
+            size
+        });
+    }
+
+    getNormalUsers(keyword, lastIndex, size) {
+        return http.get("/getNormalUsers", {
+            keyword,
+            lastIndex,
+            size
+        });
+    }
+
+    freezeUser(userID) {
+        return http.post("/freezeUser", {userID});
+    }
+
+    unfreezeUser(userID) {
+        return http.post("/unfreezeUser", {userID});
+    }
+}
+
 
 let userApi: IUserApi = null;
 if (USE_MOCK) {
     userApi = new MockUserApi();
+} else {
+    userApi = new UserApi();
 }
 export default userApi;

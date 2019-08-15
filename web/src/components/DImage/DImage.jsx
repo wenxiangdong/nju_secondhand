@@ -1,5 +1,6 @@
-import React, {useState} from "react";
-import {Icon, Tooltip} from "antd";
+import React, {useEffect, useState} from "react";
+import {Icon, Spin, Tooltip} from "antd";
+import fileApi from "../../apis/file";
 
 const SIZE = "100px";
 function DImage({image = ""} = {}) {
@@ -8,14 +9,24 @@ function DImage({image = ""} = {}) {
      * 是否全屏显示
      */
     const [fullScreen, setFullScreen] = useState(false);
+    const [url, setUrl] = useState("");
 
     // handlers
     const handleClickThumb = () => {
-        setFullScreen(true);
+        setFullScreen(!!url);
     };
     const handleCancelFullScreen = () => {
         setFullScreen(false);
     };
+
+    // effect
+    useEffect(() => {
+        fileApi.transferUrl(image)
+            .then((res) => {
+                setUrl(res);
+            })
+            .catch(console.error);
+    }, []);
 
 
     // elements
@@ -32,7 +43,9 @@ function DImage({image = ""} = {}) {
                 justifyContent: "center"
             }}>
             <Tooltip title={"点击全屏查看"}>
-                <img src={image} width={SIZE} height={"auto"}/>
+                <Spin spinning={!url}>
+                    <img src={url} width={SIZE} height={"auto"}/>
+                </Spin>
             </Tooltip>
         </div>
     );
@@ -50,7 +63,7 @@ function DImage({image = ""} = {}) {
             justifyContent: "center",
             alignItems: "center"
         }}>
-            <img src={image}/>
+            <img src={url}/>
             <Icon
                 onClick={handleCancelFullScreen}
                 type="close-circle"

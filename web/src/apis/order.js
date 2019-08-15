@@ -1,4 +1,4 @@
-import {httpMock, USE_MOCK} from "./base";
+import {http, httpMock, USE_MOCK} from "./base";
 
 export interface OrderVO {
     _id: string;
@@ -62,8 +62,18 @@ class MockOrderApi implements IOrderApi {
     }
 }
 
+class OrderApi implements IOrderApi {
+    getOrders(keyword, lastIndex, size) {
+        return http.get("/getOrders", {
+            keyword, lastIndex, size
+        });
+    }
+}
+
 let orderApi: IOrderApi;
 if (USE_MOCK) {
     orderApi = new MockOrderApi();
+} else {
+    orderApi = new OrderApi();
 }
 export default orderApi;

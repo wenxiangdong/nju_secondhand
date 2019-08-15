@@ -1,4 +1,4 @@
-import {httpMock, USE_MOCK} from "./base";
+import {http, httpMock, USE_MOCK} from "./base";
 
 export interface ComplaintVO {
     _id: string;
@@ -71,9 +71,21 @@ class MockComplaintApi implements IComplaintApi {
     }
 }
 
+class ComplaintApi implements IComplaintApi {
+    getComplaints(keyword, lastIndex, size) {
+        return http.get("/getComplaints", {keyword, lastIndex, size});
+    }
+
+    handle(complaintID, result) {
+        return http.post("/handle", {complaintID, result});
+    }
+}
+
 let complaintApi: IComplaintApi;
 if (USE_MOCK) {
     complaintApi = new MockComplaintApi();
+} else {
+    complaintApi = new ComplaintApi();
 }
 
 export default complaintApi;

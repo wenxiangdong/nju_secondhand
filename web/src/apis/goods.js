@@ -1,4 +1,4 @@
-import {httpMock, USE_MOCK} from "./base";
+import {http, httpMock, USE_MOCK} from "./base";
 import type {HttpResponse} from "./http-response";
 
 // models
@@ -60,8 +60,19 @@ class MockGoodApi implements IGoodsApi {
     }
 }
 
+class GoodApi implements IGoodsApi {
+    deleteGoods(goodID) {
+        return http.post("/deleteGoods", {goodID});
+    }
+    searchGoodsByKeyword(keyword, lastIndex, size) {
+        return http.get("/searchGoodsByKeyword", {keyword, lastIndex, size});
+    }
+}
+
 let goodsApi: IGoodsApi;
 if (USE_MOCK) {
     goodsApi = new MockGoodApi();
+} else {
+    goodsApi = new GoodApi();
 }
 export default goodsApi;
