@@ -57,7 +57,7 @@ export default class Result extends Taro.Component {
                     type='secondary'
                     size='small'
                     full
-                    onClick={() => Taro.navigateTo({url: link})}
+                    onClick={() => Taro.redirectTo({url: link})}
                   >
                     {tip}
                   </AtButton>

@@ -1,5 +1,5 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View} from '@tarojs/components'
+import {View, Text} from '@tarojs/components'
 import LoadingPage from "../../../components/common/loading-page";
 import localConfig from "../../../utils/local-config";
 import {apiHub} from "../../../apis/ApiHub";
@@ -144,7 +144,11 @@ export class index extends Component<any, IState> {
             extra={nickname}
             title="平台账户"
           >
-            ￥{account.balance}
+            {/*￥{account.balance}*/}
+            <View style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+              <Text>￥</Text>
+              <Text style={{fontSize: "3em"}}>{account.balance}</Text>
+            </View>
           </AtCard>
 
           {

@@ -1,5 +1,5 @@
 import "@tarojs/async-await";
-import { VO, httpRequest, db } from "./HttpRequest";
+import {VO, httpRequest, db, mockHttpRequest} from "./HttpRequest";
 import { copy } from "./Util";
 
 export interface ICircleApi {
@@ -33,7 +33,7 @@ class CircleApi implements ICircleApi {
 
 class MockCircleApi implements ICircleApi {
   publishPost(post: PostDTO): Promise<void> {
-    throw new Error("Method not implemented.");
+    return mockHttpRequest.success();
   }
   getPosts(lastIndex: number, size: number = 10): Promise<PostVO[]> {
     throw new Error("Method not implemented.");

@@ -21,9 +21,7 @@ function Dev() {
     // } catch (error) {
     //   console.error(error);
     // }
-    sendPostUrlConfig.go({
-      desc: "买东西啦"
-    });
+    sendPostUrlConfig.go();
   };
 
   return (
