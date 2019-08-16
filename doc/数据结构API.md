@@ -121,7 +121,7 @@ export interface OrderVO extends VO {
 enum OrderState {
     Ongoing = 0,
     Finished = 1,
-    Paying = 2
+    Paying = -1
 }
 
 // 投诉
@@ -349,6 +349,8 @@ export interface IOrderApi {
     getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
     getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+    
+    orderCallback(orderID: string, result: {0 /* 成功 */, -1 /* 失败 */}): Promise<void>;
 }
 
 // 聊天，使用websokcet
