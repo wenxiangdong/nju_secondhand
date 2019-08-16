@@ -1,7 +1,6 @@
 package nju.secondhand;
 
 import com.google.gson.Gson;
-import nju.secondhand.service.AccountService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,6 @@ import java.util.Map;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SecondhandApplicationTests {
 
-    @Autowired
-    AccountService accountService;
-
 
     @Test
     public void contextLoads() {
@@ -28,12 +24,6 @@ public class SecondhandApplicationTests {
         Map<String, Object> object = new HashMap<>();
         object.put("a", a);
         System.out.println(new Gson().toJson(object));
-    }
-
-    @Test
-    public void testAccountService() {
-        this.accountService.withdraw("hhhkkhj", 100);
-        this.accountService.pay("hdhd", "title", 100, "orderID");
     }
 
 }

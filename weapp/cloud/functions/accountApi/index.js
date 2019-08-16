@@ -53,12 +53,12 @@ exports.main = async (event, context) => {
     let {balance = 0} = account;
     amount = parseFloat(amount);
     balance = parseFloat(balance);
-    // if (balance < amount) {
-    //   throw {
-    //     code: HttpCode.Conflict,
-    //     message: "账户余额不足"
-    //   }
-    // }
+    if (balance < amount) {
+      throw {
+        code: HttpCode.Conflict,
+        message: "账户余额不足"
+      }
+    }
 
     // 微信企业付款
     await withdraw({
@@ -91,6 +91,14 @@ exports.main = async (event, context) => {
     ctx.body = result;
   })
 
+
+  app.router('withraw-test', async(ctx) => {
+    await withdraw({
+      openID: cloud.getWXContext().OPENID,
+      amount: 0.01
+    });
+  })
+
   return app.serve();
 }
 
@@ -98,9 +106,27 @@ exports.main = async (event, context) => {
 const withdraw = async ({openID = "", amount = 0}) => {
   console.log(TENPAY_CONFIG);
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
-  tenpay.transfers({
-    // todo 转账
-  });
+  // 转换成分
+  amount = parseFloat(amount);
+  amount = amount * 100;
+  try {
+    const info = {
+      // todo 转账
+      partner_trade_no: `${openID.substring(0, 10)}${+ new Date()}`,
+      openid: openID,
+      check_name: 'NO_CHECK',
+      amount: amount,
+      desc: '南大小书童提现'
+    };
+    console.log(info);
+    await tenpay.transfers(info);
+  } catch (error) {
+    console.error(error);
+    throw {
+      code: HttpCode.Fail,
+      message: "提现出错，若账户出现问题，请联系客服或填写投诉单"
+    }
+  }
 }
 
 
