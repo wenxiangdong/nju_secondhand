@@ -60,6 +60,11 @@ class App extends Component {
       navigationBarTitleText: '南大小书童',
       navigationBarTextStyle: 'black'
     },
+    permission: {
+      "scope.userLocation": {
+        "desc": "你的位置信息将用于您分布的商品的参考信息"
+      }
+    },
     cloud: true
   };
 

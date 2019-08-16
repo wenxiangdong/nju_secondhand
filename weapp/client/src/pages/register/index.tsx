@@ -1,5 +1,5 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View, Text} from '@tarojs/components'
+import {View} from '@tarojs/components'
 import {Location, MockUserApi, UserDTO} from "../../apis/UserApi";
 import {apiHub} from "../../apis/ApiHub";
 import urlList from "../../utils/url-list";
@@ -13,6 +13,7 @@ import WhiteSpace from "../../components/common/white-space";
 import {isInvalidEmail, isInvalidPhone} from "../../utils/valid-util";
 import {CSSProperties} from "react";
 import localConfig from "../../utils/local-config";
+import DChooseLocation from "../../components/common/d-choose-location/DChooseLocation";
 
 function createStyles() {
   const rootViewStyle: CSSProperties = {
@@ -191,31 +192,23 @@ export default class index extends Component<any, IState> {
     }
   };
 
-  private onChooseLocation = () => {
-    Taro.chooseLocation()
-      .then(location => {
-        console.log(location);
-        const errMsg = location['errMsg'];
-        if (errMsg === 'chooseLocation:ok') {
-          let address: Location = {
-            name: location.name,
-            longitude: location.longitude,
-            latitude: location.latitude,
-            address: location.address
-          };
-          const registerInfo:UserDTO = {
-            ...this.state.registerInfo,
-            address
-          };
-          this.setState({registerInfo});
-        } else {
-          this.onError(new Error(errMsg));
-        }
-      })
-      .catch((e) => {
-        if (e.errMsg !== 'chooseLocation:fail cancel')
-          this.onError(e);
-      });
+  private onGetLocation = (location) => {
+    const errMsg = location['errMsg'];
+    if (errMsg === 'chooseLocation:ok') {
+      let address: Location = {
+        name: location.name,
+        longitude: location.longitude,
+        latitude: location.latitude,
+        address: location.address
+      };
+      const registerInfo:UserDTO = {
+        ...this.state.registerInfo,
+        address
+      };
+      this.setState({registerInfo});
+    } else {
+      this.onError(new Error(errMsg));
+    }
   };
 
   private validRegister = () => {
@@ -299,10 +292,7 @@ export default class index extends Component<any, IState> {
           </View>
         </AtForm>
 
-        <AtButton type='primary' customStyle={styles.buttonStyle}
-                  onClick={this.onChooseLocation}>
-          请选择地点
-        </AtButton>
+        <DChooseLocation onGetLocation={this.onGetLocation}/>
         {
           registerInfo.address.name && !isRegistering
             ? <DLocation location={registerInfo.address} style={styles.locationStyle}/>
