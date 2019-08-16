@@ -54,6 +54,7 @@ class App extends Component {
       'pages/my/user-info/index',
       'pages/my/complaint/index',
       'pages/my/complaint/new-complaint/index',
+      'pages/my/complaint/complaint-form/index',
 
       'pages/register/index',
 

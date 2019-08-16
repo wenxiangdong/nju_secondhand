@@ -5,6 +5,7 @@ import formIcon from "../../../../images/complaint.png";
 import contactIcon from "../../../../images/wechat.png";
 import {CSSProperties} from "react";
 import WhiteSpace from "../../../../components/common/white-space";
+import urlList, {complaintFormUrlConfig} from "../../../../utils/url-list";
 
 export default function NewComplaint() {
   // styles
@@ -31,7 +32,7 @@ export default function NewComplaint() {
         boxSizing: "border-box"
       }}>
         <View>
-          <AtButton onClick={() => null}>
+          <AtButton onClick={() => complaintFormUrlConfig.go() }>
             <View style={buttonContentStyle}>
               <Image src={formIcon} style={imageStyle} />
               <Text>新建一个投诉单</Text>
@@ -41,7 +42,7 @@ export default function NewComplaint() {
           <AtButton openType='contact'>
             <View style={buttonContentStyle}>
               <Image src={contactIcon} style={imageStyle} />
-              <Text>直接联系客服</Text>
+              <Text>联系客服留言</Text>
             </View>
           </AtButton>
         </View>

@@ -50,6 +50,7 @@ export { circleApi, mockCircleApi }
 export interface PostDTO {
   desc: string;
   pictures: Array<string>;
+  topic: string;
 }
 
 export interface PostVO extends VO {

@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro';
 import {View, Text, Button} from "@tarojs/components";
 import './index.scss'
 import "@tarojs/async-await";
-import urlList, {resultUrlConfig} from "../../utils/url-list";
+import urlList, {complaintFormUrlConfig, resultUrlConfig, sendPostUrlConfig} from "../../utils/url-list";
 
 function Dev() {
 
@@ -21,11 +21,8 @@ function Dev() {
     // } catch (error) {
     //   console.error(error);
     // }
-    resultUrlConfig.go({
-      title: "成功啦",
-      status: "success",
-      link: urlList.MY_PUBLISH,
-      tip: "去我的发布"
+    sendPostUrlConfig.go({
+      desc: "买东西啦"
     });
   };
 

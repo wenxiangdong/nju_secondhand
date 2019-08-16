@@ -2,6 +2,8 @@ import {Location} from "../apis/UserApi";
 import {MessageVO} from "../apis/MessageApi";
 import {ResultProp} from "../pages/result";
 import Taro from "@tarojs/taro";
+import {ComplaintDTO} from "../apis/ComplaintApi";
+import {PostDTO} from "../apis/CircleApi";
 
 const urlList = {
   // DEV: "/pages/dev/index",
@@ -28,6 +30,8 @@ const urlList = {
   MY_PLATFORM_RULES:'/pages/my/platform-rules/index',
   MY_USER_INFO: '/pages/my/user-info/index',
   MY_COMPLAINT: '/pages/my/complaint/index',
+  MY_COMPLAINT_NEW: '/pages/my/complaint/new-complaint/index',
+  COMPLAINT_FORM: '/pages/my/complaint/complaint-form/index',
   LOGIN: '/pages/login/index',
   REGISTER: '/pages/register/index',
   PUBLISH_GOODS: '/pages/publish/index',
@@ -164,6 +168,37 @@ class ResultUrlConfig {
 
 const resultUrlConfig = new ResultUrlConfig();
 
+class ComplaintFormUrlConfig {
+  public go({desc = ""} = {}) {
+    const url =`${urlList.COMPLAINT_FORM}?desc=${desc}`;
+    return Taro.navigateTo({
+      url
+    });
+  }
+  public getConfig(context: Taro.Component): ComplaintDTO {
+    // @ts-ignore
+    return context.$router.params;
+  }
+}
+const complaintFormUrlConfig = new ComplaintFormUrlConfig();
+
+class SendPostUrlConfig {
+  private prePost: PostDTO | undefined;
+  public go(post: PostDTO | undefined = undefined) {
+    this.prePost = post;
+    return Taro.navigateTo({
+      url: urlList.CIRCLE_SEND_POST
+    });
+  }
+
+  public getPrePost() {
+    let res = this.prePost;
+    this.prePost = undefined;
+    return res;
+  }
+}
+const sendPostUrlConfig = new SendPostUrlConfig();
+
 export default urlList;
 export {
   indexSearchUrlConfig,
@@ -171,5 +206,7 @@ export {
   chatUrlConfig,
   locationUrlConfig,
   sendComplaintUrlConfig,
-  resultUrlConfig
+  resultUrlConfig,
+  complaintFormUrlConfig,
+  sendPostUrlConfig,
 };
