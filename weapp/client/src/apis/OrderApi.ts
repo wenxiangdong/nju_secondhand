@@ -138,6 +138,7 @@ export interface OrderVO extends VO {
 }
 
 export enum OrderState {
-  Ongoing = '送货中',
-  Finished = '已送达',
+  Ongoing = 0,
+  Finished = 1,
+  Paying = -1
 }

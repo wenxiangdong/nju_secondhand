@@ -47,9 +47,9 @@ interface AccountVO {
 }
 
 enum UserState {
-    UnRegistered, // 未注册
-    Normal,
-    Frozen, // 被管理员冻结
+    UnRegistered = 0, // 未注册
+    Normal = 1,
+    Frozen = 2, // 被管理员冻结
 }
 
 
@@ -69,6 +69,7 @@ interface GoodsDTO {
 
 interface GoodsVO extends VO {
     sellerID: string;
+    sellerName: string;
 
     name: string;
     desc: string;
@@ -87,8 +88,8 @@ export interface GoodsWithSellerVO {
 }
 
 enum GoodsState {
-    InSale,
-    Deleted
+    InSale = 0,
+    Deleted = 1,
 }
 
 // 订单
@@ -118,8 +119,9 @@ export interface OrderVO extends VO {
 }
 
 enum OrderState {
-    Ongoing,
-    Finished,
+    Ongoing = 0,
+    Finished = 1,
+    Paying = -1
 }
 
 // 投诉
@@ -141,7 +143,7 @@ export interface ComplaintVO extends VO {
 
   complainTime: number;
   
-  handling: Handling | null;
+  handling: Handling; // 若投诉未被处理，该属性不存在
 
   state: ComplaintState;
 }
@@ -152,24 +154,27 @@ export interface Handling {
 }
 
 enum ComplaintState {
-    Ongoing,
-    Handled
+    Ongoing = 0,
+    Handled = 1
 }
 
 // 圈子
 interface PostDTO {
+    topic: string;
     desc: string;
     pictures: Array<string>;
 }
 
 interface PostVO extends VO {
     ownerID: string;
-  	ownerName: string;
+    ownerName: string;
+    ownerAvatar: string;
 
     publishTime: number;
 
+    topic: string;
     desc: string;
-    picture: Array<string>;
+    pictures: Array<string>;
 
     comments: Array<Comment>; // 直接拿全部的
 }
@@ -263,6 +268,8 @@ export interface ICircleApi {
     getPosts(lastIndex: number, size?: number): Promise<PostVO[]>; // 不需要
 
     comment(postID: string, content: string): Promise<void>;
+  
+    getPostById(postId: string): Promise<PostVO>;
 }
 
 // 需要注册且未冻结
@@ -305,19 +312,19 @@ export interface IGoodsApi {
     searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>; // 不需要
   
   	// 关键字搜索商品和销售者信息
-  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
+  	searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
 
-  // 种类搜索商品和销售者信息
-  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
+  	// 种类搜索商品和销售者信息
+  	searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
   
-  // 通过 id 获取商品和销售者信息
-  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO>; // 不需要
+  	// 通过 id 获取商品和销售者信息
+  	getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO>; // 不需要
 
-  // 通过 Id 获取商品信息
-  getGoods(goodsID: string): Promise<GoodsVO>; // 不需要
+  	// 通过 id 获取商品信息
+  	getGoods(goodsID: string): Promise<GoodsVO>; // 不需要
 
-    // 购买商品
-    purchase(goodsID: string): Promise<void>;
+  	// 购买商品
+  	purchase(goodsID: string): Promise<void>;
 }
 
 // 需要注册且未冻结
@@ -334,12 +341,16 @@ export interface IOrderApi {
     getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
     accept(orderID: string): Promise<void>;
+  
+    getOrderById(orderId: string): Promise<OrderVO>;
 
     getBuyerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
     getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
     getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+    
+    orderCallback(orderID: string, result: {0 /* 成功 */, -1 /* 失败 */}): Promise<void>;
 }
 
 // 聊天，使用websokcet
@@ -358,7 +369,6 @@ void handle(String complaintID, String result);
 List<OrderVO> getOrders(String keyword, int lastIndex, int size);
 
 // 商品管理
-// 查看商品见用户API，省略
 List<CategoryVO> getCategories();
 List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size);
 List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size);
@@ -372,4 +382,5 @@ void freezeUser(String userID); // 发通知
 List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size);
 void unfreezeUser(String userID); // 发通知
 ```
+
 
