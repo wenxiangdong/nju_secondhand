@@ -87,28 +87,30 @@ public class CloudServiceImpl implements CloudService {
                 .collect(Collectors.toList());
     }
 
+    @SafeVarargs
     @Override
-    public void databaseUpdateOne(String collectionName, String id, Object newObject) {
-        log.info("UpdateOne: " + collectionName + "-" + id);
-
-        String url = String.format("https://api.weixin.qq.com/tcb/databaseupdate?access_token=%s",
+    public final long databaseCount(String collectionName, Map<String, Object>... conditions) {
+        log.info("Count: " + collectionName);
+        String url = String.format("https://api.weixin.qq.com/tcb/databasecount?access_token=%s",
                 getAccessToken());
 
-        String query = String.format("db.collection('%s').doc('%s').update(%s)",
+        String query = String.format("db.collection('%s')%s.count()",
                 collectionName,
-                id,
-                JsonUtil.toJson(newObject));
+                conditions.length != 0 ?
+                        String.format(".where(_or(%s))", JsonUtil.toJson(conditions)) : "");
 
         DatabaseParam databaseParam = DatabaseParam.builder()
                 .env(miniProgramConfig.getEnv())
                 .query(query)
                 .build();
 
-        UpdateResult result = httpService.post(url, JsonUtil.toJson(databaseParam), UpdateResult.class);
+        CountResult result = httpService.post(url, JsonUtil.toJson(databaseParam), CountResult.class);
 
         if (result.invalid()) {
             throw new FailException(result.errmsg);
         }
+
+        return result.count;
     }
 
     @Override
@@ -211,10 +213,8 @@ class QueryResult extends WechatError {
     List<String> data;
 }
 
-class UpdateResult extends WechatError {
-    Integer matched;
-    Integer modified;
-    String id;
+class CountResult extends WechatError {
+    Long count;
 }
 
 class DownLoadFileResult extends WechatError {

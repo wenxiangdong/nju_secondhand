@@ -2,9 +2,11 @@ package nju.secondhand.controller;
 
 import nju.secondhand.response.HttpResponse;
 import nju.secondhand.service.ComplaintService;
+import nju.secondhand.util.LoginUtil;
 import nju.secondhand.vo.ComplaintVO;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -20,12 +22,14 @@ public class ComplaintController {
     }
 
     @GetMapping("/getComplaints")
-    public HttpResponse<List<ComplaintVO>> getComplaints(String keyword, int lastIndex, int size) {
+    public HttpResponse<List<ComplaintVO>> getComplaints(String keyword, int lastIndex, int size, HttpSession session) {
+        LoginUtil.checkLogin(session);
         return new HttpResponse<>(complaintService.getComplaints(keyword, lastIndex, size));
     }
 
     @PostMapping("/handle")
-    public HttpResponse<Void> handle(String complaintID, String result) {
+    public HttpResponse<Void> handle(String complaintID, String result, HttpSession session) {
+        LoginUtil.checkLogin(session);
         complaintService.handle(complaintID, result);
         return new HttpResponse<>();
     }

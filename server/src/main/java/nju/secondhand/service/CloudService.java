@@ -29,16 +29,16 @@ public interface CloudService {
      * @param <T>            对象泛型
      * @return 查询结果集
      */
-    <T> List<T> databaseQuery(Class<T> tClass, String collectionName, int skip, int limit, Map<String, Object>... conditions);
+    <T> List<T> databaseQuery(Class<T> tClass, String collectionName, int skip, int limit, Map<Object, Object>... conditions);
 
     /**
-     * 更新一条记录
+     * 统计查询语句对应的结果记录数
      *
      * @param collectionName 集合名称
-     * @param id             数据 ID
-     * @param newObject      新对象
+     * @param conditions     筛选条件
+     * @return 符合条件的记录数
      */
-    void databaseUpdateOne(String collectionName, String id, Object newObject);
+    long databaseCount(String collectionName, Map<Object, Object> conditions);
 
     /**
      * 根据文件 ID 换取真实链接

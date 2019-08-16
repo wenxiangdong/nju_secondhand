@@ -2,10 +2,11 @@ package nju.secondhand.controller;
 
 import nju.secondhand.response.HttpResponse;
 import nju.secondhand.service.UserService;
+import nju.secondhand.util.LoginUtil;
 import nju.secondhand.vo.UserVO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -21,23 +22,27 @@ public class UserController {
     }
 
     @GetMapping("/getNormalUsers")
-    public HttpResponse<List<UserVO>> getNormalUsers(String keyword, int lastIndex, int size) {
+    public HttpResponse<List<UserVO>> getNormalUsers(String keyword, int lastIndex, int size, HttpSession session) {
+        LoginUtil.checkLogin(session);
         return new HttpResponse<>(userService.getNormalUsers(keyword, lastIndex, size));
     }
 
     @PostMapping("/freezeUser")
-    public HttpResponse<Void> freezeUser(String userID) {
+    public HttpResponse<Void> freezeUser(String userID, HttpSession session) {
+        LoginUtil.checkLogin(session);
         userService.freezeUser(userID);
         return new HttpResponse<>();
     }
 
     @GetMapping("/getFrozenUsers")
-    public HttpResponse<List<UserVO>> getFrozenUsers(String keyword, int lastIndex, int size) {
+    public HttpResponse<List<UserVO>> getFrozenUsers(String keyword, int lastIndex, int size, HttpSession session) {
+        LoginUtil.checkLogin(session);
         return new HttpResponse<>(userService.getFrozenUsers(keyword, lastIndex, size));
     }
 
     @PostMapping("/unfreezeUser")
-    public HttpResponse<Void> unfreezeUser(String userID) {
+    public HttpResponse<Void> unfreezeUser(String userID, HttpSession session) {
+        LoginUtil.checkLogin(session);
         userService.unfreezeUser(userID);
         return new HttpResponse<>();
     }

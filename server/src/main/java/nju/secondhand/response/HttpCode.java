@@ -10,6 +10,7 @@ public enum HttpCode {
      * 200
      */
     SUCCESS(200),
+    NOT_LOGIN(401),
     /**
      * 500
      */
