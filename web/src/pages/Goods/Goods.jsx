@@ -10,6 +10,7 @@ import type {GoodsVO} from "../../apis/goods";
 import "./Goods.css";
 import DImage from "../../components/DImage/DImage";
 import {DateUtil} from "../../utils/date";
+import {withAuth} from "../Login/Login";
 
 const logger = Logger.getLogger("Goods");
 
@@ -187,4 +188,4 @@ function Goods() {
     );
 }
 
-export default Goods;
+export default withAuth(Goods);

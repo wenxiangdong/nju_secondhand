@@ -10,6 +10,7 @@ import DTable from "../../components/DTable/DTable";
 import type {ColumnItem} from "../../components/DTable/DTable";
 import {DateUtil} from "../../utils/date";
 import type {UserVO} from "../../apis/user";
+import {withAuth} from "../Login/Login";
 
 const logger = Logger.getLogger("User");
 
@@ -258,4 +259,4 @@ function User() {
     );
 }
 
-export default User;
+export default withAuth(User);

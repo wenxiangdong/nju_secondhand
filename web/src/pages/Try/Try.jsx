@@ -7,6 +7,7 @@ import debounce from "../../utils/debounce";
 import DTable from "../../components/DTable/DTable";
 import type {ColumnItem} from "../../components/DTable/DTable";
 import InputWithDebounce from "../../components/InputWithDebounce/InputWithDebounce";
+import Login, {withAuth} from "../Login/Login";
 
 const logger = Logger.getLogger("Try");
 
@@ -21,7 +22,7 @@ const getData = async (index, offset, keyword) => {
     }));
 };
 
-function Try() {
+function Try(props) {
     // hooks
     const {data, loadMore ,setKeyword} = useLoadMoreWithKeyword({
         dataSource: (index, offset, keyword) => {
@@ -64,15 +65,9 @@ function Try() {
 
     return (
         <div>
-            <InputWithDebounce onChange={e => setKeyword(e.target.value)}/>
-            {/*<Spin spinning={loading}>*/}
-                <DTable
-                    onLoad={loadMore}
-                    columns={columns}
-                    dataSet={data}/>
-            {/*</Spin>*/}
+           <Button>Go</Button>
         </div>
     );
 }
 
-export default Try;
+export default withAuth(Try);

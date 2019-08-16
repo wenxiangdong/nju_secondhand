@@ -2,6 +2,7 @@ import "./Home.css";
 import {Card, Icon} from "antd";
 import React from "react";
 import {Link} from "react-router-dom";
+import {withAuth} from "../Login/Login";
 
 
 /**
@@ -71,4 +72,4 @@ function Home() {
 }
 
 
-export default Home;
+export default withAuth(Home);

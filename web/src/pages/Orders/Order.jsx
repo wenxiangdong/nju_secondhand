@@ -9,6 +9,7 @@ import type {OrderVO} from "../../apis/order";
 import type {GoodsVO} from "../../apis/goods";
 import InputWithDebounce from "../../components/InputWithDebounce/InputWithDebounce";
 import DTable from "../../components/DTable/DTable";
+import {withAuth} from "../Login/Login";
 
 const logger = Logger.getLogger("Order");
 
@@ -76,4 +77,4 @@ function Order() {
     );
 }
 
-export default Order;
+export default withAuth(Order);

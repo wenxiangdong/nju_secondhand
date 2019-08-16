@@ -9,6 +9,7 @@ import DImage from "../../components/DImage/DImage";
 import InputWithDebounce from "../../components/InputWithDebounce/InputWithDebounce";
 import DTable from "../../components/DTable/DTable";
 import type {ColumnItem} from "../../components/DTable/DTable";
+import {withAuth} from "../Login/Login";
 
 const logger = Logger.getLogger("Complaint");
 
@@ -183,4 +184,4 @@ function Complaint() {
 }
 
 
-export default Complaint;
+export default withAuth(Complaint);
