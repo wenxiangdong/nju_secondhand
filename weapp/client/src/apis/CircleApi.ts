@@ -32,8 +32,8 @@ class CircleApi implements ICircleApi {
     return await httpRequest.callFunction<void>(functionName, { $url: "comment", postID, content });
   }
 
-  getPostById(postId: string): Promise<PostVO> {
-    throw new Error("Method not implemented.");
+  async getPostById(postId: string): Promise<PostVO> {
+    return await httpRequest.callFunction<PostVO>(functionName, { $url: "getPostById" });
   }
 }
 
@@ -59,11 +59,13 @@ class MockCircleApi implements ICircleApi {
   static createMockPost(): PostVO {
     return {
       _id: '1',
+      topic: '二手书',
+      ownerAvatar: '',
       comments: this.createMockComments(),
       desc: 'descdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdesc',
       ownerID: '1',
       ownerName: 'ownerName',
-      picture: ['', '', ''],
+      pictures: ['', '', ''],
       publishTime: Date.now()
     }
   }
@@ -84,18 +86,22 @@ let mockCircleApi: ICircleApi = new MockCircleApi();
 export { circleApi, mockCircleApi, MockCircleApi }
 
 export interface PostDTO {
+  topic: string;
   desc: string;
   pictures: Array<string>;
 }
 
 export interface PostVO extends VO {
+  topic: string;
+
   ownerID: string;
   ownerName: string;
+  ownerAvatar: string;
 
   publishTime: number;
 
   desc: string;
-  picture: Array<string>;
+  pictures: Array<string>;
 
   comments: Array<Comment>; // 如果可能出现一个 post 有很多评论，建议删除该属性，增加一个提供 post 的 ID 来取得评论的 API
 }
