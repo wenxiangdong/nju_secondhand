@@ -1,5 +1,5 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View} from '@tarojs/components'
+import {View, Text} from '@tarojs/components'
 import {Location, MockUserApi, UserDTO} from "../../apis/UserApi";
 import {apiHub} from "../../apis/ApiHub";
 import urlList from "../../utils/url-list";
@@ -299,15 +299,14 @@ export default class index extends Component<any, IState> {
           </View>
         </AtForm>
 
+        <AtButton type='primary' customStyle={styles.buttonStyle}
+                  onClick={this.onChooseLocation}>
+          请选择地点
+        </AtButton>
         {
-          registerInfo.address.name
+          registerInfo.address.name && !isRegistering
             ? <DLocation location={registerInfo.address} style={styles.locationStyle}/>
-            : (
-              <AtButton type='primary' customStyle={styles.buttonStyle}
-                        onClick={this.onChooseLocation}>
-                请选择地点
-              </AtButton>
-            )
+            : null
         }
 
         <WhiteSpace height={80}/>

@@ -343,9 +343,13 @@ export default class index extends Component<any, IState> {
         </AtButton>
 
         {
-          modifyInfo.address.name
-            ? <DLocation location={modifyInfo.address} style={styles.locationStyle}/>
-            : <DLocation location={address} style={styles.locationStyle}/>
+          isModifying
+            ? null
+            : (
+              modifyInfo.address.name
+                ? <DLocation location={modifyInfo.address} style={styles.locationStyle}/>
+                : <DLocation location={address} style={styles.locationStyle}/>
+            )
         }
 
         <WhiteSpace height={80}/>
