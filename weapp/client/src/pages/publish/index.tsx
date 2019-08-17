@@ -68,6 +68,12 @@ function Publish() {
       console.log("上传文件成功", paths);
       goods.pictures = [...paths];
       await apiHub.goodsApi.publishGoods(goods);
+      // 顺便发一条圈子
+      apiHub.circleApi.publishPost({
+        topic: "我有好货",
+        desc: `宝贝【${goods.name}】:${goods.desc}，只需￥${goods.price}`,
+        pictures: goods.pictures
+      });
       resultUrlConfig.go({
         title: "发布商品成功",
         status: "success",
