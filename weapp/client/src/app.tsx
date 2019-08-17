@@ -28,6 +28,7 @@ class App extends Component {
       'pages/index/index',
 
       'pages/circle/index',
+      'pages/circle/post/index',
       'pages/circle/send-post/index',
 
       'pages/index/search-result/index',
@@ -67,6 +68,11 @@ class App extends Component {
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: '南大小书童',
       navigationBarTextStyle: 'black'
+    },
+    permission: {
+      "scope.userLocation": {
+        "desc": "你的位置信息将用于您分布的商品的参考信息"
+      }
     },
     cloud: true
   };

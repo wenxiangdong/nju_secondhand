@@ -1,0 +1,12 @@
+{
+  "wechatConfig": {
+    "store": "FileStore_C:\\Users\\I354990\\projects\\nju_secondhand\\weapp\\cloud\\functions\\accountApi\\wechat-info.json"
+  },
+  "globalToken": {
+    "count": 0
+  },
+  "urls": {},
+  "oauth": {},
+  "card": {},
+  "mp": {}
+}

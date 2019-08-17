@@ -15,6 +15,7 @@ import WhiteSpace from "../../../components/common/white-space";
 import DLocation from "../../../components/common/d-location/DLocation";
 import DUserInfoBar from "../../../components/common/d-user-info-bar";
 import {isInvalidEmail, isInvalidPhone} from "../../../utils/valid-util";
+import DChooseLocation from "../../../components/common/d-choose-location/DChooseLocation";
 
 function createStyles() {
   const rootViewStyle: CSSProperties = {
@@ -224,31 +225,23 @@ export default class index extends Component<any, IState> {
     }
   };
 
-  private onChooseLocation = () => {
-    Taro.chooseLocation()
-      .then(location => {
-        console.log(location);
-        const errMsg = location['errMsg'];
-        if (errMsg === 'chooseLocation:ok') {
-          let address: Location = {
-            name: location.name,
-            longitude: location.longitude,
-            latitude: location.latitude,
-            address: location.address
-          };
-          const modifyInfo:UserDTO = {
-            ...this.state.modifyInfo,
-            address
-          };
-          this.setState({modifyInfo});
-        } else {
-          this.onError(new Error(errMsg));
-        }
-      })
-      .catch((e) => {
-        if (e.errMsg !== 'chooseLocation:fail cancel')
-          this.onError(e);
-      });
+  private onGetLocation = (location) => {
+    const errMsg = location['errMsg'];
+    if (errMsg === 'chooseLocation:ok') {
+      let address: Location = {
+        name: location.name,
+        longitude: location.longitude,
+        latitude: location.latitude,
+        address: location.address
+      };
+      const modifyInfo:UserDTO = {
+        ...this.state.modifyInfo,
+        address
+      };
+      this.setState({modifyInfo});
+    } else {
+      this.onError(new Error(errMsg));
+    }
   };
 
   private validModify = () => {
@@ -337,15 +330,15 @@ export default class index extends Component<any, IState> {
           </View>
         </AtForm>
 
-        <AtButton type='primary' customStyle={styles.buttonStyle}
-                  onClick={this.onChooseLocation}>
-          选择地点
-        </AtButton>
-
+        <DChooseLocation onGetLocation={this.onGetLocation}/>
         {
-          modifyInfo.address.name
-            ? <DLocation location={modifyInfo.address} style={styles.locationStyle}/>
-            : <DLocation location={address} style={styles.locationStyle}/>
+          isModifying
+            ? null
+            : (
+              modifyInfo.address.name
+                ? <DLocation location={modifyInfo.address} style={styles.locationStyle}/>
+                : <DLocation location={address} style={styles.locationStyle}/>
+            )
         }
 
         <WhiteSpace height={80}/>

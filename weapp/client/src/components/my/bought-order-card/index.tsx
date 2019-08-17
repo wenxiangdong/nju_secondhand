@@ -97,6 +97,21 @@ function BoughtOrderCard(props: IProp) {
   const orderTimeString = timeToString(orderTime);
   const deliveryTimeString = deliveryTime > 0? timeToString(deliveryTime): '暂未送达';
 
+  let stateInfo;
+  switch (state) {
+    case OrderState.Finished:
+      stateInfo = '已送达';
+      break;
+    case OrderState.Ongoing:
+      stateInfo = '送货中';
+      break;
+    case OrderState.Paying:
+      stateInfo = '付款中';
+      break;
+    default:
+      stateInfo = '状态不明'
+  }
+
   return (
     <View style={styles.baseCardStyle}>
       <View style={styles.mainColumnStyle}>
@@ -107,7 +122,7 @@ function BoughtOrderCard(props: IProp) {
         <Text style={styles.dateStringStyle}>收货日期: {deliveryTimeString}</Text>
       </View>
       <View style={styles.subColumnStyle}>
-        <Text style={styles.dateStringStyle}>订单状态：{state}</Text>
+        <Text style={styles.dateStringStyle}>订单状态：{stateInfo}</Text>
         {
           isComplaint
             ? null

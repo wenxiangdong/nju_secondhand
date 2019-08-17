@@ -88,10 +88,10 @@ export default class CategoryGoods extends Component<any, IState> {
       : (
         <View>
           <View>
-            {goodsWithSeller.map((g, idx) => {
-              console.log(g, idx);
-              return <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>
-            })}
+            {
+              goodsWithSeller.map((g, idx) =>
+                <GoodsCard key={`goods-card-${idx}-${g.goods._id}`} goodsWithSeller={g}/>)
+            }
           </View>
           <AtLoadMore
             moreBtnStyle={StyleHelper.loadMoreBtnStyle}
