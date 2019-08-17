@@ -65,7 +65,7 @@ class MockCircleApi implements ICircleApi {
       desc: 'descdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdesc',
       ownerID: '1',
       ownerName: 'ownerName',
-      pictures: ['', '', ''],
+      pictures: ['http://img1.imgtn.bdimg.com/it/u=2565994761,3746514896&fm=26&gp=0.jpg', 'http://img1.imgtn.bdimg.com/it/u=2565994761,3746514896&fm=26&gp=0.jpg', 'http://img1.imgtn.bdimg.com/it/u=2565994761,3746514896&fm=26&gp=0.jpg'],
       publishTime: Date.now()
     }
   }

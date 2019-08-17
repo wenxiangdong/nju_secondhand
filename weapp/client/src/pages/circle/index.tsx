@@ -4,10 +4,11 @@ import {createSimpleErrorHandler} from "../../utils/function-factory";
 import LoadingPage from "../../components/common/loading-page";
 import {PostVO} from "../../apis/CircleApi";
 import {apiHub} from "../../apis/ApiHub";
-import {AtButton, AtLoadMore} from "taro-ui";
+import {AtButton, AtLoadMore, AtFab, AtIcon} from "taro-ui";
 import {StyleHelper} from "../../styles/style-helper";
 import PostCard from "../../components/circle/post-card/PostCard";
 import urlList from "../../utils/url-list";
+import MainTabBar from "../../components/common/main-tab-bar";
 
 interface IState {
   loading: boolean,
@@ -74,7 +75,7 @@ export default class index extends Component<any, IState> {
       )
       : (
       <View>
-        <AtButton type="primary" customStyle={{marginBottom: '2vw'}} onClick={this.handleSendPost}>发帖子</AtButton>
+        {/*<AtButton type="primary" customStyle={{marginBottom: '2vw'}} onClick={this.handleSendPost}>发帖子</AtButton>*/}
         {
           posts.map((p, idx) => <PostCard post={p} key={idx}/>)
         }
@@ -83,6 +84,12 @@ export default class index extends Component<any, IState> {
           onClick={this.onLoadMore}
           status={loadMoreStatus}
         />
+        <View style={{position: "fixed", right: "16px", bottom: "140rpx"}}>
+          <AtFab size='small' onClick={this.handleSendPost}>
+            <AtIcon value='edit' />
+          </AtFab>
+        </View>
+        <MainTabBar currentIndex={1} />
       </View>
     )
   }

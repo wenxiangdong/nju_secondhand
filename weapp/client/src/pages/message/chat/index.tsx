@@ -29,6 +29,14 @@ interface IState {
 export default class index extends Component<any, IState> {
 
   private readonly NOT_FIND_SELLER_ID_ERROR:Error = new Error('未找到卖家的信息请重试');
+  // 快捷消息
+  private readonly QUICK_MESSAGES = [
+    "宝贝大概几成新",
+    "包装小票还有么？:)",
+    "可以多拍几张实物照片么？",
+    "用过几次了？",
+    "还剩下多少？"
+  ];
 
   config: Config = {
     navigationBarTitleText: '聊天'
@@ -129,7 +137,8 @@ export default class index extends Component<any, IState> {
               confirmType='send'
               onConfirm={this.handleConfirmInput}
             />
-            <AtIcon value='image' onClick={this.handleClickImageIcon} />
+            <AtIcon className='icon' value='image' onClick={this.handleClickImageIcon} />
+            <AtIcon className='icon' value='lightning-bolt' onClick={this.handleClickFastMessage} />
           </View>
         </View>
       )
@@ -180,6 +189,22 @@ export default class index extends Component<any, IState> {
         icon: "none"
       });
     }
+  };
+
+  private handleClickFastMessage = async () => {
+    const {sellerInfo} = this.state;
+    try {
+      const result = await Taro.showActionSheet({
+        itemList: this.QUICK_MESSAGES
+      });
+      const message = this.QUICK_MESSAGES[result.tapIndex];
+      const vo: MessageVO = {
+        content: "text://" + message,
+        receiverID: sellerInfo && sellerInfo._id || "",
+        receiverName: sellerInfo && sellerInfo.nickname || ""
+      };
+      this.sendMessage(vo);
+    } catch (e) {}
   };
 
   private sendMessage = (vo: MessageVO) => {
