@@ -88,7 +88,13 @@ class MockCircleApi implements ICircleApi {
   }
 
   searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]> {
-    throw new Error("Method not implemented.");
+    console.log('getPosts', lastIndex, size);
+    let posts = new Array(size).fill(null).map(() => {
+      let p = MockCircleApi.createMockPost();
+      p.desc = keyword + p.desc;
+      return p;
+    });
+    return mockHttpRequest.success(posts)
   }
 }
 

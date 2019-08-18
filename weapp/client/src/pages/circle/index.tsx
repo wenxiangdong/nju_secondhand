@@ -4,17 +4,18 @@ import {createSimpleErrorHandler} from "../../utils/function-factory";
 import LoadingPage from "../../components/common/loading-page";
 import {PostVO} from "../../apis/CircleApi";
 import {apiHub} from "../../apis/ApiHub";
-import {AtButton, AtLoadMore, AtFab, AtIcon} from "taro-ui";
+import {AtLoadMore, AtFab, AtIcon, AtSearchBar} from "taro-ui";
 import {StyleHelper} from "../../styles/style-helper";
 import PostCard from "../../components/circle/post-card/PostCard";
 import urlList from "../../utils/url-list";
 import MainTabBar from "../../components/common/main-tab-bar";
 
 interface IState {
-  loading: boolean,
   errMsg?: string,
   posts: PostVO[],
   loadMoreStatus?: 'more' | 'loading' | 'noMore',
+  searchDisabled: boolean,
+  searchValue: string,
 }
 
 /**
@@ -28,33 +29,45 @@ export default class index extends Component<any, IState> {
     navigationBarTitleText: '圈子'
   };
 
+  private beforeSearchValue: string = '';
+
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
       posts: [],
+      searchValue: '',
+      searchDisabled: true,
+      loadMoreStatus: 'loading',
     };
   }
 
   componentWillMount() {
-    this.setState({ loading: false, loadMoreStatus: 'loading'}, this.loadMorePosts);
+    this.loadMorePosts();
   }
 
   private loadMorePosts = () => {
     const lastIndex = this.state.posts.length;
-    apiHub.circleApi.getPosts(lastIndex)
+    apiHub.circleApi.searchPostsByKeyword(this.state.searchValue || '', lastIndex)
       .then((posts) => {
         if (posts && posts.length) {
-          this.setState({posts: this.state.posts.concat(posts), loadMoreStatus: 'more'});
+          this.setState({searchDisabled: false, posts: this.state.posts.concat(posts), loadMoreStatus: 'more'});
         } else {
-          this.setState({loadMoreStatus: 'noMore'});
+          this.setState({searchDisabled: false, loadMoreStatus: 'noMore'});
         }
       })
       .catch(this.onError);
   };
 
+  private search = () => {
+    if (this.state.searchValue !== this.beforeSearchValue) {
+      this.setState({posts: []}, this.onLoadMore);
+    } else {
+      this.onLoadMore();
+    }
+  };
+
   private onLoadMore = () => {
-    this.setState({loadMoreStatus: 'loading'},
+    this.setState({loadMoreStatus: 'loading', searchDisabled: true},
       this.loadMorePosts);
   };
 
@@ -65,17 +78,26 @@ export default class index extends Component<any, IState> {
 
   render() {
     const {
-      loading, errMsg,
+      errMsg,
       posts,
-      loadMoreStatus
+      loadMoreStatus,
+      searchDisabled, searchValue
     } = this.state;
-    return (loading || errMsg)
+    return (errMsg)
       ? (
         <LoadingPage loadingMsg={errMsg}/>
       )
       : (
       <View>
-        {/*<AtButton type="primary" customStyle={{marginBottom: '2vw'}} onClick={this.handleSendPost}>发帖子</AtButton>*/}
+        <AtSearchBar
+          placeholder='请输入关键词搜索'
+          disabled={searchDisabled}
+          maxLength={20}
+          value={searchValue}
+          onChange={(searchValue) => this.setState({searchValue})}
+          onActionClick={this.search}
+          onConfirm={this.search}
+        />
         {
           posts.map((p, idx) => <PostCard post={p} key={idx}/>)
         }
