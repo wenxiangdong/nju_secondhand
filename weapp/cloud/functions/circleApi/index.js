@@ -33,7 +33,7 @@ exports.main = async(event, context) => {
     })).result;
 
     if (loginResult.code === HttpCode.Not_Found) {
-      ctx = {
+      ctx.body = {
         code: HttpCode.Not_Found,
         message: '找不到您的个人消息'
       }
@@ -89,6 +89,58 @@ exports.main = async(event, context) => {
 
     ctx.body = {
       code: HttpCode.Success
+    }
+  })
+
+  app.router('getPostById', async(ctx) => {
+    const {
+      postId
+    } = event;
+
+    const {
+      postCollection
+    } = ctx.data;
+
+    let result = await postCollection
+      .doc(postId)
+      .get()
+
+    ctx.body = {
+      code: HttpCode.Success,
+      data: result.data
+    }
+  })
+
+  app.router('searchPostsByKeyword', async(ctx) => {
+    const {
+      keyword,
+      lastIndex,
+      size
+    } = event;
+
+    const {
+      postCollection
+    } = ctx.data;
+
+    let result = keyword ?
+      await postCollection
+        .where({
+          topic: db.RegExp({
+            regexp: keyword,
+            options: 'i',
+          })
+        })
+        .skip(lastIndex)
+        .limit(size)
+        .get() :
+      await postCollection
+        .skip(lastIndex)
+        .limit(size)
+        .get()
+
+    ctx.body = {
+      code: HttpCode.Success,
+      data: result.data
     }
   })
 

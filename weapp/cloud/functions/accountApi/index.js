@@ -30,18 +30,33 @@ exports.main = async (event, context) => {
   })
 
   app.router(['withdraw', 'pay'], async (ctx, next) => {
-    try {
-      let self = await cloud.callFunction('userApi', {
-        $url: 'getNormalSelf',
+    let loginResult = (await cloud.callFunction({
+      name: 'userApi',
+      data: {
+        $url: 'login',
         openid: ctx.data.openid
-      }).result;
-      ctx.data.self = self;
-    } catch (error) {
-      console.error(error);
-      ctx.data.self = {};
-    }
+      }
+    })).result;
 
-    await next();
+    if (loginResult.code === HttpCode.Not_Found) {
+      ctx.body = {
+        code: HttpCode.Not_Found,
+        message: '找不到您的个人消息'
+      }
+    } else {
+      self = loginResult.data
+      switch (self.state) {
+        case UserState.Frozen:
+          ctx.body = {
+            code: HttpCode.Forbidden,
+            message: '您的帐户被冻结'
+          }
+          break
+        default:
+          ctx.data.self = self;
+          await next();
+      }
+    }
   })
 
   app.router('withdraw', async (ctx) => {
@@ -76,6 +91,10 @@ exports.main = async (event, context) => {
           }
         }
       })
+
+    return {
+      code: HttpCode.Success
+    }
   })
 
   /**
@@ -88,7 +107,7 @@ exports.main = async (event, context) => {
     console.log("进入 pay route", ctx.data);
     const {payTitle, payAmount, orderID} = event;
     const result = await pay({openID: ctx.data.openid, payTitle, payAmount, orderID});
-    ctx.body = result;
+    ctx.body = {code: HttpCode.Success, data: result};
   })
 
 
@@ -183,6 +202,7 @@ const TENPAY_CONFIG = {
 // };
 
 const HttpCode = {
+  Success: 200,
   Forbidden: 403, // 403
   Not_Found: 404, // 404
   Conflict: 409, // 409 冲突

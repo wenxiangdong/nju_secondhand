@@ -35,10 +35,8 @@ class OrderApi implements IOrderApi {
     return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getSellerOrders", lastIndex, size, state: OrderState.Finished });
   }
 
-  getOrderById(orderId: string): Promise<OrderVO> {
-    // TODO 优先级 中
-    // 添加通过 id 获取订单的方法
-    throw new Error("Method not implemented.");
+  async getOrderById(orderId: string): Promise<OrderVO> {
+    return await httpRequest.callFunction<OrderVO>(functionName, { $url: "getOrderById", orderId });
   }
 }
 

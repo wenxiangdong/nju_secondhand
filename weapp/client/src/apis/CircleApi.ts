@@ -35,12 +35,11 @@ class CircleApi implements ICircleApi {
   }
 
   async getPostById(postId: string): Promise<PostVO> {
-    return await httpRequest.callFunction<PostVO>(functionName, { $url: "getPostById" });
+    return await httpRequest.callFunction<PostVO>(functionName, { $url: "getPostById", postId });
   }
 
-  searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]> {
-    // TODO
-    throw new Error("Method not implemented.");
+  async searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]> {
+    return await httpRequest.callFunction<PostVO[]>(functionName, { $url: "searchPostsByKeyword", keyword, lastIndex, size });
   }
 }
 

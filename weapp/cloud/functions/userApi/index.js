@@ -47,32 +47,37 @@ exports.main = async(event, context) => {
   })
 
   app.router('checkState', async(ctx) => {
-    let result = await ctx.data.userCollection
+    const {
+      openid,
+      userCollection
+    } = ctx.data;
+    let result = await userCollection
       .where({
-        _openid: ctx.data.openid
+        _openid: openid
       })
       .limit(1)
+      .field({
+        state: true
+      })
       .get();
 
 
-    let data = result.data;
+    let users = result.data;
 
-    if (!data.length) {
-      ctx.body = {
-        code: HttpCode.Success,
-        data: UserState.UnRegistered
-      };
-    } else {
-      ctx.body = {
-        code: HttpCode.Success,
-        data: data[0].state
-      };
+    ctx.body = {
+      code: HttpCode.Success,
+      data: users.length ? users[0].state : UserState.UnRegistered
     }
   })
 
   app.router('login', async(ctx) => {
+    const {
+      openid,
+      userCollection
+    } = ctx.data;
+
     try {
-      let self = await login(ctx.data.openid)
+      let self = await login(openid)
       ctx.body = {
         code: HttpCode.Success,
         data: self
@@ -83,60 +88,69 @@ exports.main = async(event, context) => {
   })
 
   app.router('getUserInfo', async(ctx) => {
-    const userID = event.userID;
+    const {
+      userID
+    } = event;
 
-    try {
-      let result = await ctx.data.userCollection
-        .doc(userID)
-        .get()
+    const {
+      openid,
+      userCollection
+    } = ctx.data;
 
-      if (!result) {
-        ctx.body = {
-          code: HttpCode.Not_Found,
-          message: '找不到该用户信息',
-        }
-      } else {
-        let user = result.data;
+    let result = await userCollection
+      .doc(userID)
+      .field({
+        _openid: false
+      })
+      .get()
 
-        delete user._openid;
-        ctx.body = {
-          code: HttpCode.Success,
-          data: user
-        }
-      }
+    let user = result.data;
 
-    } catch (e) {
-      ctx.body = {
-        code: HttpCode.Not_Found,
-        message: '找不到该用户信息',
-      }
+    ctx.body = {
+      code: HttpCode.Success,
+      data: user
     }
   })
 
   app.router('getUsersByAdmin', async(ctx) => {
-    let result = await ctx.data.userCollection
-      .where(command
-        .or([{
-          nickname: db.RegExp({
-            regexp: event.keyword,
-            options: 'i',
-          }),
-        }, {
-          phone: db.RegExp({
-            regexp: event.keyword,
-            options: 'i',
-          }),
-        }, {
-          email: db.RegExp({
-            regexp: event.keyword,
-            options: 'i',
-          }),
-        }]).and({
-          state: event.state
-        }))
-      .skip(event.lastIndex)
-      .limit(event.size)
-      .get()
+    const {
+      keyword,
+      lastIndex,
+      size,
+      state
+    } = event
+
+    const {
+      openid,
+      userCollection
+    } = ctx.data;
+
+    let result = await userCollection
+      .where(keyword ? command
+        .or(
+          [{
+            nickname: db.RegExp({
+              regexp: keyword,
+              options: 'i',
+            }),
+          }, {
+            phone: db.RegExp({
+              regexp: keyword,
+              options: 'i',
+            }),
+          }, {
+            email: db.RegExp({
+              regexp: keyword,
+              options: 'i',
+            }),
+          }])
+        .and({
+          state
+        }) : {
+          state
+        })
+      .skip(lastIndex)
+      .limit(size)
 
     ctx.body = {
       code: HttpCode.Success,
@@ -145,13 +159,23 @@ exports.main = async(event, context) => {
   })
 
   app.router("updateUserByAdmin", async(ctx) => {
-    await ctx.data.userCollection
+    const {
+      userID,
+      state
+    } = event
+
+    const {
+      openid,
+      userCollection
+    } = ctx.data;
+
+    await userCollection
       .where({
-        _id: event.userID,
+        _id: userID,
       })
       .update({
         data: {
-          state: event.state
+          state
         }
       })
 
@@ -163,28 +187,27 @@ exports.main = async(event, context) => {
   return app.serve();
 }
 
-async function login(openid) {
+const login = async(openid) => {
   let result = await db.collection('user')
     .where({
       _openid: openid
     })
     .limit(1)
+    .field({
+      _openid: false
+    })
     .get();
 
-  let data = result.data;
+  let users = result.data;
 
-  if (!data.length) {
+  if (!users.length) {
     throw {
       code: HttpCode.Not_Found,
       message: '找不到您的个人信息'
     }
   }
 
-  let self = data[0];
-
-  delete self._openid;
-
-  return self;
+  return users[0];
 }
 
 const UserState = {
