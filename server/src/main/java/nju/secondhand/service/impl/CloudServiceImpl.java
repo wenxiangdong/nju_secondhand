@@ -58,7 +58,7 @@ public class CloudServiceImpl implements CloudService {
 
     @SafeVarargs
     @Override
-    public final <T> List<T> databaseQuery(Class<T> tClass, String collectionName, int skip, int limit, Map<String, Object>... conditions) {
+    public final <T> List<T> databaseQuery(Class<T> tClass, String collectionName, int skip, int limit, Map<Object, Object>... conditions) {
         log.info("Query: " + collectionName);
         String url = String.format("https://api.weixin.qq.com/tcb/databasequery?access_token=%s",
                 getAccessToken());
@@ -89,7 +89,7 @@ public class CloudServiceImpl implements CloudService {
 
     @SafeVarargs
     @Override
-    public final long databaseCount(String collectionName, Map<String, Object>... conditions) {
+    public final long databaseCount(String collectionName, Map<Object, Object>... conditions) {
         log.info("Count: " + collectionName);
         String url = String.format("https://api.weixin.qq.com/tcb/databasecount?access_token=%s",
                 getAccessToken());

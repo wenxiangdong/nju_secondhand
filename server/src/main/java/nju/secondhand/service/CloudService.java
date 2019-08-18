@@ -38,7 +38,7 @@ public interface CloudService {
      * @param conditions     筛选条件
      * @return 符合条件的记录数
      */
-    long databaseCount(String collectionName, Map<Object, Object> conditions);
+    long databaseCount(String collectionName, Map<Object, Object>... conditions);
 
     /**
      * 根据文件 ID 换取真实链接
