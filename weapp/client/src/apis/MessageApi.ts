@@ -36,7 +36,8 @@ class MessageHub {
         try {
           ob(vo)
         } catch (e) {
-          console.error("监听消息出错", e, ob);
+          if (e.message && e.message.indexOf('.atMessage is not a function') < 0)
+            console.error("监听消息出错", e, ob);
         }
       });
       // store
