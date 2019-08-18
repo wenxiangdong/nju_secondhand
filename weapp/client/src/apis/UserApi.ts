@@ -3,7 +3,6 @@ import {VO, httpRequest, db, Fail, HttpCode, mockHttpRequest} from "./HttpReques
 import {AccountVO, MockAccountApi} from "./AccountApi";
 import {Debugger} from "inspector";
 import Location = module
-import localConfig from "../utils/local-config";
 
 export interface IUserApi {
   // 检查用户状态

@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro'
 import {View, Text} from '@tarojs/components'
 import {GoodsWithSellerVO, MockGoodsApi} from "../../../apis/GoodsApi";
-import AddressShowBar from "../address-show-bar";
+import AddressShowBar from "../../common/address-show-bar";
 import UserBriefInfoBar from "../../common/user-brief-info-bar";
 
 import "taro-ui/dist/style/components/flex.scss";

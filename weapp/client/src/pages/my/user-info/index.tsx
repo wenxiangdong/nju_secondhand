@@ -12,10 +12,10 @@ import {CSSProperties} from "react";
 import {AtButton, AtForm, AtInput} from "taro-ui";
 import WechatUserInfoBar from "../../../components/common/wechat-user-info-bar";
 import WhiteSpace from "../../../components/common/white-space";
-import DLocation from "../../../components/common/d-location/DLocation";
 import DUserInfoBar from "../../../components/common/d-user-info-bar";
 import {isInvalidEmail, isInvalidPhone} from "../../../utils/valid-util";
 import DChooseLocation from "../../../components/common/d-choose-location/DChooseLocation";
+import AddressShowBar from "../../../components/common/address-show-bar";
 
 function createStyles() {
   const rootViewStyle: CSSProperties = {
@@ -287,7 +287,7 @@ export default class index extends Component<any, IState> {
             ? <WechatUserInfoBar/>
             : <DUserInfoBar avatar={avatar} nickname={nickname}/>
         }
-        <AtButton type='primary' openType='getUserInfo'
+        <AtButton type='secondary' openType='getUserInfo'
                   customStyle={styles.buttonStyle}
                   onGetUserInfo={this.setModifyUserInfo}>
           授权头像昵称
@@ -336,8 +336,8 @@ export default class index extends Component<any, IState> {
             ? null
             : (
               modifyInfo.address.name
-                ? <DLocation location={modifyInfo.address} style={styles.locationStyle}/>
-                : <DLocation location={address} style={styles.locationStyle}/>
+                ? <AddressShowBar address={modifyInfo.address}/>
+                : <AddressShowBar address={address}/>
             )
         }
 

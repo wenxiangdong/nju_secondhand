@@ -8,12 +8,12 @@ import {createSimpleErrorHandler} from "../../utils/function-factory";
 import ConfirmModal from "../../components/common/confirm-modal";
 import WechatUserInfoBar from "../../components/common/wechat-user-info-bar";
 import {AtButton, AtForm, AtInput} from "taro-ui";
-import DLocation from "../../components/common/d-location/DLocation";
 import WhiteSpace from "../../components/common/white-space";
 import {isInvalidEmail, isInvalidPhone} from "../../utils/valid-util";
 import {CSSProperties} from "react";
 import localConfig from "../../utils/local-config";
 import DChooseLocation from "../../components/common/d-choose-location/DChooseLocation";
+import AddressShowBar from "../../components/common/address-show-bar";
 
 function createStyles() {
   const rootViewStyle: CSSProperties = {
@@ -247,7 +247,7 @@ export default class index extends Component<any, IState> {
           registerInfo.avatar
             ? <WechatUserInfoBar/>
             : (
-              <AtButton type='primary' openType='getUserInfo'
+              <AtButton openType='getUserInfo'
                         customStyle={styles.buttonStyle}
                         onGetUserInfo={this.setRegisterUserInfo}>
                 请授权头像昵称
@@ -295,7 +295,7 @@ export default class index extends Component<any, IState> {
         <DChooseLocation onGetLocation={this.onGetLocation}/>
         {
           registerInfo.address.name && !isRegistering
-            ? <DLocation location={registerInfo.address} style={styles.locationStyle}/>
+            ? <AddressShowBar address={registerInfo.address}/>
             : null
         }
 

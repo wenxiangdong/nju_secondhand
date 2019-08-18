@@ -105,7 +105,7 @@ export default class DChooseLocation extends Component<IProp, IState> {
             : null
         }
 
-        <AtButton type='primary' customStyle={styles.buttonStyle}
+        <AtButton type='secondary' customStyle={styles.buttonStyle}
                   onClick={this.onChooseLocation}>
           请选择地点
         </AtButton>
