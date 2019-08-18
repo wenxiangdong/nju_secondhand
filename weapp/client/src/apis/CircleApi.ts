@@ -10,6 +10,8 @@ export interface ICircleApi {
   comment(postID: string, content: string): Promise<void>;
 
   getPostById(postId: string): Promise<PostVO>;
+
+  searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]>;
 }
 
 const postCollection = db.collection('post');
@@ -34,6 +36,11 @@ class CircleApi implements ICircleApi {
 
   async getPostById(postId: string): Promise<PostVO> {
     return await httpRequest.callFunction<PostVO>(functionName, { $url: "getPostById" });
+  }
+
+  searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]> {
+    // TODO
+    throw new Error("Method not implemented.");
   }
 }
 
@@ -78,6 +85,10 @@ class MockCircleApi implements ICircleApi {
       commentTime: Date.now(),
       content: ''
     }
+  }
+
+  searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]> {
+    throw new Error("Method not implemented.");
   }
 }
 

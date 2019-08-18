@@ -270,6 +270,8 @@ export interface ICircleApi {
     comment(postID: string, content: string): Promise<void>;
   
     getPostById(postId: string): Promise<PostVO>;
+
+    searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]>; // 不需要
 }
 
 // 需要注册且未冻结
