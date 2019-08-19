@@ -37,6 +37,7 @@ class App extends Component {
       'pages/index/location/index',
 
       'pages/login/index',
+      'pages/login/frozen_error/index',
 
       'pages/message/index',
       'pages/message/system/index',
