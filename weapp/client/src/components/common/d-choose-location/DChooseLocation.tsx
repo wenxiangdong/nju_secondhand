@@ -3,7 +3,7 @@ import {View} from '@tarojs/components'
 import {AtButton} from "taro-ui";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import {CSSProperties} from "react";
-import ConfirmModal from "../confirm-modal";
+// import ConfirmModal from "../confirm-modal";
 
 function createStyles() {
   const buttonStyle: CSSProperties = {
@@ -67,7 +67,11 @@ export default class DChooseLocation extends Component<IProp, IState> {
     Taro.getSetting()
       .then(res => {
         if (!res.authSetting[userLocationSetting]) {
-          this.setState({chooseLoading: false});
+          Taro.authorize({
+            scope: userLocationSetting
+          }).then(() => {
+            chooseLocation()
+          }).catch(this.onError)
         } else {
           chooseLocation();
         }
@@ -75,24 +79,24 @@ export default class DChooseLocation extends Component<IProp, IState> {
       .catch(this.onError);
   };
 
-  private handleCancel = () => {
-    this.setState({isChoosingLocation: false, chooseLoading: false, errMsg: undefined});
-  };
+  // private handleCancel = () => {
+  //   this.setState({isChoosingLocation: false, chooseLoading: false, errMsg: undefined});
+  // };
 
-  private handleConfirm = () => {
-    Taro.openSetting()
-      .then(() => {
-        this.setState({isChoosingLocation: false, chooseLoading: false});
-      })
-      .catch(this.onError);
-  };
+  // private handleConfirm = () => {
+  //   Taro.openSetting()
+  //     .then(() => {
+  //       this.setState({isChoosingLocation: false, chooseLoading: false});
+  //     })
+  //     .catch(this.onError);
+  // };
 
   render() {
-    const {isChoosingLocation, chooseLoading, errMsg} = this.state;
+    // const {isChoosingLocation, chooseLoading, errMsg} = this.state;
     return (
       <View>
 
-        {
+        {/* {
           isChoosingLocation
             ? (
               <ConfirmModal loading={chooseLoading}
@@ -103,7 +107,7 @@ export default class DChooseLocation extends Component<IProp, IState> {
                             content={'请提供您的位置信息\n信息将被用于您发布的商品的参考信息'}/>
             )
             : null
-        }
+        } */}
 
         <AtButton type='secondary' customStyle={styles.buttonStyle}
                   onClick={this.onChooseLocation}>

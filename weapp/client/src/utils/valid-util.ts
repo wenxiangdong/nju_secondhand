@@ -1,6 +1,6 @@
 export function isInvalidEmail(email: string): boolean {
   // 南京大学本科生校邮
-  return !/^\d{9}@smail\.nju\.edu\.cn$/.test(email);
+  return !/^@smail\.nju\.edu\.cn$/.test(email);
 }
 
 export function isInvalidPhone(phone: string): boolean {
