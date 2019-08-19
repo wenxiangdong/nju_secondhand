@@ -14,6 +14,8 @@ export interface IOrderApi {
   getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
   getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+
+  
 }
 
 const functionName = 'orderApi'

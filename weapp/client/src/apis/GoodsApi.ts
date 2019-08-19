@@ -36,7 +36,7 @@ export interface IGoodsApi {
   getGoods(goodsID: string): Promise<GoodsVO>;
 
   // 购买商品
-  purchase(goodsID: string): Promise<void>;
+  purchase(goodsID: string): Promise<PurchaseResult>;
 
   // 获取浏览过的商品和销售者信息
   getVisitedGoodsWithSeller(keyword: string, lastIndex: number): Promise<GoodsWithSellerVO[]>;
@@ -76,8 +76,8 @@ class GoodsApi implements IGoodsApi {
   async searchGoodsByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsVO[]> {
     return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByCategory", categoryID, lastIndex, size });
   }
-  async purchase(goodsID: string): Promise<void> {
-    return await httpRequest.callFunction<void>(functionName, { $url: "purchase", goodsID });
+  async purchase(goodsID: string): Promise<PurchaseResult> {
+    return await httpRequest.callFunction<PurchaseResult>(functionName, { $url: "purchase", goodsID });
   }
 
   async searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
@@ -153,9 +153,16 @@ class MockGoodsApi implements IGoodsApi {
       return mockHttpRequest.success(goodsArray);
     }
   }
-  purchase(goodsID: string): Promise<void> {
+  purchase(goodsID: string): Promise<PurchaseResult> {
     console.log('purchase goodsID:', goodsID);
-    return mockHttpRequest.success();
+    return mockHttpRequest.success({
+      nonceStr: "Eitm6bNcNBuiuF6E",
+      package: "prepay_id=wx142304056617426311ec67b91052901600",
+      paySign: "7304A5C335B29CA6B09A7FBA02309C8C",
+      signType: "MD5",
+      timeStamp: "1565795040",
+      orderID: "orderID"
+    } as PurchaseResult);
   }
 
   searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number = 10): Promise<GoodsWithSellerVO[]> {
@@ -277,4 +284,12 @@ export interface GoodsWithSellerVO {
 export enum GoodsState {
   InSale,
   Deleted
+}
+
+export interface PurchaseResult {
+  timeStamp: string,
+  nonceStr: string,
+  package: string,
+  signType: string,
+  orderID: string
 }
