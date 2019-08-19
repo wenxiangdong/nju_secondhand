@@ -1,7 +1,7 @@
 import Taro, {Component} from '@tarojs/taro'
 import {View} from '@tarojs/components'
-import {GoodsWithSellerVO, MockGoodsApi} from "../../../apis/GoodsApi";
-import urlList, {chatUrlConfig} from "../../../utils/url-list";
+import {GoodsWithSellerVO, MockGoodsApi, PurchaseResult} from "../../../apis/GoodsApi";
+import urlList, {chatUrlConfig, resultUrlConfig} from "../../../utils/url-list";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import WhiteSpace from "../../common/white-space";
 import {AtButton} from "taro-ui";
@@ -12,6 +12,8 @@ import "taro-ui/dist/style/components/modal.scss";
 import {apiHub} from "../../../apis/ApiHub";
 import ConfirmModal from "../../common/confirm-modal";
 import {relaunchTimeout} from "../../../utils/date-util";
+
+import "@tarojs/async-await";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO
@@ -73,22 +75,73 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
     this.setState({...this.defaultBuyingState});
   };
 
-  private handleConfirm = () => {
-    const that = this;
-    this.setState({buyingLoading: true}, function() {
-      apiHub.goodsApi.purchase(that.props.goodsWithSeller.goods._id)
-        .then(function() {
-          const sucMsg = '购买完成';
-          that.setState({sucMsg, buyingLoading: false}, function() {
-            setTimeout(function() {
-              Taro.reLaunch({
-                url: urlList.INDEX
-              }).catch(that.onError);
-            },  relaunchTimeout);
-          });
-        })
-        .catch(that.onError);
+  private handleConfirm = async () => {
+    this.setState({buyingLoading: true});
+    let res: PurchaseResult | undefined = undefined;
+    try {
+      res = await apiHub.goodsApi.purchase(this.props.goodsWithSeller.goods._id);
+    } catch (error) {
+      this.onError(error);
+    }
+    // 购买失败
+    if (!res) {
+      return;
+    }
+    let payResult: 0 | -1 = 0;
+    try {
+      await Taro.requestPayment({
+        nonceStr: res.nonceStr,
+        signType: res.signType,
+        timeStamp: res.timeStamp,
+        paySign: res.paySign,
+        package: res.package
+      });
+    } catch (error) {
+      console.error(error);
+      payResult = -1;
+      this.onError(new Error("支付失败"));
+    }
+    apiHub.orderApi.orderCallback(res.orderID, payResult)
+      .then(() => {
+        console.log("订单回调成功")
+      })
+      .catch(() => {
+        console.log("订单回调失败");
+      });
+    // 支付失败
+    if (payResult === -1) {
+      return;
+    }
+    resultUrlConfig.go({
+      title: "购买成功",
+      status: "success",
+      tip: "去【我买过的】看看",
+      link: urlList.MY_BOUGHT
     });
+    // this.setState({buyingLoading: true}, function() {
+    //   apiHub.goodsApi.purchase(that.props.goodsWithSeller.goods._id)
+    //     .then((res: PurchaseResult) => {
+    //       return Taro.requestPayment({
+    //         nonceStr: res.nonceStr,
+    //         signType: res.signType,
+    //         timeStamp: res.timeStamp,
+    //         paySign: res.paySign,
+    //         package: res.package
+    //       });
+    //       // const sucMsg = '购买完成';
+    //       // that.setState({sucMsg, buyingLoading: false}, function() {
+    //       //   setTimeout(function() {
+    //       //     Taro.reLaunch({
+    //       //       url: urlList.INDEX
+    //       //     }).catch(that.onError);
+    //       //   },  relaunchTimeout);
+    //       // });
+    //     })
+    //     .then(res => {
+
+    //     })
+    //     .catch(that.onError);
+    // });
   };
 
   render() {

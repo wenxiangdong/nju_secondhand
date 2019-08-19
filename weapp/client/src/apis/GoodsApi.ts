@@ -291,5 +291,6 @@ export interface PurchaseResult {
   nonceStr: string,
   package: string,
   signType: string,
+  paySign: string,
   orderID: string
 }

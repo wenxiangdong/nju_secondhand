@@ -15,12 +15,19 @@ export interface IOrderApi {
 
   getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
 
-  
+  orderCallback(orderID: string, result: 0 | -1): Promise<void>;
 }
 
 const functionName = 'orderApi'
 
 class OrderApi implements IOrderApi {
+  async orderCallback(orderID: string, result: 0 | -1): Promise<void> {
+    return await httpRequest.callFunction<void>(functionName, {
+      $url: "orderCallback",
+      orderID,
+      result
+    });
+  }
   async getBuyerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
     return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getBuyerOrders", lastIndex, size, state: OrderState.Ongoing });
   }
@@ -43,6 +50,9 @@ class OrderApi implements IOrderApi {
 }
 
 class MockOrderApi implements IOrderApi {
+  orderCallback(orderID: string, result: 0 | -1): Promise<void> {
+    return mockHttpRequest.success();
+  }
   private ordersCount = 20;
 
   getBuyerOngoingOrders(lastIndex: number, size: number = 10): Promise<OrderVO[]> {
