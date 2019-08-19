@@ -265,7 +265,7 @@ exports.main = async(event, context) => {
         }
       })
 
-    return {
+    ctx.body = {
       code: HttpCode.Success
     }
   })
@@ -287,7 +287,7 @@ exports.main = async(event, context) => {
       })
       .get();
       if (!goodsList || !goodsList.length) {
-        throw {
+        ctx.body = {
           code: HttpCode.Not_Found,
           message: '找不到该商品'
         }
@@ -334,14 +334,13 @@ exports.main = async(event, context) => {
           }
         });
         console.error(error);
-        throw {
+        ctx.body = {
           code: HttpCode.Fail,
           message: "下单失败，请重试"
         };
       }
       // 调用支付
-      return (
-        await cloud.callFunction("accountApi", {
+      const result = await cloud.callFunction("accountApi", {
           /**
            * 参数
            * payTitle 支付的标题，例“商品xxx”
@@ -352,8 +351,11 @@ exports.main = async(event, context) => {
           payAmount: order.price,
           orderID: order._id,
           $url: "pay",
-        })
-      ).result;
+        }).result;
+      ctx.body = {
+        code: HttpCode.Success,
+        data: result
+      };
   })
 
   return app.serve();
