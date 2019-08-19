@@ -291,6 +291,7 @@ exports.main = async(event, context) => {
           code: HttpCode.Not_Found,
           message: '找不到该商品'
         }
+        return;
       }
       // 对商品下单，创建订单和让商品下架
       await goodsCollection.doc(goodsID).update({
@@ -338,9 +339,11 @@ exports.main = async(event, context) => {
           code: HttpCode.Fail,
           message: "下单失败，请重试"
         };
+        return;
       }
       // 调用支付
-      const result = await cloud.callFunction("accountApi", {
+      try {
+        const result = (await cloud.callFunction("accountApi", {
           /**
            * 参数
            * payTitle 支付的标题，例“商品xxx”
@@ -351,11 +354,21 @@ exports.main = async(event, context) => {
           payAmount: order.price,
           orderID: order._id,
           $url: "pay",
-        }).result;
-      ctx.body = {
-        code: HttpCode.Success,
-        data: result
-      };
+        })).result;
+        // 调用云函数是否正常
+        ctx.body = {
+          code: result.code,
+          data: {
+            ...result.data,
+            orderID: order._id
+          }
+        };
+      } catch (error) {
+        ctx.body = {
+          code: HttpCode.Fail,
+          message: "微信支付服务出错"
+        }
+      }
   })
 
   return app.serve();

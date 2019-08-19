@@ -69,17 +69,23 @@ exports.main = async (event, context) => {
     amount = parseFloat(amount);
     balance = parseFloat(balance);
     if (balance < amount) {
-      throw {
+      ctx.body = {
         code: HttpCode.Conflict,
         message: "账户余额不足"
       }
+      return;
     }
 
     // 微信企业付款
-    await withdraw({
-      openID: ctx.data.openid,
-      amount: amount
-    });
+    try {
+      await withdraw({
+        openID: ctx.data.openid,
+        amount: amount
+      });
+    } catch (error) {
+      ctx.body = error;
+      return;
+    }
 
     // 更新数据库
     await userCollection
@@ -92,7 +98,7 @@ exports.main = async (event, context) => {
         }
       })
 
-    return {
+     ctx.body = {
       code: HttpCode.Success
     }
   })

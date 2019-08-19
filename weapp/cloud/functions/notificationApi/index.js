@@ -75,6 +75,10 @@ exports.main = async(event, context) => {
       .add({
         data: notification
       })
+      
+    ctx.body = {
+      code: HttpCode.Success
+    }
   })
 
   return app.serve();
