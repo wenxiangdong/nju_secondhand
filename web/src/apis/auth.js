@@ -13,7 +13,7 @@ class MockAuthApi implements IAuthApi {
 class AuthApi implements IAuthApi{
     async login(username, password) {
         return http.post(
-            "",
+            "/login",
             {
                 username, password
             }
