@@ -7,6 +7,7 @@ import { IComplaintApi, complainApi, mockComplaintApi } from "./ComplaintApi";
 import { INotificationApi, notificationApi, mockNotificationApi } from "./NotificationApi";
 import { IOrderApi, orderApi, mockOrderApi } from "./OrderApi";
 import { IUserApi, userApi, mockUserApi } from "./UserApi";
+import configApi, { ConfigApi } from "./Config";
 
 export interface IApiHub {
   accountApi: IAccountApi;
@@ -17,6 +18,7 @@ export interface IApiHub {
   notificationApi: INotificationApi;
   orderApi: IOrderApi;
   userApi: IUserApi;
+  configApi: ConfigApi
 }
 
 class ApiHub implements IApiHub {
@@ -28,6 +30,7 @@ class ApiHub implements IApiHub {
   notificationApi: INotificationApi = notificationApi;
   orderApi: IOrderApi = orderApi;
   userApi: IUserApi = userApi;
+  configApi = configApi;
 }
 
 class MockApiHub implements IApiHub {
@@ -39,6 +42,7 @@ class MockApiHub implements IApiHub {
   notificationApi: INotificationApi = mockNotificationApi;
   orderApi: IOrderApi = mockOrderApi;
   userApi: IUserApi = mockUserApi;
+  configApi = configApi;
 }
 
 export const mock = true;

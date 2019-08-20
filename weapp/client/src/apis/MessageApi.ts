@@ -31,6 +31,8 @@ class MessageHub {
     this.websocket.onMessage((ev: Taro.onSocketMessage.ParamParam) => {
       // console.log("onmessage", ev);
       const vo: MessageVO = JSON.parse(ev.data);
+      // store
+      this.addMessageToList(vo.senderID, vo);
       // notify
       this.observers.forEach(ob => {
         try {
@@ -40,8 +42,6 @@ class MessageHub {
             console.error("监听消息出错", e, ob);
         }
       });
-      // store
-      this.addMessageToList(vo.senderID, vo);
     })
   }
 

@@ -11,6 +11,7 @@ import localConfig from "../../utils/local-config";
 import {apiHub} from "../../apis/ApiHub";
 import {relaunchTimeout} from "../../utils/date-util";
 import LoadingPage from "../../components/common/loading-page";
+import DeveloperFooter from '../../components/common/developer-footer';
 
 interface IState {
   loading: boolean,
@@ -59,11 +60,11 @@ export default class My extends Component<any, IState> {
       title: '平台账户',
       iconInfo: {value: 'credit-card'},
     },
-    {
-      page: urlList.MY_SOFTWARE_LICENSE_AGREEMENT,
-      title: '软件许可使用协议',
-      iconInfo: {value: 'heart'},
-    },
+    // {
+    //   page: urlList.MY_SOFTWARE_LICENSE_AGREEMENT,
+    //   title: '软件许可使用协议',
+    //   iconInfo: {value: 'heart'},
+    // },
     {
       page: urlList.MY_PRIVACY_POLICY,
       title: '隐私权条款',
@@ -76,7 +77,7 @@ export default class My extends Component<any, IState> {
     },
     {
       page: urlList.MY_COMPLAINT,
-      title: '订单反馈',
+      title: '反馈',
       iconInfo: {value: 'phone'},
     },
   ];
@@ -156,6 +157,7 @@ export default class My extends Component<any, IState> {
             }
           )}
         </AtList>
+        <DeveloperFooter />
         <MainTabBar currentIndex={MainTabBar.MY_INDEX}/>
       </View>
     )

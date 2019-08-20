@@ -3,31 +3,24 @@ import {View, Text, Button} from "@tarojs/components";
 import './index.scss'
 import "@tarojs/async-await";
 import urlList, {complaintFormUrlConfig, resultUrlConfig, sendPostUrlConfig} from "../../utils/url-list";
+import { apiHub } from '../../apis/ApiHub';
+import DeveloperFooter from '../../components/common/developer-footer';
+
 
 function Dev() {
 
   const handleClick = async () => {
-    // try {
-    //   await Taro.requestPayment({
-    //     nonceStr: "Eitm6bNcNBuiuF6E",
-    //     package: "prepay_id=wx142304056617426311ec67b91052901600",
-    //     paySign: "7304A5C335B29CA6B09A7FBA02309C8C",
-    //     signType: "MD5",
-    //     timeStamp: "1565795040"
-    //   });
-    //   Taro.showToast({
-    //     title: "支付成功"
-    //   });
-    // } catch (error) {
-    //   console.error(error);
-    // }
-    sendPostUrlConfig.go();
+    console.log(apiHub.configApi.getAllConfigs());
+    Taro.reLaunch({
+      url: urlList.MY
+    })
   };
 
   return (
     <View>
       <Text>Dev works</Text>
       <Button onClick={handleClick}>go</Button>
+      <DeveloperFooter />
     </View>
   )
 }
