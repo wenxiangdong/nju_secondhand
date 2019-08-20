@@ -11,16 +11,11 @@ import nju.secondhand.response.HttpCode;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SystemException extends RuntimeException {
-    int code;
+    HttpCode code;
 
     String message;
 
     SystemException(HttpCode code, String message) {
-        this.code = code.getCode();
-        this.message = message;
-    }
-
-    public SystemException(int code, String message) {
         this.code = code;
         this.message = message;
     }

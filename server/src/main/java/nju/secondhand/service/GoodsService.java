@@ -22,9 +22,10 @@ public interface GoodsService {
      * @param keyword   关键词
      * @param lastIndex 之前总共查询到的数量
      * @param size      本次查询数量
+     * @param timestamp 时间戳
      * @return {@link GoodsVO}
      */
-    List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size);
+    List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size, long timestamp);
 
     /**
      * 根据商品类别取得在售商品
@@ -32,9 +33,10 @@ public interface GoodsService {
      * @param categoryID 商品类别 ID
      * @param lastIndex  之前总共查询到的数量
      * @param size       本次查询数量
+     * @param timestamp  时间戳
      * @return {@link GoodsVO}
      */
-    List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size);
+    List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size, long timestamp);
 
     /**
      * 下架商品

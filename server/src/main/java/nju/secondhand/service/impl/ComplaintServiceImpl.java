@@ -1,20 +1,19 @@
 package nju.secondhand.service.impl;
 
-import com.google.common.collect.ImmutableMap;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.service.ComplaintService;
+import nju.secondhand.util.MapObjectUtil;
+import nju.secondhand.util.Pair;
 import nju.secondhand.vo.ComplaintVO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author cst
  */
 @Service
 public class ComplaintServiceImpl implements ComplaintService {
-    private static final String COMPLAINT_API = "complaintApi";
     private final CloudService cloudService;
 
     public ComplaintServiceImpl(CloudService cloudService) {
@@ -22,26 +21,23 @@ public class ComplaintServiceImpl implements ComplaintService {
     }
 
     @Override
-    public List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size) {
-        Map<Object, Object> map =
-                ImmutableMap.builder()
-                        .put("$url", "getComplaintsByAdmin")
-                        .put("keyword", keyword)
-                        .put("lastIndex", lastIndex)
-                        .put("size", size)
-                        .build();
+    public List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size, long timestamp) {
         //noinspection unchecked
-        return cloudService.invokeCloudFunction(List.class, COMPLAINT_API, map);
+        return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
+                Pair.of("$url", "getComplaints"),
+                Pair.of("keyword", keyword),
+                Pair.of("lastIndex", lastIndex),
+                Pair.of("size", size),
+                Pair.of("timestamp", timestamp)
+        ));
     }
 
     @Override
     public void handle(String complaintID, String result) {
-        Map<Object, Object> map =
-                ImmutableMap.builder()
-                        .put("$url", "handle")
-                        .put("complaintID", complaintID)
-                        .put("result", result)
-                        .build();
-        cloudService.invokeCloudFunction(Void.class, COMPLAINT_API, map);
+        cloudService.invokeCloudFunction(Void.class, MapObjectUtil.mapObject(
+                Pair.of("$url", "handle"),
+                Pair.of("complaintID", complaintID),
+                Pair.of("result", result)
+        ));
     }
 }

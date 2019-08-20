@@ -15,9 +15,10 @@ public interface ComplaintService {
      * @param keyword   关键词
      * @param lastIndex 之前总共查询到的数量
      * @param size      本次查询数量
+     * @param timestamp 时间戳
      * @return {@link ComplaintVO}
      */
-    List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size);
+    List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size, long timestamp);
 
     /**
      * <p>处理投诉</p>

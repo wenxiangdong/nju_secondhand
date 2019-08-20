@@ -22,9 +22,9 @@ public class UserController {
     }
 
     @GetMapping("/getNormalUsers")
-    public HttpResponse<List<UserVO>> getNormalUsers(String keyword, int lastIndex, int size, HttpSession session) {
+    public HttpResponse<List<UserVO>> getNormalUsers(String keyword, int lastIndex, int size, long timestamp, HttpSession session) {
         LoginUtil.checkLogin(session);
-        return new HttpResponse<>(userService.getNormalUsers(keyword, lastIndex, size));
+        return new HttpResponse<>(userService.getNormalUsers(keyword, lastIndex, size, timestamp));
     }
 
     @PostMapping("/freezeUser")
@@ -35,9 +35,9 @@ public class UserController {
     }
 
     @GetMapping("/getFrozenUsers")
-    public HttpResponse<List<UserVO>> getFrozenUsers(String keyword, int lastIndex, int size, HttpSession session) {
+    public HttpResponse<List<UserVO>> getFrozenUsers(String keyword, int lastIndex, int size, long timestamp, HttpSession session) {
         LoginUtil.checkLogin(session);
-        return new HttpResponse<>(userService.getFrozenUsers(keyword, lastIndex, size));
+        return new HttpResponse<>(userService.getFrozenUsers(keyword, lastIndex, size, timestamp));
     }
 
     @PostMapping("/unfreezeUser")

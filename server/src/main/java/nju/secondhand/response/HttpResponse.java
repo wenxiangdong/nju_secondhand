@@ -31,11 +31,5 @@ public class HttpResponse<T> {
         this.code = code.code;
         this.message = message;
     }
-
-    public HttpResponse(int code, String message) {
-        this.data = null;
-        this.code = code;
-        this.message = message;
-    }
 }
 

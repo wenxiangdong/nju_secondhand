@@ -22,9 +22,9 @@ public class ComplaintController {
     }
 
     @GetMapping("/getComplaints")
-    public HttpResponse<List<ComplaintVO>> getComplaints(String keyword, int lastIndex, int size, HttpSession session) {
+    public HttpResponse<List<ComplaintVO>> getComplaints(String keyword, int lastIndex, int size, long timestamp, HttpSession session) {
         LoginUtil.checkLogin(session);
-        return new HttpResponse<>(complaintService.getComplaints(keyword, lastIndex, size));
+        return new HttpResponse<>(complaintService.getComplaints(keyword, lastIndex, size, timestamp));
     }
 
     @PostMapping("/handle")

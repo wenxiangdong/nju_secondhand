@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.extern.log4j.Log4j2;
 import nju.secondhand.config.MiniProgramConfig;
 import nju.secondhand.exception.FailException;
-import nju.secondhand.exception.SystemException;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.service.HttpService;
 import nju.secondhand.util.JsonUtil;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author cst
@@ -34,12 +31,11 @@ public class CloudServiceImpl implements CloudService {
     }
 
     @Override
-    public <T> T invokeCloudFunction(Class<T> tClass, String name, Object object) {
-        log.info("Invoke: " + name);
+    public <T> T invokeCloudFunction(Class<T> tClass, Object object) {
         String url = String.format("https://api.weixin.qq.com/tcb/invokecloudfunction?access_token=%s&env=%s&name=%s",
                 getAccessToken(),
                 miniProgramConfig.getEnv(),
-                name);
+                miniProgramConfig.getApi());
 
         FunctionResult result = httpService.post(url, JsonUtil.toJson(object), FunctionResult.class);
 
@@ -47,70 +43,7 @@ public class CloudServiceImpl implements CloudService {
             throw new FailException(result.errmsg);
         }
 
-        @SuppressWarnings("unchecked")
-        CloudHttpResponse<T> httpResponse = JsonUtil.fromJson(result.resp_data, CloudHttpResponse.class);
-        if (httpResponse.code == 200) {
-            return httpResponse.data;
-        } else {
-            throw new SystemException(httpResponse.code, httpResponse.message);
-        }
-    }
-
-    @SafeVarargs
-    @Override
-    public final <T> List<T> databaseQuery(Class<T> tClass, String collectionName, int skip, int limit, Map<Object, Object>... conditions) {
-        log.info("Query: " + collectionName);
-        String url = String.format("https://api.weixin.qq.com/tcb/databasequery?access_token=%s",
-                getAccessToken());
-
-        String query = String.format("db.collection('%s')%s.skip(%d).limit(%d).get()",
-                collectionName,
-                conditions.length != 0 ?
-                        String.format(".where(_or(%s))", JsonUtil.toJson(conditions)) : "",
-                skip,
-                limit);
-
-        DatabaseParam databaseParam = DatabaseParam.builder()
-                .env(miniProgramConfig.getEnv())
-                .query(query)
-                .build();
-
-        QueryResult result = httpService.post(url, JsonUtil.toJson(databaseParam), QueryResult.class);
-
-        if (result.invalid()) {
-            throw new FailException(result.errmsg);
-        }
-
-        return result.data
-                .stream()
-                .map(json -> JsonUtil.fromJson(json, tClass))
-                .collect(Collectors.toList());
-    }
-
-    @SafeVarargs
-    @Override
-    public final long databaseCount(String collectionName, Map<Object, Object>... conditions) {
-        log.info("Count: " + collectionName);
-        String url = String.format("https://api.weixin.qq.com/tcb/databasecount?access_token=%s",
-                getAccessToken());
-
-        String query = String.format("db.collection('%s')%s.count()",
-                collectionName,
-                conditions.length != 0 ?
-                        String.format(".where(_or(%s))", JsonUtil.toJson(conditions)) : "");
-
-        DatabaseParam databaseParam = DatabaseParam.builder()
-                .env(miniProgramConfig.getEnv())
-                .query(query)
-                .build();
-
-        CountResult result = httpService.post(url, JsonUtil.toJson(databaseParam), CountResult.class);
-
-        if (result.invalid()) {
-            throw new FailException(result.errmsg);
-        }
-
-        return result.count;
+        return JsonUtil.fromJson(result.resp_data, tClass);
     }
 
     @Override
@@ -160,12 +93,6 @@ public class CloudServiceImpl implements CloudService {
 }
 
 @Builder
-class DatabaseParam {
-    String env;
-    String query;
-}
-
-@Builder
 class DownLoadFileParam {
     String env;
     List<FileList> file_list;
@@ -191,30 +118,8 @@ class AccessToken extends WechatError {
     Integer expires_in;
 }
 
-class CloudHttpResponse<T> {
-    Integer code;
-    String message;
-    T data;
-}
-
 class FunctionResult extends WechatError {
     String resp_data;
-}
-
-class QueryResult extends WechatError {
-    Pager pager;
-
-    static class Pager {
-        Integer Offset;
-        Integer Limit;
-        Integer Total;
-    }
-
-    List<String> data;
-}
-
-class CountResult extends WechatError {
-    Long count;
 }
 
 class DownLoadFileResult extends WechatError {

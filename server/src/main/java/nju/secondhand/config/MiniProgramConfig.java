@@ -21,4 +21,6 @@ public class MiniProgramConfig {
     String appSecret;
 
     String env;
+
+    String api;
 }
