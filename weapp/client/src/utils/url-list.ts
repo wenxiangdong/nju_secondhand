@@ -34,6 +34,7 @@ const urlList = {
   MY_COMPLAINT_NEW: '/pages/my/complaint/new-complaint/index',
   COMPLAINT_FORM: '/pages/my/complaint/complaint-form/index',
   LOGIN: '/pages/login/index',
+  LOGIN_FROZEN_ERROR: '/pages/login/frozen_error/index',
   REGISTER: '/pages/register/index',
   PUBLISH_GOODS: '/pages/publish/index',
   RESULT: '/pages/result/index',

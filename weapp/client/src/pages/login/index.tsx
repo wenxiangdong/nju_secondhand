@@ -37,21 +37,21 @@ export default class index extends Component<any, IState> {
         if (state === UserState.Normal) {
           this.login();
         } else {
-          let errMsg = '用户信息无法识别\n请稍后重试';
           if (state === UserState.Frozen) {
-            errMsg = '账户已被冻结\n请与管理员联系';
+            setTimeout(() => {
+              Taro.reLaunch({
+                url: urlList.LOGIN_FROZEN_ERROR
+              }).catch(this.onError);
+            }, relaunchTimeout);
           } else if (state === UserState.UnRegistered) {
-            errMsg = '请先注册';
-          }
-
-          this.setState({errMsg});
-
-          if (state === UserState.UnRegistered) {
+            this.setState({errMsg: '请先注册'});
             setTimeout(() => {
               Taro.reLaunch({
                 url: urlList.REGISTER
               }).catch(this.onError);
             }, relaunchTimeout);
+          } else {
+            this.setState({errMsg: '用户信息无法识别\n请稍后重试'});
           }
         }
       })
