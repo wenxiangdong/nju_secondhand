@@ -143,7 +143,7 @@ export interface ComplaintVO extends VO {
 
   complainTime: number;
   
-  handling: Handling; // 若投诉未被处理，该属性不存在
+  handling: Handling | undefined; // 若投诉未被处理，该属性不存在
 
   state: ComplaintState;
 }
@@ -263,25 +263,24 @@ export interface IAccountApi {
 
 // 需要注册且未冻结
 export interface ICircleApi {
-    publishPost(post: PostDTO): Promise<void>;
+  publishPost(post: PostDTO): Promise<void>;
 
-    getPosts(lastIndex: number, size?: number): Promise<PostVO[]>; // 不需要
+  getPosts(lastIndex: number, size: number, timestamp: number): Promise<PostVO[]>;
 
-    comment(postID: string, content: string): Promise<void>;
-  
-    getPostById(postId: string): Promise<PostVO>;
+  comment(postID: string, content: string): Promise<void>;
 
-    searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]>; // 不需要
+  getPostById(postId: string): Promise<PostVO>;
+
+  searchPostsByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<PostVO[]>;
 }
 
 // 需要注册且未冻结
 export interface IComplaintApi {
-    complain(complaint: ComplaintDTO): Promise<void>;
+  complain(complaint: ComplaintDTO): Promise<void>;
 
-    getComplaints(lastIndex: number, size?: number): Promise<ComplaintVO[]>;
+  getComplaints(lastIndex: number, size: number): Promise<ComplaintVO[]>;
 }
 
-// 需要注册且未冻结
 export interface IFileApi {
     uploadFile(cloudPath: string, filePath: string): Promise<string>;
 
@@ -292,67 +291,66 @@ export interface IFileApi {
     deleteFile(fileList: string[]): Promise<DeleteFileResultItem[]>;
 }
 
-
-// 需要注册且未冻结，特殊会说明
+// 查询的不需要，其余均需要
 export interface IGoodsApi {
-    // 取得商品分类
-    getCategories(): Promise<CategoryVO[]>; // 不需要
+  // 取得商品分类
+  getCategories(): Promise<CategoryVO[]>;
 
-    // 发布闲置物品
-    publishGoods(goods: GoodsDTO): Promise<void>;
+  // 发布闲置物品
+  publishGoods(goods: GoodsDTO): Promise<void>;
 
-    // 查看自己正在卖的物品
-    getOngoingGoods(): Promise<GoodsVO[]>;
+  // 查看自己正在卖的物品
+  getOngoingGoods(): Promise<GoodsVO[]>;
 
-    // 下架商品
-    deleteGoods(goodsId: string): Promise<void>;
+  // 下架商品
+  deleteGoods(goodsID: string): Promise<void>;
 
-    // 关键字搜索商品
-    searchGoodsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsVO[]>; // 不需要
+  // 关键字搜索商品
+  searchGoodsByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsVO[]>;
 
-    // 种类搜索商品
-    searchGoodsByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsVO[]>; // 不需要
-  
-  	// 关键字搜索商品和销售者信息
-  	searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
+  // 种类搜索商品
+  searchGoodsByCategory(categoryID: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsVO[]>;
 
-  	// 种类搜索商品和销售者信息
-  	searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size?: number): Promise<GoodsWithSellerVO[]>; // 不需要
-  
-  	// 通过 id 获取商品和销售者信息
-  	getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO>; // 不需要
+  // 关键字搜索商品和销售者信息
+  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsWithSellerVO[]>;
 
-  	// 通过 id 获取商品信息
-  	getGoods(goodsID: string): Promise<GoodsVO>; // 不需要
+  // 种类搜索商品和销售者信息
+  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsWithSellerVO[]>;
 
-  	// 购买商品
-  	purchase(goodsID: string): Promise<void>;
+  // 通过 id 获取商品和销售者信息
+  getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO>;
+
+  // 通过 Id 获取商品信息
+  getGoods(goodsID: string): Promise<GoodsVO>;
+
+  // 购买商品
+  purchase(goodsID: string): Promise<PurchaseResult>;
 }
 
 // 需要注册且未冻结
 export interface INotificationApi {
-    // 取得通知消息
-    getNotifications(): Promise<NotificationVO[]>;
+  // 取得通知消息
+  getNotifications(lastIndex: number, size: number, timestamp: number): Promise<NotificationVO[]>;
 
-    // 发送通知消息（供其他接口调用）
-    sendNotification(notification: NotificationDTO): Promise<void>;
+  // 发送通知消息（供其他接口调用）
+  sendNotification(notification: NotificationDTO): Promise<void>;
 }
 
 // 需要注册且未冻结
 export interface IOrderApi {
-    getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+  getBuyerOngoingOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]>;
 
-    accept(orderID: string): Promise<void>;
-  
-    getOrderById(orderId: string): Promise<OrderVO>;
+  accept(orderID: string): Promise<void>;
 
-    getBuyerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+  getOrderById(orderId: string): Promise<OrderVO>;
 
-    getSellerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
+  getBuyerHistoryOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]>;
 
-    getSellerHistoryOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;
-    
-    orderCallback(orderID: string, result: {0 /* 成功 */, -1 /* 失败 */}): Promise<void>;
+  getSellerOngoingOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]>;
+
+  getSellerHistoryOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]>;
+
+  orderCallback(orderID: string, result: {0 /* 成功 */, -1 /* 失败 */}): Promise<void>;
 }
 
 // 聊天，使用websokcet
@@ -360,29 +358,134 @@ export interface IOrderApi {
 接收解析 MessageVO 的 JSON 格式
  ```
 
-## 管理员API
+## 管理员
+
+### 数据结构
 
 ```java
+// 封装类
+public class HttpResponse<T> {
+  T data;
+  int code; // 200 正常；401 未登录；其他的直接提示错误消息就好了
+  String message;
+}
+
+public abstract class VO {
+    String _id;
+}
+
+public class CategoryVO extends VO {
+  String name;
+  String icon;
+}
+
+public class ComplaintVO extends VO {
+    String orderID;
+    String desc;
+
+    String complainantID;
+    String complainantName;
+
+    List<String> pictures;
+
+    Long complainTime;
+
+    Integer state; // 枚举属性全部转化为对应数字，如 Ongoing 为 0，Handled 为 1，其他同理
+}
+
+public class GoodsVO extends VO {
+    String sellerID;
+    String sellerName;
+
+    String name;
+    String desc;
+    String price;
+    List<String> pictures;
+    CategoryVO categoryVO;
+
+    Long publishTime;
+
+    Integer state;
+}
+
+public class Location {
+    String name;
+    String address;
+    String latitude;
+    String longitude;
+}
+
+public class OrderVO extends VO {
+    String buyerID;
+    String buyerName;
+
+    String sellerID;
+    String sellerName;
+
+    String goodsID;
+    String goodsName;
+    String goodsPrice;
+
+    Location address;
+
+    Long orderTime;
+    Long deliveryTime;
+
+    Integer state;
+}
+
+public class AccountVO {
+    String balance;
+}
+
+public class UserVO extends VO {
+    String phone;
+    String avatar;
+    String nickname;
+    Location address;
+    String email;
+    Long signUpTime;
+    Long state;
+    AccountVO account;
+}
+```
+
+
+
+### API
+
+1. 除登录登出操作外，其他 API 需要先登录才能访问；无操作情况下登录状态维持 30min
+2. 所有返回值均用 HttpResponse 对象封装
+
+```java
+// 登录、登出
+// 返回 false 表示用户名或密码错误
+boolean login(String username, String password); // post
+void logout(); // post
+
 // 投诉管理
-List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size);
-void handle(String complaintID, String result);
+List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size, long timestamp); // get
+void handle(String complaintID, String result); // post
 
 // 订单管理
-List<OrderVO> getOrders(String keyword, int lastIndex, int size);
+List<OrderVO> getOrders(String keyword, int lastIndex, int size, long timestamp); // get
 
 // 商品管理
-List<CategoryVO> getCategories();
-List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size);
-List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size);
-void deleteGoods(String goodsID); // 下架商品，需要给卖家发通知
+List<CategoryVO> getCategories(); // get
+List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size, long timestamp); // get
+List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size, long timestamp); // get
+void deleteGoods(String goodsID); // post
 
 
 // 用户管理
-List<UserVO> getNormalUsers(String keyword, int lastIndex, int size);
-void freezeUser(String userID); // 发通知
+List<UserVO> getNormalUsers(String keyword, int lastIndex, int size, long timestamp); // get
+void freezeUser(String userID); // post
 
-List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size);
-void unfreezeUser(String userID); // 发通知
+List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size, long timestamp); // get
+void unfreezeUser(String userID); // post
+
+// 文件管理
+String transferUrl(String fileID) // get
 ```
 
 

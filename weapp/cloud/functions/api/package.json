@@ -1,5 +1,5 @@
 {
-  "name": "goodsApi",
+  "name": "api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "tcb-router": "^1.1.2",
+    "@sigodenjs/wechatpay": "^2.1.1",
+    "tcb-router": "latest",
+    "tenpay": "^2.1.18",
+    "wechat-jssdk": "^5.0.2",
     "wx-server-sdk": "latest"
   }
 }

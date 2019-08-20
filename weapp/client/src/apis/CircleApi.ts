@@ -5,30 +5,24 @@ import { copy } from "./Util";
 export interface ICircleApi {
   publishPost(post: PostDTO): Promise<void>;
 
-  getPosts(lastIndex: number, size?: number): Promise<PostVO[]>;
+  getPosts(lastIndex: number, size: number, timestamp: number): Promise<PostVO[]>;
 
   comment(postID: string, content: string): Promise<void>;
 
   getPostById(postId: string): Promise<PostVO>;
 
-  searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]>;
+  searchPostsByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<PostVO[]>;
 }
 
-const postCollection = db.collection('post');
-const functionName = 'circleApi'
+const functionName = 'api'
 
 class CircleApi implements ICircleApi {
   async publishPost(post: PostDTO): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "publishPost", post });
   }
 
-  async getPosts(lastIndex: number, size: number = 10): Promise<PostVO[]> {
-    let result = await postCollection
-      .skip(lastIndex)
-      .limit(size)
-      .get()
-
-    return copy<PostVO[]>(result.data);
+  async getPosts(lastIndex: number, size: number, timestamp: number): Promise<PostVO[]> {
+    return await httpRequest.callFunction<PostVO[]>(functionName, { $url: 'post', lastIndex, size, timestamp });
   }
   async comment(postID: string, content: string): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "comment", postID, content });
@@ -38,8 +32,8 @@ class CircleApi implements ICircleApi {
     return await httpRequest.callFunction<PostVO>(functionName, { $url: "getPostById", postId });
   }
 
-  async searchPostsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<PostVO[]> {
-    return await httpRequest.callFunction<PostVO[]>(functionName, { $url: "searchPostsByKeyword", keyword, lastIndex, size });
+  async searchPostsByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<PostVO[]> {
+    return await httpRequest.callFunction<PostVO[]>(functionName, { $url: "searchPostsByKeyword", keyword, lastIndex, size, timestamp });
   }
 }
 

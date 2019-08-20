@@ -22,7 +22,7 @@ export interface IUserApi {
 }
 
 const userCollection = db.collection('user');
-const functionName = 'userApi'
+const functionName = 'api'
 
 class UserApi implements IUserApi {
   async checkState(): Promise<UserState> {

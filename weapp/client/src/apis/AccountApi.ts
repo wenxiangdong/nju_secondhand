@@ -7,7 +7,7 @@ export interface IAccountApi {
   withdraw(amount: String): Promise<void>;
 }
 
-const functionName = 'accountApi'
+const functionName = 'api'
 
 class AccountApi implements IAccountApi {
   async withdraw(amount: String): Promise<void> {

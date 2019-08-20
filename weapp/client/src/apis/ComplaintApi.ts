@@ -3,16 +3,16 @@ import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
 export interface IComplaintApi {
   complain(complaint: ComplaintDTO): Promise<void>;
 
-  getComplaints(lastIndex: number, size?: number): Promise<ComplaintVO[]>;
+  getComplaints(lastIndex: number, size: number): Promise<ComplaintVO[]>;
 }
 
-const functionName = 'complaintApi'
+const functionName = 'api'
 
 class ComplaintApi implements IComplaintApi {
   async complain(complaint: ComplaintDTO): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "complain", complaint });
   }
-  async getComplaints(lastIndex: number, size: number = 10): Promise<ComplaintVO[]> {
+  async getComplaints(lastIndex: number, size: number): Promise<ComplaintVO[]> {
     return await httpRequest.callFunction<ComplaintVO[]>(functionName, { $url: "getComplaints", lastIndex, size });
   }
 }
@@ -83,7 +83,7 @@ export interface ComplaintVO extends VO {
 
   complainTime: number;
 
-  handling: Handling | null;
+  handling: Handling | undefined; // 未处理的投诉不具有该属性
 
   state: ComplaintState;
 }
@@ -94,6 +94,6 @@ export interface Handling {
 }
 
 export enum ComplaintState {
-  Ongoing = '处理中',
-  Handled = '已处理'
+  Ongoing = 0,
+  Handled = 1
 }
