@@ -14,6 +14,11 @@ export interface MessageVO {
   read: boolean;
 }
 
+export interface MessageDTO {
+  receiverID: string;
+  content: string;
+}
+
 declare type Observer = (msg: MessageVO) => void;
 
 class MessageHub {

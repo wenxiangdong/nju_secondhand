@@ -163,7 +163,7 @@ export interface Location {
 }
 
 export enum UserState {
-  UnRegistered, // 未注册
-  Normal,
-  Frozen, // 被管理员冻结
+  UnRegistered = 0, // 未注册
+  Normal = 1,
+  Frozen = 2, // 被管理员冻结
 }

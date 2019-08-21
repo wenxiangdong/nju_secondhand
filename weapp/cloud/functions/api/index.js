@@ -40,16 +40,17 @@ exports.main = async (event, context) => {
     'publishPost', 'getPosts', 'comment', 'getPostById', 'searchPostsByKeyword',
     'complain', 'getComplaints',
     'getNotifications',
-    'accept', 'getBuyerOrders', 'getSellerOrders'], async (ctx, next) => {
-      if (ctx.data.self.state !== User.Normal) {
-        ctx.body = {
-          code: HttpCode.Forbidden,
-          message: '帐号异常'
-        }
-      } else {
-        await next()
+    'accept', 'getBuyerOrders', 'getSellerOrders',
+  ], async (ctx, next) => {
+    if (ctx.data.self.state !== User.Normal) {
+      ctx.body = {
+        code: HttpCode.Forbidden,
+        message: '帐号异常'
       }
-    })
+    } else {
+      await next()
+    }
+  })
 
   /** 用户 */
   app.router('checkState', async (ctx) => {
@@ -69,7 +70,7 @@ exports.main = async (event, context) => {
   app.router('getUserInfo', async (ctx) => {
     ctx.body = {
       code: HttpCode.Success,
-      data: await getUserInfo({ userID: event.userID })
+      data: await getOneUser({ userID: event.userID })
     }
   })
 
@@ -77,39 +78,36 @@ exports.main = async (event, context) => {
   app.router('getCategories', async (ctx) => {
     ctx.body = {
       code: HttpCode.Success,
-      data: await getAll({ name: 'category' })
+      data: await getAllCategory()
     }
   })
 
   app.router('getGoods', async (ctx) => {
     ctx.body = {
       code: HttpCode.Success,
-      data: await getOne({
-        name: 'goods',
-        id: event.goodsID
-      })
+      data: await getOneGoods({ goodsID })
     }
   })
 
   app.router('searchGoodsByKeyword', async (ctx) => {
-    const { keyword, lastIndex, size, timestamp } = event
+    const { keyword, lastIndex, size } = event
     ctx.body = {
       code: HttpCode.Success,
-      data: await searchGoodsByKeyword({ keyword, lastIndex, size, timestamp })
+      data: await searchGoodsByKeyword({ keyword, lastIndex, size })
     }
   })
 
   app.router('searchGoodsByCategory', async (ctx) => {
-    const { categoryID, lastIndex, size, timestamp } = event
+    const { categoryID, lastIndex, size } = event
     ctx.body = {
       code: HttpCode.Success,
-      data: await searchGoodsByCategory({ categoryID, lastIndex, size, timestamp })
+      data: await searchGoodsByCategory({ categoryID, lastIndex, size })
     }
   })
 
   app.router('getGoodsWithSeller', async (ctx) => {
-    const goods = await getOne({ name: 'goods', id: event.goodsID })
-    const seller = await getUserInfo({ userID: goods.sellerID })
+    const goods = await getOneGoods({ goodsID: event.goodsID })
+    const seller = await getOneUser({ userID: goods.sellerID })
     ctx.body = {
       code: HttpCode.Success,
       data: { goods, seller }
@@ -117,38 +115,24 @@ exports.main = async (event, context) => {
   })
 
   app.router('searchGoodsWithSellerByKeyword', async (ctx) => {
-    const { keyword, lastIndex, size, timestamp } = event
-    const goodsList = await searchGoodsByKeyword({ keyword, lastIndex, size, timestamp })
-    const goodsWithSellers = []
-    for (const goods of goodsList) {
-      const seller = await getUserInfo({ userID: goods.sellerID })
-      goodsWithSellers.push({
-        goods,
-        seller
-      })
-    }
+    const { keyword, lastIndex, size } = event
+    const goodsList = await searchGoodsByKeyword({ keyword, lastIndex, size })
+    const sellers = await Promise.all(goodsList.map(goods => getOneUser({ userID: goods.sellerID })))
 
     ctx.body = {
       code: HttpCode.Success,
-      data: goodsWithSellers
+      data: goodsList.map((goods, index) => { return { goods, seller: sellers[index] } })
     }
   })
 
   app.router('searchGoodsWithSellerByCategory', async (ctx) => {
-    const { categoryID, lastIndex, size, timestamp } = event
-    const goodsList = await searchGoodsByCategory({ categoryID, lastIndex, size, timestamp })
-    const goodsWithSellers = []
-    for (const goods of goodsList) {
-      const seller = await getUserInfo({ userID: goods.sellerID })
-      goodsWithSellers.push({
-        goods,
-        seller
-      })
-    }
+    const { categoryID, lastIndex, size } = event
+    const goodsList = await searchGoodsByCategory({ categoryID, lastIndex, size })
+    const sellers = await Promise.all(goodsList.map(goods => getOneUser({ userID: goods.sellerID })))
 
     ctx.body = {
       code: HttpCode.Success,
-      data: goodsWithSellers
+      data: goodsList.map((goods, index) => { return { goods, seller: sellers[index] } })
     }
   })
 
@@ -162,10 +146,10 @@ exports.main = async (event, context) => {
     goods.publishTime = Date.now()
     goods.state = GoodsState.InSale
 
-    goods.category = await getOne({ name: 'category', id: goods.categoryID })
+    goods.category = await getOneCategory({ categoryID: goods.categoryID })
     delete goods.categoryID
 
-    await add({ name: 'goods', data: goods })
+    await addGoods({ goods })
 
     ctx.body = {
       code: HttpCode.Success
@@ -175,17 +159,12 @@ exports.main = async (event, context) => {
   app.router('getOngoingGoods', async (ctx) => {
     ctx.body = {
       code: HttpCode.Success,
-      data: await getAll({
-        name: 'goods', condition: {
-          sellerID: ctx.data.self._id,
-          state: GoodsState.InSale
-        }
-      })
+      data: await getGoodsByUserIdAndState({ userID: ctx.data.self._id, state: GoodsState.InSale })
     }
   })
 
   app.router('deleteGoods', async (ctx) => {
-    await removeOne({ name: 'goods', id: event.goodsID })
+    await deleteOneGoods({ goodsID: event.goodsID })
 
     ctx.body = {
       code: HttpCode.Success
@@ -197,10 +176,9 @@ exports.main = async (event, context) => {
     const { self } = ctx.data;
 
     // 对商品下单，创建订单和让商品下架
-    await updateOne({
-      name: 'goods',
-      id: goodsID,
-      data: {
+    await updateOneGoods({
+      goodsID,
+      goods: {
         state: GoodsState.Deleted
       }
     })
@@ -208,7 +186,7 @@ exports.main = async (event, context) => {
 
     // 下个单
     // const goods = goodsList[0]; // 取goods
-    const goods = getOne({ name: 'goods', id: goodsID })
+    const goods = await getOneGoods({ goodsID })
     const order = {
       // buyer就是当前用户
       buyerID: self._id,
@@ -230,14 +208,13 @@ exports.main = async (event, context) => {
     };
     // 这里插失败都要回滚，将商品的信息改回来 
     try {
-      order._id = await add({ name: 'order', data: order })
+      order._id = await addOrder({ order })
       console.log("插入的order", order);
     } catch (error) {
       // 放着异步做了，无力的保证
       console.error(error);
-      await updateOne({
-        name: 'goods',
-        id: goodsID,
+      await updateOneGoods({
+        goodsID,
         data: {
           state: GoodsState.InSale
         }
@@ -289,16 +266,16 @@ exports.main = async (event, context) => {
     post.publishTime = Date.now()
     post.comments = []
 
-    await add({ name: 'post', data: post });
+    await addPost({ post });
 
     ctx.body = { code: HttpCode.Success }
   })
 
   app.router('getPosts', async (ctx) => {
-    const { lastIndex, size, timestamp } = event
+    const { lastIndex, size } = event
     ctx.body = {
       code: HttpCode.Success,
-      data: await getPage({ name: 'post', condition: { publishTime: command.lte(timestamp) }, lastIndex, size })
+      data: await getPostsByPageAndKeyword({ lastIndex, size })
     }
   })
 
@@ -306,10 +283,9 @@ exports.main = async (event, context) => {
     const { postID, content } = event
     const { self } = ctx.data
 
-    await updateOne({
-      name: 'post',
-      id: postID,
-      data: {
+    await updateOnePost({
+      postID,
+      post: {
         comments: command.push([{
           nickname: self.nickname,
           content,
@@ -326,31 +302,19 @@ exports.main = async (event, context) => {
   app.router('getPostById', async (ctx) => {
     ctx.body = {
       code: HttpCode.Success,
-      data: await getOne({ name: 'post', id: event.postId })
+      data: await getOnePost({ postID: event.postId })
     }
   })
 
   app.router('searchPostsByKeyword', async (ctx) => {
     const {
-      keyword,
-      lastIndex,
-      size,
-      timestamp
+      keyword, lastIndex, size
     } = event;
 
     ctx.body = {
       code: HttpCode.Success,
-      data: await getPage({
-        name: 'post',
-        condition: keyword ? {
-          topic: db.RegExp({
-            regexp: keyword,
-            options: 'i',
-          }),
-          publishTime: command.lte(timestamp)
-        } : { publishTime: command.lte(timestamp) },
-        lastIndex,
-        size
+      data: await getPostsByPageAndKeyword({
+        keyword, lastIndex, size
       })
     }
   })
@@ -361,13 +325,13 @@ exports.main = async (event, context) => {
     const { self } = ctx.data
 
     complaint.complaintID = self._id
-    complaint.complaintName = self.nickName
+    complaint.complaintName = self.nickname
 
     complaint.complainTime = Date.now()
 
     complaint.state = ComplaintState.Ongoing
 
-    await add({ name: 'complaint', data: complaint })
+    await addComplaint({ complaint })
 
     ctx.body = {
       code: HttpCode.Success
@@ -381,24 +345,24 @@ exports.main = async (event, context) => {
 
     ctx.body = {
       data: result.data,
-      code: await getPage({ name: 'complaint', condition: { complaintID: self._id }, orders: ['complainTime', 'desc'], lastIndex, size })
+      code: await getComplaintsByPageAndUserId({ userID: self._id, lastIndex, size })
     }
   })
 
   /** 系统消息 */
   // 逆序取得系统消息
   app.router('getNotifications', async (ctx) => {
-    const { lastIndex, size, timestamp } = event
+    const { lastIndex, size } = event
     const { self } = ctx.data
 
     ctx.body = {
-      data: await getPage({ name: 'notification', condition: { userID: self._id, time: command.lte(timestamp) }, orders: [['time', 'desc']], lastIndex, size }),
+      data: await getNotificationsByPageAndUserId({ userID: self._id, lastIndex, size }),
       code: HttpCode.Success
     }
   })
 
   app.router('sendNotification', async (ctx) => {
-    await sendNotification(...event.notification)
+    await addNotification({ notification: event.notification })
 
     ctx.body = {
       code: HttpCode.Success
@@ -435,10 +399,9 @@ exports.main = async (event, context) => {
     }
 
     // 更新数据库
-    await updateOne({
-      name: 'user',
-      id: self._id,
-      data: {
+    await updateOneUser({
+      userID: self._id,
+      user: {
         account: {
           balance: (balance - amount) + ''
         }
@@ -456,15 +419,15 @@ exports.main = async (event, context) => {
       orderID
     } = ctx.event;
 
-    const order = await getOne({ name: 'order', id: orderID })
+    const order = await getOneOrder({ orderID })
 
-    const account = (await getOne({ name: 'user', id: order.sellerID, field: { account: true } })).account
+    const account = (await getOneUser({ userID: order.sellerID })).account
 
     await Promise.all(
       [
-        updateOne({ name: 'order', id: orderID, data: { state: OrderState.Finished, deliveryTime: Date.now() } }),
-        updateOne({ name: 'user', id: order.sellerID, data: { account } }),
-        sendNotification({ userID: order.sellerID, content: `您的订单 ${order._id} 已被签收` })
+        udpateOneOrder({ orderID, order: { state: OrderState.Finished, deliveryTime: Date.now() } }),
+        updateOneUser({ userID: order.sellerID, user: { account } }),
+        sendNotification({ userID: order.sellerID, content: `您的商品 ${order.goodsName} 已被签收` })
       ]
     )
 
@@ -475,48 +438,28 @@ exports.main = async (event, context) => {
 
   // 逆序
   app.router('getBuyerOrders', async (ctx) => {
-    const { state, lastIndex, size, timestamp } = event
+    const { state, lastIndex, size } = event
 
     ctx.body = {
       code: HttpCode.Success,
-      data: await getPage({
-        name: 'order',
-        condition: {
-          buyerID: ctx.data.self._id,
-          state,
-          orderTime: command.lte(timestamp)
-        },
-        orders: [['orderTime', 'desc']],
-        lastIndex,
-        size
-      })
+      data: await getBuyerOrdersByPageAndState({ buyerID: ctx.data.self._id, state, lastIndex, size })
     }
   })
 
   // 逆序
   app.router('getSellerOrders', async (ctx) => {
-    const { state, lastIndex, size, timestamp } = event
+    const { state, lastIndex, size } = event
 
     ctx.body = {
       code: HttpCode.Success,
-      data: await getPage({
-        name: 'order',
-        condition: {
-          sellerID: ctx.data.self._id,
-          state,
-          orderTime: command.lte(timestamp)
-        },
-        orders: [['orderTime', 'desc']],
-        lastIndex,
-        size
-      })
+      data: await getSellerOrdersByPageAndState({ sellerID: ctx.data.self._id, state, lastIndex, size })
     }
   })
 
   app.router('getOrderById', async (ctx) => {
     ctx.body = {
       code: HttpCode.Success,
-      data: await getOne({ name: 'order', id: event.orderId })
+      data: await getOneOrder({ orderID: event.orderId })
     }
   })
 
@@ -527,15 +470,15 @@ exports.main = async (event, context) => {
     // 处理函数
     const handlers = {
       '0': async (order) => {
-        await updateOne({ name: 'order', id: order._id, data: { state: OrderState.Ongoing } })
+        await udpateOneOrder({ orderID: order._id, order: { state: OrderState.Ongoing } })
       },
       '-1': async (order) => {
         // 删除订单
         // 就算出错了也没有太多关系，放着异步
-        await removeOne({ name: 'order', id: order._id })
+        await deleteOneOrder({ orderID: order._id })
         // 上架商品
         // 一定要重新上架成功，否则得报错
-        await updateOne({ name: 'goods', id: order.goodsID, data: { state: GoodsState.InSale } })
+        await updateOneGoods({ goodsID: order.goodsID, goods: { state: GoodsState.InSale } })
       }
     };
 
@@ -551,7 +494,7 @@ exports.main = async (event, context) => {
     }
 
     // 查询订单
-    const order = await getOne({ name: 'order', id: orderID })
+    const order = await getOneOrder({ orderID })
     if (!order) {
       ctx.body = NOT_FOUND;
       return
@@ -583,13 +526,44 @@ exports.main = async (event, context) => {
     }
   })
 
+  /** 消息 */
+  app.router('addMessage', async (ctx) => {
+    const { message } = event
+    const sender = await getOneUser({ userID: message.senderID })
+    const receiver = await getOneUser({ userID: message.receiverID })
+
+    message.senderName = sender.nickname
+    message.receiverName = receiver.nickname
+    message.time = Date.now()
+    message.read = false
+    await addMessage({ message })
+  })
+
+  app.router('readMessage', async (ctx) => {
+    const { messageID } = event
+    await updateOneMessage({
+      messageID,
+      message: {
+        read: true
+      }
+    })
+  })
+
+  app.router('getUnreadMessages', async (ctx) => {
+    const { receiverID } = event
+    ctx.body = await getMessagesByReceiverIdAndRead({ receiverID })
+  })
+
   return app.serve()
 }
 
 // (service)
+/** user */
+const userName = 'user'
+
 const login = async ({ openid }) => {
   return (await getPage({
-    name: 'user',
+    name: userName,
     condition: {
       _openid: openid
     },
@@ -599,16 +573,36 @@ const login = async ({ openid }) => {
   }))[0] || {}
 }
 
-const getUserInfo = async ({ userID }) => {
-  return await getOne({ name: 'user', id: userID, field: { _openid: false } })
+const getOneUser = async ({ userID }) => {
+  return await getOne({ name: userName, id: userID, field: { _openid: false } })
 }
 
-const searchGoodsByKeyword = async ({ keyword, lastIndex, size, timestamp }) => {
+const updateOneUser = async ({ userID, user }) => {
+  await updateOne({ name: userName, id: userID, data: user })
+}
+
+/** goods */
+const goodsName = 'goods'
+const categoryName = 'category'
+
+const getOneGoods = async ({ goodsID }) => {
+  return await getOne({ name: goodsName, id: goodsID })
+}
+
+const getOneCategory = async ({ categoryID }) => {
+  return await getOne({ name: categoryName, id: categoryID })
+}
+
+const getAllCategory = async () => {
+  return await getAll({ name: categoryName })
+}
+
+const searchGoodsByKeyword = async ({ keyword, lastIndex, size }) => {
   return await getPage({
-    name: 'goods',
-    condition: keyword ?
-      command.or(
-        [{
+    name: goodsName,
+    condition: command.and(
+      keyword ? command.or(
+        {
           name: db.RegExp({
             regexp: keyword,
             options: 'i',
@@ -621,31 +615,148 @@ const searchGoodsByKeyword = async ({ keyword, lastIndex, size, timestamp }) => 
               options: 'i'
             })
           }
-        }]).and({ state: GoodsState.InSale, publishTime: command.lte(timestamp) })
-      :
-      { state: GoodsState.InSale, publishTime: command.lte(timestamp) },
+        }
+      ) : {},
+      { state: GoodsState.InSale }),
     lastIndex,
     size
   })
 }
 
-const searchGoodsByCategory = async ({ categoryID, lastIndex, size, timestamp }) => {
+const searchGoodsByCategory = async ({ categoryID, lastIndex, size }) => {
   return await getPage({
-    name: 'goods',
+    name: goodsName,
     condition: {
       category: {
         _id: categoryID
-      }, state: GoodsState.InSale, publishTime: command.lte(timestamp)
+      },
+      state: GoodsState.InSale
     },
     lastIndex,
     size
   })
 }
 
-const sendNotification = async ({ userID, content }) => {
-  await add({ name: 'notification', data: { userID, content, time: Date.now() } })
+const getGoodsByUserIdAndState = async ({ userID, state }) => {
+  return await getAll({
+    name: goodsName, condition: {
+      sellerID: userID,
+      state
+    }
+  })
 }
 
+const addGoods = async ({ goods }) => {
+  return await add({ name: goodsName, data: goods })
+}
+
+const deleteOneGoods = async ({ goodsID }) => {
+  await removeOne({ name: goodsName, id: goodsID })
+}
+
+const updateOneGoods = async ({ goodsID, goods }) => {
+  await updateOne({ name: goodsName, id: goodsID, data: goods })
+}
+
+/** order */
+const orderName = 'order'
+
+const getOneOrder = async ({ orderID }) => {
+  return await getOne({ name: orderName, id: orderID })
+}
+
+const getBuyerOrdersByPageAndState = async ({ buyerID, state, lastIndex, size }) => {
+  return await getPage({
+    name: orderName,
+    condition: {
+      buyerID,
+      state
+    },
+    orders: [['orderTime', 'desc']],
+    lastIndex,
+    size
+  })
+}
+
+const getSellerOrdersByPageAndState = async ({ sellerID, state, lastIndex, size }) => {
+  return await getPage({
+    name: orderName,
+    condition: {
+      sellerID,
+      state,
+    },
+    orders: [['orderTime', 'desc']],
+    lastIndex,
+    size
+  })
+}
+
+const addOrder = async ({ order }) => {
+  return await add({ name: orderName, data: order })
+}
+
+const deleteOneOrder = async ({ orderID }) => {
+  return await removeOne({ name: orderName, id: orderID })
+}
+
+const udpateOneOrder = async ({ orderID, order }) => {
+  await updateOne({ name: orderName, id: orderID, data: order })
+}
+
+/** post */
+const postName = 'post'
+
+const getOnePost = async ({ postID }) => {
+  return await getOne({ name: postName, id: postID })
+}
+
+const getPostsByPageAndKeyword = async ({ keyword = '', lastIndex, size }) => {
+  return await getPage({
+    name: postName,
+    condition:
+      keyword ? {
+        topic: db.RegExp({
+          regexp: keyword,
+          options: 'i',
+        })
+      } : {},
+    lastIndex,
+    size
+  })
+}
+
+const addPost = async ({ post }) => {
+  return await add({ name: postName, data: post })
+}
+
+const updateOnePost = async ({ postID, post }) => {
+  await updateOne({ name: postName, id: postID, data: post })
+}
+
+/** complaint */
+const complaintName = 'complaint'
+
+const getComplaintsByPageAndUserId = async ({ userID, lastIndex, size }) => {
+  return await getPage({ name: complaintName, condition: { complaintID: userID }, orders: ['complainTime', 'desc'], lastIndex, size })
+}
+
+const addComplaint = async ({ complaint }) => {
+  return await add({ name: complaintName, data: complaint })
+}
+
+
+/** notification */
+const notificationName = 'notification'
+
+const getNotificationsByPageAndUserId = async ({ userID, lastIndex, size }) => {
+  return await getPage({ name: notificationName, condition: { userID }, orders: [['time', 'desc']], lastIndex, size })
+}
+
+const addNotification = async ({ notification }) => {
+  await add({ name: notificationName, data: notification })
+}
+
+/** account */
 const withdraw = async ({ openID = "", amount = 0 }) => {
   console.log(TENPAY_CONFIG);
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
@@ -672,7 +783,6 @@ const withdraw = async ({ openID = "", amount = 0 }) => {
   }
 }
 
-
 const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount = 0, orderID = "" }) => {
   console.log(TENPAY_CONFIG);
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
@@ -695,6 +805,34 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
       message: "预下单失败"
     };
   }
+}
+
+/** message */
+const messageName = 'message'
+
+const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
+  const messages = await getAll({
+    name: messageName,
+    condition: {
+      receiverID,
+      read
+    },
+  })
+  const ids = messages.map(message => message._id)
+  await updateAll({ name: messageName, condition: { receiverID: command.in(ids) }, data: { read: true } })
+  return messages
+}
+
+const addMessage = async ({ message }) => {
+  return await add({ name: messageName, data: message })
+}
+
+const updateOneMessage = async ({ messageID, message }) => {
+  await updateOne({
+    name: messageName,
+    id: messageID,
+    data: message
+  })
 }
 
 // 数据库操作方法（dao）

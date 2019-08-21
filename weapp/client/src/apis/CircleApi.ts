@@ -5,13 +5,13 @@ import { copy } from "./Util";
 export interface ICircleApi {
   publishPost(post: PostDTO): Promise<void>;
 
-  getPosts(lastIndex: number, size: number, timestamp: number): Promise<PostVO[]>;
+  getPosts(lastIndex: number, size: number): Promise<PostVO[]>;
 
   comment(postID: string, content: string): Promise<void>;
 
   getPostById(postId: string): Promise<PostVO>;
 
-  searchPostsByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<PostVO[]>;
+  searchPostsByKeyword(keyword: string, lastIndex: number, size: number): Promise<PostVO[]>;
 }
 
 const functionName = 'api'
@@ -21,8 +21,8 @@ class CircleApi implements ICircleApi {
     return await httpRequest.callFunction<void>(functionName, { $url: "publishPost", post });
   }
 
-  async getPosts(lastIndex: number, size: number, timestamp: number): Promise<PostVO[]> {
-    return await httpRequest.callFunction<PostVO[]>(functionName, { $url: 'post', lastIndex, size, timestamp });
+  async getPosts(lastIndex: number, size: number): Promise<PostVO[]> {
+    return await httpRequest.callFunction<PostVO[]>(functionName, { $url: 'post', lastIndex, size });
   }
   async comment(postID: string, content: string): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "comment", postID, content });
@@ -32,8 +32,8 @@ class CircleApi implements ICircleApi {
     return await httpRequest.callFunction<PostVO>(functionName, { $url: "getPostById", postId });
   }
 
-  async searchPostsByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<PostVO[]> {
-    return await httpRequest.callFunction<PostVO[]>(functionName, { $url: "searchPostsByKeyword", keyword, lastIndex, size, timestamp });
+  async searchPostsByKeyword(keyword: string, lastIndex: number, size: number): Promise<PostVO[]> {
+    return await httpRequest.callFunction<PostVO[]>(functionName, { $url: "searchPostsByKeyword", keyword, lastIndex, size });
   }
 }
 
@@ -99,7 +99,6 @@ export interface PostDTO {
   topic: string;
   desc: string;
   pictures: Array<string>;
-  topic: string;
 }
 
 export interface PostVO extends VO {

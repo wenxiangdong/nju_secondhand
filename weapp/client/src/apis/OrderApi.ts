@@ -3,17 +3,17 @@ import {Location, MockUserApi} from "./UserApi";
 import {createRandomNumberStr} from "./Util";
 
 export interface IOrderApi {
-  getBuyerOngoingOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]>;
+  getBuyerOngoingOrders(lastIndex: number, size: number): Promise<OrderVO[]>;
 
   accept(orderID: string): Promise<void>;
 
   getOrderById(orderId: string): Promise<OrderVO>;
 
-  getBuyerHistoryOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]>;
+  getBuyerHistoryOrders(lastIndex: number, size: number): Promise<OrderVO[]>;
 
-  getSellerOngoingOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]>;
+  getSellerOngoingOrders(lastIndex: number, size: number): Promise<OrderVO[]>;
 
-  getSellerHistoryOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]>;
+  getSellerHistoryOrders(lastIndex: number, size: number): Promise<OrderVO[]>;
 
   orderCallback(orderID: string, result: 0 | -1): Promise<void>;
 }
@@ -28,20 +28,20 @@ class OrderApi implements IOrderApi {
       result
     });
   }
-  async getBuyerOngoingOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]> {
-    return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getBuyerOrders", lastIndex, size, state: OrderState.Ongoing, timestamp });
+  async getBuyerOngoingOrders(lastIndex: number, size: number): Promise<OrderVO[]> {
+    return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getBuyerOrders", lastIndex, size, state: OrderState.Ongoing });
   }
   async accept(orderID: string): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "accept", orderID });
   }
-  async getBuyerHistoryOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]> {
-    return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getBuyerOrders", lastIndex, size, state: OrderState.Finished, timestamp });
+  async getBuyerHistoryOrders(lastIndex: number, size: number): Promise<OrderVO[]> {
+    return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getBuyerOrders", lastIndex, size, state: OrderState.Finished });
   }
-  async getSellerOngoingOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]> {
-    return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getSellerOrders", lastIndex, size, state: OrderState.Ongoing, timestamp });
+  async getSellerOngoingOrders(lastIndex: number, size: number): Promise<OrderVO[]> {
+    return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getSellerOrders", lastIndex, size, state: OrderState.Ongoing });
   }
-  async getSellerHistoryOrders(lastIndex: number, size: number, timestamp: number): Promise<OrderVO[]> {
-    return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getSellerOrders", lastIndex, size, state: OrderState.Finished, timestamp });
+  async getSellerHistoryOrders(lastIndex: number, size: number): Promise<OrderVO[]> {
+    return await httpRequest.callFunction<OrderVO[]>(functionName, { $url: "getSellerOrders", lastIndex, size, state: OrderState.Finished });
   }
 
   async getOrderById(orderId: string): Promise<OrderVO> {

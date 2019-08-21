@@ -18,16 +18,16 @@ export interface IGoodsApi {
   deleteGoods(goodsID: string): Promise<void>;
 
   // 关键字搜索商品
-  searchGoodsByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsVO[]>;
+  searchGoodsByKeyword(keyword: string, lastIndex: number, size: number): Promise<GoodsVO[]>;
 
   // 种类搜索商品
-  searchGoodsByCategory(categoryID: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsVO[]>;
+  searchGoodsByCategory(categoryID: string, lastIndex: number, size: number): Promise<GoodsVO[]>;
 
   // 关键字搜索商品和销售者信息
-  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsWithSellerVO[]>;
+  searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number): Promise<GoodsWithSellerVO[]>;
 
   // 种类搜索商品和销售者信息
-  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsWithSellerVO[]>;
+  searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number): Promise<GoodsWithSellerVO[]>;
 
   // 通过 id 获取商品和销售者信息
   getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO>;
@@ -69,22 +69,22 @@ class GoodsApi implements IGoodsApi {
 
     return await httpRequest.callFunction<void>(functionName, { $url: "deleteGoods", goodsID });
   }
-  async searchGoodsByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsVO[]> {
-    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByKeyword", keyword, lastIndex, size, timestamp });
+  async searchGoodsByKeyword(keyword: string, lastIndex: number, size: number): Promise<GoodsVO[]> {
+    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByKeyword", keyword, lastIndex, size });
   }
-  async searchGoodsByCategory(categoryID: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsVO[]> {
-    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByCategory", categoryID, lastIndex, size, timestamp });
+  async searchGoodsByCategory(categoryID: string, lastIndex: number, size: number): Promise<GoodsVO[]> {
+    return await httpRequest.callFunction<GoodsVO[]>(functionName, { $url: "searchGoodsByCategory", categoryID, lastIndex, size });
   }
   async purchase(goodsID: string): Promise<PurchaseResult> {
     return await httpRequest.callFunction<PurchaseResult>(functionName, { $url: "purchase", goodsID });
   }
 
-  async searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsWithSellerVO[]> {
-    return await httpRequest.callFunction<GoodsWithSellerVO[]>(functionName, { $url: 'searchGoodsWithSellerByCategory', categoryID, lastIndex, size, timestamp })
+  async searchGoodsWithSellerByCategory(categoryID: string, lastIndex: number, size: number): Promise<GoodsWithSellerVO[]> {
+    return await httpRequest.callFunction<GoodsWithSellerVO[]>(functionName, { $url: 'searchGoodsWithSellerByCategory', categoryID, lastIndex, size })
   }
 
-  async searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number, timestamp: number): Promise<GoodsWithSellerVO[]> {
-    return await httpRequest.callFunction<GoodsWithSellerVO[]>(functionName, { $url: 'searchGoodsWithSellerByKeyword', keyword, lastIndex, size, timestamp })
+  async searchGoodsWithSellerByKeyword(keyword: string, lastIndex: number, size: number): Promise<GoodsWithSellerVO[]> {
+    return await httpRequest.callFunction<GoodsWithSellerVO[]>(functionName, { $url: 'searchGoodsWithSellerByKeyword', keyword, lastIndex, size })
   }
 
   async getGoodsWithSeller(goodsID: string): Promise<GoodsWithSellerVO> {
@@ -281,8 +281,8 @@ export interface GoodsWithSellerVO {
 }
 
 export enum GoodsState {
-  InSale,
-  Deleted
+  InSale = 0,
+  Deleted = 1
 }
 
 export interface PurchaseResult {
