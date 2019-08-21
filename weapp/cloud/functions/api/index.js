@@ -26,11 +26,12 @@ exports.main = async (event, context) => {
 
   // 取得自身信息
   app.router('*', async (ctx, next) => {
+    console.log(`invoke: ${event.$url}`)
+    
     const openid = cloud.getWXContext().OPENID
     ctx.data.openid = openid
     console.log(openid)
     ctx.data.self = await login({ openid })
-    console.log(ctx.data.self)
 
     await next()
   })
@@ -42,7 +43,7 @@ exports.main = async (event, context) => {
     'getNotifications',
     'accept', 'getBuyerOrders', 'getSellerOrders',
   ], async (ctx, next) => {
-    if (ctx.data.self.state !== User.Normal) {
+    if (ctx.data.self.state !== UserState.Normal) {
       ctx.body = {
         code: HttpCode.Forbidden,
         message: '帐号异常'
@@ -344,8 +345,8 @@ exports.main = async (event, context) => {
     const { self } = ctx.data
 
     ctx.body = {
-      data: result.data,
-      code: await getComplaintsByPageAndUserId({ userID: self._id, lastIndex, size })
+      code: HttpCode.Success,
+      data: await getComplaintsByPageAndUserId({ userID: self._id, lastIndex, size })
     }
   })
 
@@ -737,7 +738,7 @@ const updateOnePost = async ({ postID, post }) => {
 const complaintName = 'complaint'
 
 const getComplaintsByPageAndUserId = async ({ userID, lastIndex, size }) => {
-  return await getPage({ name: complaintName, condition: { complaintID: userID }, orders: ['complainTime', 'desc'], lastIndex, size })
+  return await getPage({ name: complaintName, condition: { complaintID: userID }, orders: [['complainTime', 'desc']], lastIndex, size })
 }
 
 const addComplaint = async ({ complaint }) => {
@@ -840,7 +841,7 @@ const getAll = async ({ name, condition = {}, orders = [], field = {} }) => {
   let query = db.collection(name)
     .where(condition)
 
-  for (const orderPair in orders) {
+  for (const orderPair of orders) {
     query = query.orderBy(orderPair[0], orderPair[1])
   }
 
@@ -865,7 +866,7 @@ const getPage = async ({ name, condition = {}, orders = [], field = {}, lastInde
   let query = db.collection(name)
     .where(condition)
 
-  for (const orderPair in orders) {
+  for (const orderPair of orders) {
     query = query.orderBy(orderPair[0], orderPair[1])
   }
 
@@ -947,7 +948,7 @@ const APP_CONFIG = {
   APP_SECRET: "b67831c61b8af414d031fe209a30c683",
   ACCOUNT: "1521513131",
   KEY: "NanjingdunshudianzishangwuYXXL18",
-  CERT: fs.readFileSync('cert.p12'),
+  CERT: fs.readFileSync(`${__dirname}/cert.p12`),
 };
 
 const TENPAY_CONFIG = {
