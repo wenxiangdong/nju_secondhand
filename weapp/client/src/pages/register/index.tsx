@@ -14,6 +14,7 @@ import {CSSProperties} from "react";
 import localConfig from "../../utils/local-config";
 import DChooseLocation from "../../components/common/d-choose-location/DChooseLocation";
 import AddressShowBar from "../../components/common/address-show-bar";
+import messageHub from "../../apis/MessageApi";
 
 function createStyles() {
   const rootViewStyle: CSSProperties = {
@@ -124,6 +125,8 @@ export default class index extends Component<any, IState> {
                   setTimeout(function () {
                     Taro.reLaunch({
                       url: urlList.INDEX
+                    }).then(() => {
+                      that.initWebsocket();
                     }).catch(that.onError);
                   }, relaunchTimeout);
                 } else {
@@ -304,6 +307,16 @@ export default class index extends Component<any, IState> {
       </View>
     )
   }
+
+  initWebsocket(){
+    console.log("init socket")
+    // 记得在要有消息通知的页面，引用  <AtMessage />
+    messageHub.subscribe((vo) => {
+      Taro.atMessage({
+        message: `收到一条来自 ${vo.senderName} 的消息`
+      })
+    });
+  };
 
   private onError = createSimpleErrorHandler('userInfo', this);
 }

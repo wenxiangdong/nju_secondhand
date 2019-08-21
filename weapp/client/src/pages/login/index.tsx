@@ -6,6 +6,7 @@ import urlList from "../../utils/url-list";
 import {relaunchTimeout} from "../../utils/date-util";
 import localConfig from "../../utils/local-config";
 import LoadingPage from "../../components/common/loading-page";
+import messageHub from "../../apis/MessageApi";
 
 interface IState {
   loadingContent: string,
@@ -67,6 +68,8 @@ export default class index extends Component<any, IState> {
         setTimeout(() => {
           Taro.reLaunch({
             url: urlList.INDEX
+          }).then(() => {
+            this.initWebsocket();
           }).catch(this.onError);
         }, relaunchTimeout);
       })
@@ -79,6 +82,16 @@ export default class index extends Component<any, IState> {
       <LoadingPage loadingMsg={errMsg || sucMsg}
                    loadingContent={loadingContent}/>
     );
+  }
+
+  initWebsocket() {
+    console.log("init socket")
+    // 记得在要有消息通知的页面，引用  <AtMessage />
+    messageHub.subscribe((vo) => {
+      Taro.atMessage({
+        message: `收到一条来自 ${vo.senderName} 的消息`
+      })
+    });
   }
 
   private onError = createSimpleErrorHandler('login', this);

@@ -1,4 +1,5 @@
 import Taro from "@tarojs/taro";
+import configApi, {ConfigItem} from "./Config";
 
 export interface MessageVO {
   _id: string;
@@ -139,12 +140,33 @@ class MockSocket {
 
 }
 
+class Socket {
+  private wechatSocket: Taro.SocketTask;
+  constructor() {
+    this.init();
+  }
+  init() {
+    const url = configApi.getConfig(ConfigItem.SOCKET_ADDRESS);
+    Taro.connectSocket({url})
+      .then(res => this.wechatSocket = res)
+      .catch(console.error);
+  }
+  onMessage(onParam) {
+    this.wechatSocket && this.wechatSocket.onMessage(onParam);
+  }
+  send(msg) {
+    this.wechatSocket && this.wechatSocket.send(msg);
+  }
+}
+
 let messageHub: MessageHub;
 let websocket;
 // 由于这个socket要在程序一开始就调用， 云环境未初始完成，所以不要引用 api hub中的mock，会引发其他云函数的调用
 const mock = true;
 if (mock) {
   websocket = new MockSocket();
+} else {
+  websocket = new Socket();
 }
 messageHub = new MessageHub(websocket);
 
