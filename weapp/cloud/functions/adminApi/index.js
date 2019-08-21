@@ -31,8 +31,7 @@ exports.main = async (event, context) => {
             })
           } : {},
           {
-            state: ComplaintState.Ongoing,
-            complainTime: command.lte(timestamp)
+            state: ComplaintState.Ongoing
           }),
       lastIndex,
       size
