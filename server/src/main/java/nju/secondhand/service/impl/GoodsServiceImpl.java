@@ -6,6 +6,7 @@ import nju.secondhand.util.MapObjectUtil;
 import nju.secondhand.util.Pair;
 import nju.secondhand.vo.CategoryVO;
 import nju.secondhand.vo.GoodsVO;
+import nju.secondhand.vo.enums.ApiType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,31 +26,29 @@ public class GoodsServiceImpl implements GoodsService {
     public List<CategoryVO> getCategories() {
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
-                Pair.of("$url", "getCategories")));
+                Pair.of("$url", "getCategories")), ApiType.ADMIN_API);
     }
 
     @Override
-    public List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size, long timestamp) {
+    public List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size) {
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
                 Pair.of("$url", "searchGoodsByKeyword"),
                 Pair.of("keyword", keyword),
                 Pair.of("lastIndex", lastIndex),
-                Pair.of("size", size),
-                Pair.of("timestamp", timestamp)
-        ));
+                Pair.of("size", size)
+        ), ApiType.ADMIN_API);
     }
 
     @Override
-    public List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size, long timestamp) {
+    public List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size) {
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
                 Pair.of("$url", "searchGoodsByCategory"),
                 Pair.of("categoryID", categoryID),
                 Pair.of("lastIndex", lastIndex),
-                Pair.of("size", size),
-                Pair.of("timestamp", timestamp)
-        ));
+                Pair.of("size", size)
+        ), ApiType.ADMIN_API);
     }
 
     @Override
@@ -57,6 +56,6 @@ public class GoodsServiceImpl implements GoodsService {
         cloudService.invokeCloudFunction(Void.class, MapObjectUtil.mapObject(
                 Pair.of("$url", "deleteGoods"),
                 Pair.of("goodsID", goodsID)
-        ));
+        ), ApiType.ADMIN_API);
     }
 }

@@ -5,6 +5,7 @@ import nju.secondhand.service.OrderService;
 import nju.secondhand.util.MapObjectUtil;
 import nju.secondhand.util.Pair;
 import nju.secondhand.vo.OrderVO;
+import nju.secondhand.vo.enums.ApiType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,14 +22,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderVO> getOrders(String keyword, int lastIndex, int size, long timestamp) {
+    public List<OrderVO> getOrders(String keyword, int lastIndex, int size) {
 
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
                 Pair.of("$url", "getOrders"),
                 Pair.of("keyword", keyword),
                 Pair.of("lastIndex", lastIndex),
-                Pair.of("size", size),
-                Pair.of("timestamp", timestamp)));
+                Pair.of("size", size)), ApiType.ADMIN_API);
     }
 }

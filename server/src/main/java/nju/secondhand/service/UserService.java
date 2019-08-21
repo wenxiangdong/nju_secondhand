@@ -14,10 +14,9 @@ public interface UserService {
      * @param keyword   关键词
      * @param lastIndex 之前总共查询到的数量
      * @param size      本次查询数量
-     * @param timestamp 时间戳
      * @return {@link UserVO}
      */
-    List<UserVO> getNormalUsers(String keyword, int lastIndex, int size, long timestamp);
+    List<UserVO> getNormalUsers(String keyword, int lastIndex, int size);
 
     /**
      * 冻结用户
@@ -32,10 +31,9 @@ public interface UserService {
      * @param keyword   关键词
      * @param lastIndex 之前总共查询到的数量
      * @param size      本次查询数量
-     * @param timestamp 时间戳
      * @return {@link UserVO}
      */
-    List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size, long timestamp);
+    List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size);
 
     /**
      * 解冻用户

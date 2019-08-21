@@ -1,5 +1,7 @@
 package nju.secondhand.service;
 
+import nju.secondhand.vo.enums.ApiType;
+
 /**
  * @author cst
  */
@@ -12,29 +14,7 @@ public interface CloudService {
      * @param <T>    对象泛型
      * @return 调用云函数结果
      */
-    <T> T invokeCloudFunction(Class<T> tClass, Object object);
-
-//    /**
-//     * 数据库查询记录
-//     *
-//     * @param tClass         返回对象类
-//     * @param collectionName 集合名称
-//     * @param conditions     筛选条件
-//     * @param skip           跳过多少数据量
-//     * @param limit          拿多少数据量
-//     * @param <T>            对象泛型
-//     * @return 查询结果集
-//     */
-//    <T> List<T> databaseQuery(Class<T> tClass, String collectionName, int skip, int limit, Map<Object, Object>... conditions);
-//
-//    /**
-//     * 统计查询语句对应的结果记录数
-//     *
-//     * @param collectionName 集合名称
-//     * @param conditions     筛选条件
-//     * @return 符合条件的记录数
-//     */
-//    long databaseCount(String collectionName, Map<Object, Object>... conditions);
+    <T> T invokeCloudFunction(Class<T> tClass, Object object, ApiType apiType);
 
     /**
      * 根据文件 ID 换取真实链接

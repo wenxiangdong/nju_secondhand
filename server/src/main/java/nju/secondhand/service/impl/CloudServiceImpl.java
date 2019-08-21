@@ -7,6 +7,7 @@ import nju.secondhand.exception.FailException;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.service.HttpService;
 import nju.secondhand.util.JsonUtil;
+import nju.secondhand.vo.enums.ApiType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,11 +32,11 @@ public class CloudServiceImpl implements CloudService {
     }
 
     @Override
-    public <T> T invokeCloudFunction(Class<T> tClass, Object object) {
+    public <T> T invokeCloudFunction(Class<T> tClass, Object object, ApiType apiType) {
         String url = String.format("https://api.weixin.qq.com/tcb/invokecloudfunction?access_token=%s&env=%s&name=%s",
                 getAccessToken(),
                 miniProgramConfig.getEnv(),
-                miniProgramConfig.getApi());
+                apiType.getApiName());
 
         FunctionResult result = httpService.post(url, JsonUtil.toJson(object), FunctionResult.class);
 

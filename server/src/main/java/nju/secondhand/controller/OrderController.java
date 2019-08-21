@@ -25,8 +25,8 @@ public class OrderController {
     }
 
     @GetMapping("/getOrders")
-    public HttpResponse<List<OrderVO>> getOrders(String keyword, int lastIndex, int size, long timestamp, HttpSession session) {
+    public HttpResponse<List<OrderVO>> getOrders(String keyword, int lastIndex, int size, HttpSession session) {
         LoginUtil.checkLogin(session);
-        return new HttpResponse<>(orderService.getOrders(keyword, lastIndex, size, timestamp));
+        return new HttpResponse<>(orderService.getOrders(keyword, lastIndex, size));
     }
 }

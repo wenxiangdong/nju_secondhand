@@ -6,6 +6,7 @@ import nju.secondhand.util.JsonUtil;
 import nju.secondhand.util.MapObjectUtil;
 import nju.secondhand.util.Pair;
 import nju.secondhand.vo.MessageVO;
+import nju.secondhand.vo.enums.ApiType;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.OnClose;
@@ -45,7 +46,7 @@ public class WebSocketServer {
                 MapObjectUtil.mapObject(
                         Pair.of("$url", "getUnreadMessages"),
                         Pair.of("receiverID", uid)
-                ))));
+                ), ApiType.USER_API)));
     }
 
     @OnClose
@@ -56,11 +57,12 @@ public class WebSocketServer {
     @OnMessage
     public void onMessage(String message) {
         MessageDTO messageDTO = JsonUtil.fromJson(message, MessageDTO.class);
+        messageDTO.setSenderID(uid);
 
         MessageVO messageVO = cloudService.invokeCloudFunction(MessageVO.class, MapObjectUtil.mapObject(
                 Pair.of("$url", "addMessage"),
-                Pair.of("data", messageDTO)
-        ));
+                Pair.of("message", messageDTO)
+        ), ApiType.USER_API);
 
         WebSocketServer receiver = WEB_SOCKET_SERVERS.get(messageDTO.getReceiverID());
         if (receiver != null) {
@@ -68,7 +70,7 @@ public class WebSocketServer {
             cloudService.invokeCloudFunction(Void.class, MapObjectUtil.mapObject(
                     Pair.of("$url", "readMessage"),
                     Pair.of("messageID", messageVO.get_id())
-            ));
+            ), ApiType.USER_API);
         }
     }
 }

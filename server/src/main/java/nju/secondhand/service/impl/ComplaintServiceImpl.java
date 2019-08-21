@@ -5,6 +5,7 @@ import nju.secondhand.service.ComplaintService;
 import nju.secondhand.util.MapObjectUtil;
 import nju.secondhand.util.Pair;
 import nju.secondhand.vo.ComplaintVO;
+import nju.secondhand.vo.enums.ApiType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,15 +22,14 @@ public class ComplaintServiceImpl implements ComplaintService {
     }
 
     @Override
-    public List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size, long timestamp) {
+    public List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size) {
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
                 Pair.of("$url", "getComplaints"),
                 Pair.of("keyword", keyword),
                 Pair.of("lastIndex", lastIndex),
-                Pair.of("size", size),
-                Pair.of("timestamp", timestamp)
-        ));
+                Pair.of("size", size)
+        ), ApiType.ADMIN_API);
     }
 
     @Override
@@ -38,6 +38,6 @@ public class ComplaintServiceImpl implements ComplaintService {
                 Pair.of("$url", "handle"),
                 Pair.of("complaintID", complaintID),
                 Pair.of("result", result)
-        ));
+        ), ApiType.ADMIN_API);
     }
 }

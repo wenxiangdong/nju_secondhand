@@ -2,6 +2,5 @@ mini-program:
   appID: wxc4e156082fbd97ba
   appSecret: b67831c61b8af414d031fe209a30c683
   env: dev-mecmb
-  api: adminApi
 server:
   port: 18080
