@@ -1,8 +1,6 @@
 import "@tarojs/async-await";
 import {VO, httpRequest, db, Fail, HttpCode, mockHttpRequest} from "./HttpRequest";
 import {AccountVO, MockAccountApi} from "./AccountApi";
-import {Debugger} from "inspector";
-import Location = module
 
 export interface IUserApi {
   // 检查用户状态
@@ -32,6 +30,12 @@ class UserApi implements IUserApi {
     if (await this.checkState() !== UserState.UnRegistered) {
       throw new Fail(HttpCode.Forbidden, "该用户已注册")
     }
+
+    const account: AccountVO = {
+      balance: '0'
+    }
+
+    user['account'] = account
 
     user['signUpTime'] = Date.now()
     user['state'] = UserState.Normal
