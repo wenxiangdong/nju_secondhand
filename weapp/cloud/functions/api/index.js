@@ -239,16 +239,14 @@ exports.main = async (event, context) => {
          */
         openID: ctx.data.openid,
         payTitle: goods.name,
-        payAmount: order.price,
+        payAmount: goods.price,
         orderID: order._id,
       });
+      result.orderID = order._id
       // 调用云函数是否正常
       ctx.body = {
-        code: result.code,
-        data: {
-          ...result.data,
-          orderID: order._id
-        }
+        code: HttpCode.Success,
+        data: result
       };
     } catch (error) {
       ctx.body = {
@@ -796,7 +794,7 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
   // 转换成分
   payAmount = parseFloat(payAmount);
-  payAmount = payAmount * 100;
+  payAmount = parseInt(Math.round(payAmount * 100));
   try {
     const result = await tenpay.getPayParams({
       out_trade_no: orderID || `order${+new Date()}`,

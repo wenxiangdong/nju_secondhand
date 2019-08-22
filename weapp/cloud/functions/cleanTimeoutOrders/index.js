@@ -15,6 +15,7 @@ exports.main = async (event, context) => {
   }
   const expiredOrders = db.collection('order').where(condition)
 
+  const MAX_LIMIT = 100
   const countResult = await expiredOrders.count()
   const total = countResult.total
   // 计算需分几次取
