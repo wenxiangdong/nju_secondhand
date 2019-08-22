@@ -185,15 +185,17 @@ exports.main = async (event, context) => {
     const { goodsID = -1 } = event;
     const { self } = ctx.data;
 
-    // 对商品下单，创建订单和让商品下架
+    // 对商品下单：商品下架、创建订单
+    const goods = await getOneGoods({ goodsID })
+
+    if (goods.state !== GoodsState.InSale) {
+      ctx.body = { code: HttpCode.Forbidden, messsage: '该商品暂时无法购买' }
+    }
+
     await updateOneGoods({
       goodsID, goods: { state: GoodsState.Paying }
     })
 
-
-    // 下个单
-    // const goods = goodsList[0]; // 取goods
-    const goods = await getOneGoods({ goodsID })
     const order = {
       // buyer就是当前用户
       buyerID: self._id,
@@ -249,6 +251,11 @@ exports.main = async (event, context) => {
         data: result
       };
     } catch (error) {
+      console.error(error)
+      await deleteOneOrder({ orderID: order._id })
+      await updateOneGoods({
+        goodsID, goods: { state: GoodsState.InSale }
+      })
       ctx.body = {
         code: HttpCode.Fail,
         message: "微信支付服务出错"
@@ -518,6 +525,7 @@ exports.main = async (event, context) => {
         code: HttpCode.Fail,
         message: `订单[${order._id}]处理失败，请重试，或者联系客服`
       }
+      return
     }
 
     ctx.body = {
