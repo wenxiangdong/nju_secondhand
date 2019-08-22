@@ -25,7 +25,7 @@ public class GoodsController {
 
     @GetMapping("/getCategories")
     public HttpResponse<List<CategoryVO>> getCategories(HttpSession session) {
-//        LoginUtil.checkLogin(session);
+        LoginUtil.checkLogin(session);
         return new HttpResponse<>(goodsService.getCategories());
     }
 
