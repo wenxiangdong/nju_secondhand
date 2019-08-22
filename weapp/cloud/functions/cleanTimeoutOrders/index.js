@@ -5,13 +5,13 @@ cloud.init()
 
 const db = cloud.database()
 const command = db.command
-const eightMinutesAgo = -8 * 60 * 1000
+const tenMinutesAgo = -10 * 60 * 1000
 
 // 云函数入口函数
 exports.main = async (event, context) => {
   const condition = {
     state: OrderState.Paying,
-    orderTime: command.lte(Date.now() + eightMinutesAgo)
+    orderTime: command.lte(Date.now() + tenMinutesAgo)
   }
   const expiredOrders = db.collection('order').where(condition)
 
@@ -28,25 +28,22 @@ exports.main = async (event, context) => {
     tasks.push(promise)
   }
 
-  const goodsIDs = (await Promise.all(tasks)).reduce((acc, cur) => {
-    return {
-      data: acc.data.concat(cur.data)
-    }
-  }, {
-      data: []
-    }).data.map(order => order.goodsID);
+  const goodsIDs =
+    (await Promise.all(tasks))
+      .reduce((acc, cur) => {
+        return {
+          data: acc.data.concat(cur.data)
+        }
+      }, { data: [] }).data
+      .map(order => order.goodsID);
 
   await Promise.all(
     [
       expiredOrders.remove(),
       db.collection('goods')
-        .where({
-          _id: command.in(goodsIDs)
-        })
+        .where({_id: command.in(goodsIDs)})
         .update({
-          data: {
-            state: GoodsState.InSale
-          }
+          data: {state: GoodsState.InSale}
         })
     ]
   )

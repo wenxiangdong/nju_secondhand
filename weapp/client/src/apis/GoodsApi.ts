@@ -282,7 +282,9 @@ export interface GoodsWithSellerVO {
 
 export enum GoodsState {
   InSale = 0,
-  Deleted = 1
+  Deleted = 1, // 下架
+  Paying = 2, // 支付中
+  Frozen = 3, // 被冻结
 }
 
 export interface PurchaseResult {

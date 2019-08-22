@@ -76,8 +76,8 @@ export interface ComplaintVO extends VO {
   orderID: string // 订单编号
   desc: string
 
-  complaintID: string;
-  complaintName: string;
+  complainantID: string;
+  complainantName: string;
 
   pictures: Array<string>;
 

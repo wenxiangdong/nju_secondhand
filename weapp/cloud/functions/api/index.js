@@ -27,7 +27,7 @@ exports.main = async (event, context) => {
   // 取得自身信息
   app.router('*', async (ctx, next) => {
     console.log(`invoke: ${event.$url}`)
-    
+
     const openid = cloud.getWXContext().OPENID
     ctx.data.openid = openid
     console.log(openid)
@@ -144,7 +144,6 @@ exports.main = async (event, context) => {
     goods.sellerID = self._id
     goods.sellerName = self.nickname
 
-    goods.publishTime = Date.now()
     goods.state = GoodsState.InSale
 
     goods.category = await getOneCategory({ categoryID: goods.categoryID })
@@ -160,12 +159,22 @@ exports.main = async (event, context) => {
   app.router('getOngoingGoods', async (ctx) => {
     ctx.body = {
       code: HttpCode.Success,
-      data: await getGoodsByUserIdAndState({ userID: ctx.data.self._id, state: GoodsState.InSale })
+      data: await getGoodsByUserIdAndState({ userID: ctx.data.self._id, state: command.eq(GoodsState.InSale).or(command.eq(GoodsState.Paying)) })
     }
   })
 
   app.router('deleteGoods', async (ctx) => {
-    await deleteOneGoods({ goodsID: event.goodsID })
+    const { goodsID } = event
+    const goods = getOneGoods({ goodsID })
+    if (goods.state === GoodsState.Paying) {
+      ctx.body = {
+        code: HttpCode.Forbidden,
+        message: '该商品正在被购买，无法下架'
+      }
+      return
+    }
+
+    await updateOneGoods({ goodsID: event.goodsID, goods: { state: GoodsState.Deleted } })
 
     ctx.body = {
       code: HttpCode.Success
@@ -178,10 +187,7 @@ exports.main = async (event, context) => {
 
     // 对商品下单，创建订单和让商品下架
     await updateOneGoods({
-      goodsID,
-      goods: {
-        state: GoodsState.Deleted
-      }
+      goodsID, goods: { state: GoodsState.Paying }
     })
 
 
@@ -202,7 +208,6 @@ exports.main = async (event, context) => {
 
       address: self.address,
 
-      orderTime: Date.now(),
       deliveryTime: -1, // -1 表示还未送达
 
       state: OrderState.Paying
@@ -215,10 +220,7 @@ exports.main = async (event, context) => {
       // 放着异步做了，无力的保证
       console.error(error);
       await updateOneGoods({
-        goodsID,
-        data: {
-          state: GoodsState.InSale
-        }
+        goodsID, goods: { state: GoodsState.InSale }
       })
       ctx.body = {
         code: HttpCode.Fail,
@@ -265,7 +267,6 @@ exports.main = async (event, context) => {
     post.ownerName = self.nickname
     post.ownerAvatar = self.avatar
 
-    post.publishTime = Date.now()
     post.comments = []
 
     await addPost({ post });
@@ -288,17 +289,11 @@ exports.main = async (event, context) => {
     await updateOnePost({
       postID,
       post: {
-        comments: command.push([{
-          nickname: self.nickname,
-          content,
-          commentTime: Date.now()
-        }])
+        comments: command.push([{ nickname: self.nickname, content, commentTime: Date.now() }])
       }
     })
 
-    ctx.body = {
-      code: HttpCode.Success
-    }
+    ctx.body = { code: HttpCode.Success }
   })
 
   app.router('getPostById', async (ctx) => {
@@ -326,18 +321,14 @@ exports.main = async (event, context) => {
     const { complaint } = event
     const { self } = ctx.data
 
-    complaint.complaintID = self._id
-    complaint.complaintName = self.nickname
-
-    complaint.complainTime = Date.now()
+    complaint.complainantID = self._id
+    complaint.complainantName = self.nickname
 
     complaint.state = ComplaintState.Ongoing
 
     await addComplaint({ complaint })
 
-    ctx.body = {
-      code: HttpCode.Success
-    }
+    ctx.body = { code: HttpCode.Success }
   })
 
   // 逆序取得投诉列表
@@ -366,9 +357,7 @@ exports.main = async (event, context) => {
   app.router('sendNotification', async (ctx) => {
     await addNotification({ notification: event.notification })
 
-    ctx.body = {
-      code: HttpCode.Success
-    }
+    ctx.body = { code: HttpCode.Success }
   })
 
   /** 账户 */
@@ -410,9 +399,7 @@ exports.main = async (event, context) => {
       }
     })
 
-    ctx.body = {
-      code: HttpCode.Success
-    }
+    ctx.body = { code: HttpCode.Success }
   })
 
   /** 订单 */
@@ -425,17 +412,27 @@ exports.main = async (event, context) => {
 
     const account = (await getOneUser({ userID: order.sellerID })).account
 
-    await Promise.all(
-      [
-        udpateOneOrder({ orderID, order: { state: OrderState.Finished, deliveryTime: Date.now() } }),
-        updateOneUser({ userID: order.sellerID, user: { account } }),
-        sendNotification({ userID: order.sellerID, content: `您的商品 ${order.goodsName} 已被签收` })
-      ]
-    )
-
-    ctx.body = {
-      code: HttpCode.Success
+    try {
+      await udpateOneOrder({ orderID, order: { state: OrderState.Finished, deliveryTime: Date.now() } })
+    } catch (e) {
+      console.error(e)
+      ctx.body = { code: HttpCode.Fail, message: '接受订单失败，请重试' }
+      return
     }
+
+    try {
+      await updateOneUser({ userID: order.sellerID, user: { account } })
+    } catch (e) {
+      console.error(e)
+      // 如果更新卖家消息失败，回滚订单操作，将其改为进行中状态
+      await udpateOneOrder({ orderID, order: { state: OrderState.Ongoing, deliveryTime: -1 } })
+      ctx.body = { code: HttpCode.Fail, message: '接受订单失败，请重试' }
+      return
+    }
+
+    await addNotification({ userID: order.sellerID, content: `您的商品 ${order.goodsName} 已被签收` })
+
+    ctx.body = { code: HttpCode.Success }
   })
 
   // 逆序
@@ -515,6 +512,8 @@ exports.main = async (event, context) => {
     const handler = handlers[result];
     try {
       await handler(order);
+      // 通知卖家发货
+      await addNotification({ notification: { userID: order.sellerID, content: `你的商品 ${order.goodsName} 已被购买，请及时发货` } })
     } catch (error) {
       console.error(error);
       ctx.body = {
@@ -536,19 +535,13 @@ exports.main = async (event, context) => {
 
     message.senderName = sender.nickname
     message.receiverName = receiver.nickname
-    message.time = Date.now()
     message.read = false
     await addMessage({ message })
   })
 
   app.router('readMessage', async (ctx) => {
     const { messageID } = event
-    await updateOneMessage({
-      messageID,
-      message: {
-        read: true
-      }
-    })
+    await updateOneMessage({ messageID, message: { read: true } })
   })
 
   app.router('getUnreadMessages', async (ctx) => {
@@ -649,6 +642,7 @@ const getGoodsByUserIdAndState = async ({ userID, state }) => {
 }
 
 const addGoods = async ({ goods }) => {
+  goods.publishTime = Date.now()
   return await add({ name: goodsName, data: goods })
 }
 
@@ -694,6 +688,7 @@ const getSellerOrdersByPageAndState = async ({ sellerID, state, lastIndex, size 
 }
 
 const addOrder = async ({ order }) => {
+  order.orderTime = Date.now()
   return await add({ name: orderName, data: order })
 }
 
@@ -728,6 +723,7 @@ const getPostsByPageAndKeyword = async ({ keyword = '', lastIndex, size }) => {
 }
 
 const addPost = async ({ post }) => {
+  post.publishTime = Date.now()
   return await add({ name: postName, data: post })
 }
 
@@ -739,10 +735,12 @@ const updateOnePost = async ({ postID, post }) => {
 const complaintName = 'complaint'
 
 const getComplaintsByPageAndUserId = async ({ userID, lastIndex, size }) => {
-  return await getPage({ name: complaintName, condition: { complaintID: userID }, orders: [['complainTime', 'desc']], lastIndex, size })
+  return await getPage({ name: complaintName, condition: { complainantID: userID }, orders: [['complainTime', 'desc']], lastIndex, size })
 }
 
 const addComplaint = async ({ complaint }) => {
+  complaint.complainTime = Date.now()
+
   return await add({ name: complaintName, data: complaint })
 }
 
@@ -755,6 +753,7 @@ const getNotificationsByPageAndUserId = async ({ userID, lastIndex, size }) => {
 }
 
 const addNotification = async ({ notification }) => {
+  notification.time = Date.now()
   await add({ name: notificationName, data: notification })
 }
 
@@ -826,6 +825,8 @@ const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
 }
 
 const addMessage = async ({ message }) => {
+  message.time = Date.now()
+
   return await add({ name: messageName, data: message })
 }
 
@@ -927,7 +928,9 @@ const UserState = {
 
 const GoodsState = {
   InSale: 0,
-  Deleted: 1
+  Deleted: 1,
+  Paying: 2,
+  Frozen: 3
 }
 
 const OrderState = {

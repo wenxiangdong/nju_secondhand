@@ -7,6 +7,14 @@ cloud.init()
 const db = cloud.database()
 const command = db.command
 
+const adminName = 'admin'
+const userName = 'user'
+const goodsName = 'goods'
+const categoryName = 'category'
+const orderName = 'order'
+const complaintName = 'complaint'
+const userApi = 'api'
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   const app = new TcbRouter({
@@ -15,13 +23,13 @@ exports.main = async (event, context) => {
 
   app.router('checkAdmin', async (ctx) => {
     const { username, password } = event
-    ctx.body = exists({ name: 'admin', condition: { username, password } })
+    ctx.body = exists({ name: adminName, condition: { username, password } })
   })
 
   app.router('getComplaints', async (ctx) => {
     const { lastIndex, size } = event
     ctx.body = await getPage({
-      name: 'complaint',
+      name: complaintName,
       condition:
         command.and(
           keyword ? {
@@ -39,12 +47,24 @@ exports.main = async (event, context) => {
   })
 
   app.router('handle', async (ctx) => {
-    const { complainID, result } = event
+    const { complaintID, result } = event
     await updateOne({
-      name: 'complaint', id: complainID, data: {
-        handling: {
-          time: Date.now(),
-          result
+      name: complaintName,
+      id: complaintID,
+      data: {
+        handling: { time: Date.now(), result }
+      }
+    })
+
+    const complaint = await getOne({ name: complaintName, id: complaintID })
+
+    await cloud.callFunction({
+      name: userApi,
+      data: {
+        $url: 'sendNotification',
+        notification: {
+          userID: complaint.complainantID,
+          content: `你的投诉单 ${complaintID} 已被处理`
         }
       }
     })
@@ -54,17 +74,14 @@ exports.main = async (event, context) => {
     const { keyword, lastIndex, size } = event
 
     ctx.body = await getPage({
-      name: 'order',
+      name: orderName,
       ccondition: command.and(
         keyword ? {
           goodsName: db.RegExp({
             regexp: keyword,
             options: 'i'
           })
-        } : {},
-        {
-          state: command.neq(OrderState.Paying)
-        }),
+        } : {}),
       lastIndex,
       size,
     })
@@ -72,9 +89,9 @@ exports.main = async (event, context) => {
 
   app.router('getCategories', async (ctx) => {
     const res = await cloud.callFunction({
-      name: 'api',
+      name: userApi,
       data: {
-        $url: 'getCategories'
+        $url: event.$url
       }
     })
 
@@ -88,12 +105,12 @@ exports.main = async (event, context) => {
   })
 
   app.router('searchGoodsByKeyword', async (ctx) => {
-    const { keyword, lastIndex, size } = event
+    const { $url, keyword, lastIndex, size } = event
 
     const res = await cloud.callFunction({
-      name: 'api',
+      name: userApi,
       data: {
-        $url: 'searchGoodsByKeyword',
+        $url,
         keyword,
         lastIndex,
         size
@@ -110,12 +127,12 @@ exports.main = async (event, context) => {
   })
 
   app.router('searchGoodsByCategory', async (ctx) => {
-    const { categoryID, lastIndex, size } = event
+    const { $url, categoryID, lastIndex, size } = event
 
     const res = await cloud.callFunction({
-      name: 'api',
+      name: userApi,
       data: {
-        $url: 'searchGoodsByCategory',
+        $url,
         categoryID,
         lastIndex,
         size
@@ -133,11 +150,11 @@ exports.main = async (event, context) => {
 
   app.router('deleteGoods', async (ctx) => {
     const { goodsID } = event
-    const goods = await getOne({ name: 'goods', id: goodsID })
-    await removeOne({ name: 'goods', id: goodsID })
+    const goods = await getOne({ name: goodsName, id: goodsID })
 
+    await updateOne({ name: goodsName, id: goodsID, data: { state: Deleted } });
     await cloud.callFunction({
-      name: 'api',
+      name: userApi,
       data: {
         $url: 'sendNotification',
         userID: goods.sellerID,
@@ -149,7 +166,7 @@ exports.main = async (event, context) => {
   app.router('getUsers', async (ctx) => {
     const { state, keyword, lastIndex, size } = event
     ctx.body = await getPage({
-      name: 'user',
+      name: userName,
       condition: command.and(
         keyword ?
           {
@@ -169,17 +186,13 @@ exports.main = async (event, context) => {
   app.router('updateUser', async (ctx) => {
     const { userID, state } = event
 
-    await updateOne({
-      name: 'user',
-      id: userID,
-      data: {
-        state
-      }
+    await updateOne({ name: userName, id: userID, data: { state } })
+    await updateAll({
+      name: goodsName,
+      condition: { sellerID: userID, state: state === UserState.Frozen ? GoodsState.InSale : GoodsState.Frozen },
+      data: { state: state === UserState.Frozen ? GoodsState.Frozen : GoodsState.InSale }
     })
   })
-
-  /** 聊天部分 */
-  app.router('getUnread')
 
   return app.serve()
 }
@@ -280,7 +293,9 @@ const UserState = {
 
 const GoodsState = {
   InSale: 0,
-  Deleted: 1
+  Deleted: 1,
+  Paying: 2,
+  Frozen: 3
 }
 
 const OrderState = {
@@ -292,6 +307,14 @@ const OrderState = {
 const ComplaintState = {
   Ongoing: 0,
   Handled: 1
+}
+
+const HttpCode = {
+  Success: 200,
+  Forbidden: 403, // 403
+  Not_Found: 404, // 404
+  Conflict: 409, // 409 冲突
+  Fail: 500 // 500
 }
 
 const HttpCode = {
