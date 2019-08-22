@@ -40,6 +40,7 @@ export default function ComplaintForm() {
         icon: "none",
         title: "提交投诉失败，请重试"
       });
+      console.error(e);
     } finally {
       setLoading(false);
     }

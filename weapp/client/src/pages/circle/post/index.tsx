@@ -131,7 +131,7 @@ export default class index extends Component<any, IState> {
 
   private getPost = async () => {
     let postId = circlePostUrlConfig.getCircleId(this);
-    postId = '1'; // TODO
+    // postId = '1'; // TODO
     if (postId && postId.length) {
       return apiHub.circleApi.getPostById(postId);
     } else {
@@ -141,7 +141,7 @@ export default class index extends Component<any, IState> {
 
   private getUserInfo = async () => {
     let userId = localConfig.getUserId();
-    userId = '1'; // TODO
+    // userId = '1'; // TODO
     if (userId && userId.length) {
       return apiHub.userApi.getUserInfo(userId)
     } else {
@@ -259,7 +259,7 @@ export default class index extends Component<any, IState> {
             autoFocus
             showConfirmBar
           />
-          <AtButton type='primary' formType='submit'>提交评论</AtButton>
+          <AtButton type='primary' formType='submit' disabled={!comment}>提交评论</AtButton>
         </AtForm>
 
         <View style={styles.comments}>

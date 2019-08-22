@@ -14,7 +14,7 @@ export default function DeveloperFooter() {
         setInfo({
             ...res
         });
-    }, []); 
+    }, []);
 
     const itemTitleStyle: CSSProperties = {
         color: "black",
@@ -22,10 +22,10 @@ export default function DeveloperFooter() {
     };
 
     return (
-        <View 
+        <View
         onClick={() => setOpen(true)}
         style={{
-            width: "100%", boxSizing: "border-box", 
+            width: "100%", boxSizing: "border-box",
             display: "flex", justifyContent: "center", alignItems: "center",
             padding: "16px"
             }}>
@@ -47,7 +47,7 @@ export default function DeveloperFooter() {
                         <View style={itemTitleStyle}>联系邮箱</View>
                         <View>{developerInfo.email}</View>
                         <View style={{textAlign: "right"}}>
-                            <Text 
+                            <Text
                             onClick={() => Taro.setClipboardData({data: developerInfo.email})}
                             style={{
                                 color: "#C9C9C9"
@@ -55,7 +55,7 @@ export default function DeveloperFooter() {
                         </View>
                         <WhiteSpace height={16}/>
                         <View style={itemTitleStyle}>开发人员</View>
-                        <View>{developerInfo.members.join("，")}</View>
+                        <View>{developerInfo.members && developerInfo.members.join("，")}</View>
                     </View>
                 </AtCard>
             </AtCurtain>
