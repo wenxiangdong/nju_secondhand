@@ -16,7 +16,6 @@ import java.util.List;
  * @author cst
  */
 @RestController
-@CrossOrigin(value = "*", methods = {RequestMethod.GET, RequestMethod.POST}, allowCredentials = "true")
 public class OrderController {
     private final OrderService orderService;
 

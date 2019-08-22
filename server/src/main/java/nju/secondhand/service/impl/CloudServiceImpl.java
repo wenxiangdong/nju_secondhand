@@ -23,8 +23,8 @@ public class CloudServiceImpl implements CloudService {
     private final HttpService httpService;
     private final MiniProgramConfig miniProgramConfig;
 
-    private static LocalDateTime accessTokenExpireTime;
-    private static String accessToken;
+    private static LocalDateTime access_token_expireTime;
+    private static String access_token;
 
     public CloudServiceImpl(HttpService httpService, MiniProgramConfig miniProgramConfig) {
         this.httpService = httpService;
@@ -73,23 +73,23 @@ public class CloudServiceImpl implements CloudService {
     }
 
     private String getAccessToken() {
-        if (accessToken == null || LocalDateTime.now().compareTo(accessTokenExpireTime) >= 0) {
+        if (access_token == null || LocalDateTime.now().compareTo(access_token_expireTime) >= 0) {
             String url = String.format("https://api.weixin.qq.com/cgi-bin/token?grant_type=%s&appid=%s&secret=%s",
                     "client_credential",
                     miniProgramConfig.getAppId(),
                     miniProgramConfig.getAppSecret());
 
-            AccessToken access_token = httpService.get(url, AccessToken.class);
+            AccessToken accessToken = httpService.get(url, AccessToken.class);
 
-            log.info("AccessToken: " + access_token);
+            log.info("AccessToken: " + accessToken.access_token);
 
-            if (access_token.invalid()) {
-                throw new FailException(access_token.errmsg);
+            if (accessToken.invalid()) {
+                throw new FailException(accessToken.errmsg);
             }
-            accessTokenExpireTime = LocalDateTime.now().plusSeconds(access_token.expires_in);
-            accessToken = access_token.access_token;
+            access_token_expireTime = LocalDateTime.now().plusSeconds(accessToken.expires_in);
+            access_token = accessToken.access_token;
         }
-        return accessToken;
+        return access_token;
     }
 }
 

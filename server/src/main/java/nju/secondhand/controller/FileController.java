@@ -14,7 +14,6 @@ import javax.servlet.http.HttpSession;
  * @author cst
  */
 @RestController
-@CrossOrigin(value = "*", methods = {RequestMethod.GET, RequestMethod.POST}, allowCredentials = "true")
 public class FileController {
     private final FileService fileService;
 

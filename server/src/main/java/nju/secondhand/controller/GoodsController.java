@@ -5,7 +5,9 @@ import nju.secondhand.service.GoodsService;
 import nju.secondhand.util.LoginUtil;
 import nju.secondhand.vo.CategoryVO;
 import nju.secondhand.vo.GoodsVO;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -14,7 +16,6 @@ import java.util.List;
  * @author cst
  */
 @RestController
-@CrossOrigin(value = "*", methods = {RequestMethod.GET, RequestMethod.POST}, allowCredentials = "true")
 public class GoodsController {
     private final GoodsService goodsService;
 
@@ -24,7 +25,7 @@ public class GoodsController {
 
     @GetMapping("/getCategories")
     public HttpResponse<List<CategoryVO>> getCategories(HttpSession session) {
-        LoginUtil.checkLogin(session);
+//        LoginUtil.checkLogin(session);
         return new HttpResponse<>(goodsService.getCategories());
     }
 
