@@ -30,12 +30,25 @@ export default function SendPost() {
     return post.desc;
   };
 
+  const uploadFiles = (files: {url: string}[]) => {
+    console.log("上传中", files);
+    const CLOUD_DIR = "post";
+    const now = Date.now();
+    // 上传文件
+    return files.map(
+      (p, index) => apiHub.fileApi.uploadFile(`${CLOUD_DIR}/${post.topic}/${now}/topic_${index}`, p.url)
+    );
+  };
+
   // handlers
   const handleClickSend = async () => {
     try {
       Taro.showLoading({
         title: "发表中..."
       });
+      const paths = await Promise.all(uploadFiles(pictures));
+      console.log("上传文件成功", paths);
+      post.pictures = [...paths];
       await apiHub.circleApi.publishPost(post);
       resultUrlConfig.go({
         title: "发表成功",

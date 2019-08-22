@@ -82,11 +82,11 @@ export const ConfigItem = {
         default: "13390758334"
     },
     SOCKET_ADDRESS: {
-        key: "socker-address",  
+        key: "socker-address",
         default: "http://106.13.165.249/wechat"
     },// 聊天socket的连接地址
     DEVELOPER: {
-        key: "developer",    
+        key: "developer",
         default: {
             team: "文向东开发团队",
             email: "wenxiangdong@outlook.com",
@@ -104,7 +104,11 @@ export const ConfigItem = {
     LOGO: {
         key: "logo",
         default: "cloud://dev-mecmb.6465-dev-mecmb/logo.jpg"
-    }
+    },
+  ACTIVITY_PICTURES: {
+      key: "activity-pictures",
+    default: []
+  },  // 首页轮播图
 }
 
 const configApi = new ConfigApi();

@@ -47,7 +47,7 @@ export default class index extends Component<any, IState> {
 
   private loadMorePosts = () => {
     const lastIndex = this.state.posts.length;
-    apiHub.circleApi.searchPostsByKeyword(this.state.searchValue || '', lastIndex)
+    apiHub.circleApi.searchPostsByKeyword(this.state.searchValue || '', lastIndex, 10)
       .then((posts) => {
         if (posts && posts.length) {
           this.setState({searchDisabled: false, posts: this.state.posts.concat(posts), loadMoreStatus: 'more'});

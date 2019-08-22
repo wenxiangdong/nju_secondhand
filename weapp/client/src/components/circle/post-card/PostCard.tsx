@@ -19,7 +19,7 @@ function createStyles() {
     padding: '1vw 2vw',
     margin: '1vw 2vw',
     border: '1px solid lightgrey',
-    borderRadius: '5vw'
+    borderRadius: '5Px'
   };
   const headerBar:CSSProperties = {
     display: "inline-flex",
@@ -121,7 +121,7 @@ function PostCard(props: IProp) {
       }
       <View style={styles.bottomBar}>
         <View style={{marginLeft: '2vw'}}>
-          <AtIcon value='message' size='30' customStyle={{marginRight: '2vw'}}/> {comments.length}
+          <AtIcon value='message' size='20' customStyle={{marginRight: '2vw'}}/> {comments.length}
         </View>
         <Text style={{marginRight: '2vw'}}>
           {timeToString(publishTime)}
