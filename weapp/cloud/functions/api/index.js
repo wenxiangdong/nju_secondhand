@@ -711,12 +711,19 @@ const getPostsByPageAndKeyword = async ({ keyword = '', lastIndex, size }) => {
   return await getPage({
     name: postName,
     condition:
-      keyword ? {
-        topic: db.RegExp({
-          regexp: keyword,
-          options: 'i',
-        })
-      } : {},
+      keyword ? command.or(
+        {
+          topic: db.RegExp({
+            regexp: keyword,
+            options: 'i',
+          })
+        },
+        {
+          desc: db.RegExp({
+            regexp: keyword,
+            options: 'i',
+          })
+        }) : {},
     lastIndex,
     size
   })
