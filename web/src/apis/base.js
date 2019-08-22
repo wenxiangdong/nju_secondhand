@@ -3,6 +3,8 @@ import Axios from "axios";
 import Logger from "../utils/logger";
 const logger = Logger.getLogger("http");
 
+Axios.defaults.withCredentials = true;
+
 export const httpMock = async(data, timeout = 500): HttpResponse => {
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -16,7 +18,7 @@ export const httpMock = async(data, timeout = 500): HttpResponse => {
 };
 
 export const http = {};
-http.BASE_URL = "http://127.0.0.1:8080";
+http.BASE_URL = "http://106.13.165.249/nju_secondhand_server";
 http.handleHttpResponse = (res: HttpResponse) => {
     switch (res.code) {
         case 401:
@@ -56,4 +58,4 @@ http.post = async (url, params) => {
     return http.handleHttpResponse(data);
 };
 
-export const USE_MOCK = true;
+export const USE_MOCK = false;
