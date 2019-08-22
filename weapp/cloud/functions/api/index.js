@@ -141,7 +141,7 @@ exports.main = async (event, context) => {
     const { goods } = event
     const { self } = ctx.data
 
-    goods.sellerID = self.sellerID
+    goods.sellerID = self._id
     goods.sellerName = self.nickname
 
     goods.publishTime = Date.now()
@@ -263,6 +263,7 @@ exports.main = async (event, context) => {
 
     post.ownerID = self._id
     post.ownerName = self.nickname
+    post.ownerAvatar = self.avatar
 
     post.publishTime = Date.now()
     post.comments = []
@@ -933,6 +934,11 @@ const OrderState = {
   Ongoing: 0,
   Finished: 1,
   Paying: -1 // 正在支付中 by eric
+}
+
+const ComplaintState = {
+  Ongoing: 0,
+  Handled: 1
 }
 
 const HttpCode = {

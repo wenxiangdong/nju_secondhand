@@ -464,24 +464,24 @@ boolean login(String username, String password); // post
 void logout(); // post
 
 // 投诉管理
-List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size, long timestamp); // get
+List<ComplaintVO> getComplaints(String keyword, int lastIndex, int size); // get
 void handle(String complaintID, String result); // post
 
 // 订单管理
-List<OrderVO> getOrders(String keyword, int lastIndex, int size, long timestamp); // get
+List<OrderVO> getOrders(String keyword, int lastIndex, int size); // get
 
 // 商品管理
 List<CategoryVO> getCategories(); // get
-List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size, long timestamp); // get
-List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size, long timestamp); // get
+List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size); // get
+List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size); // get
 void deleteGoods(String goodsID); // post
 
 
 // 用户管理
-List<UserVO> getNormalUsers(String keyword, int lastIndex, int size, long timestamp); // get
+List<UserVO> getNormalUsers(String keyword, int lastIndex, int size); // get
 void freezeUser(String userID); // post
 
-List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size, long timestamp); // get
+List<UserVO> getFrozenUsers(String keyword, int lastIndex, int size); // get
 void unfreezeUser(String userID); // post
 
 // 文件管理
