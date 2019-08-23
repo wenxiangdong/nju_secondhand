@@ -1,6 +1,6 @@
 mini-program:
   appID: wxc4e156082fbd97ba
-  appSecret: b67831c61b8af414d031fe209a30c683
+  appSecret: 08c5dba9b8e3f52eded6f4c9a0ad4650
   env: dev-mecmb
 server:
   port: 18080

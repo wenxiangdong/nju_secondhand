@@ -1,6 +1,7 @@
 package nju.secondhand.service.impl;
 
 import lombok.Builder;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import nju.secondhand.config.MiniProgramConfig;
 import nju.secondhand.exception.FailException;
@@ -105,6 +106,7 @@ class DownLoadFileParam {
     }
 }
 
+@Setter
 class WechatError {
     Integer errcode;
     String errmsg;
@@ -114,15 +116,18 @@ class WechatError {
     }
 }
 
+@Setter
 class AccessToken extends WechatError {
     String access_token;
     Integer expires_in;
 }
 
+@Setter
 class FunctionResult extends WechatError {
     String resp_data;
 }
 
+@Setter
 class DownLoadFileResult extends WechatError {
     FileList file_list;
 
