@@ -39,14 +39,20 @@ class MockComplaintApi implements IComplaintApi {
       orderID: 'orderID',
       desc: 'descdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdescdesc',
 
-      complaintID: 'complaintID',
-      complaintName: 'complaintName',
+      complainantID: 'complaintID',
+      complainantName: 'complaintName',
 
-      pictures: ['','',''],
+      pictures: [
+        'cloud://dev-mecmb.6465-dev-mecmb/complaint/complaint_1566567497247_0',
+        'cloud://dev-mecmb.6465-dev-mecmb/complaint/complaint_1566567497247_0',
+        'cloud://dev-mecmb.6465-dev-mecmb/complaint/complaint_1566567497247_0',
+        'cloud://dev-mecmb.6465-dev-mecmb/complaint/complaint_1566567497247_0',
+        'cloud://dev-mecmb.6465-dev-mecmb/complaint/complaint_1566567497247_0'
+      ],
 
       complainTime: Date.now(),
 
-      handling: handled? this.createMockHandling(): null,
+      handling: handled? this.createMockHandling(): undefined,
 
       state: handled? ComplaintState.Handled: ComplaintState.Ongoing,
     };
