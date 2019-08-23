@@ -543,7 +543,8 @@ exports.main = async (event, context) => {
     message.senderName = sender.nickname
     message.receiverName = receiver.nickname
     message.read = false
-    await addMessage({ message })
+    const messageID = await addMessage({ message })
+    ctx.body = await getOneMessage({messageID})
   })
 
   app.router('readMessage', async (ctx) => {
@@ -825,6 +826,10 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
 /** message */
 const messageName = 'message'
 
+const getOneMessage = async({messageID}) => {
+  return await getOne({name: messageName, id: messageID})
+}
+
 const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
   const messages = await getAll({
     name: messageName,
@@ -834,7 +839,7 @@ const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
     },
   })
   const ids = messages.map(message => message._id)
-  await updateAll({ name: messageName, condition: { receiverID: command.in(ids) }, data: { read: true } })
+  await updateAll({ name: messageName, condition: { _id: command.in(ids) }, data: { read: true } })
   return messages
 }
 
