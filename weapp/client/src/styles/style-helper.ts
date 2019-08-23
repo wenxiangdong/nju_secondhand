@@ -20,6 +20,9 @@ class StyleHelper {
   static readonly loadMoreBtnStyle:CSSProperties = {
     // TODO 优先级 低 增加样式
     // 加载更多按钮样式
+    border: "none",
+    outline: "none",
+    color: "rgb(62, 207, 111)"
   };
 }
 

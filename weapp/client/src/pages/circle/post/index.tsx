@@ -132,6 +132,7 @@ export default class index extends Component<any, IState> {
   private getPost = async () => {
     let postId = circlePostUrlConfig.getCircleId(this);
     // postId = '1'; // TODO
+    console.log("postId", postId);
     if (postId && postId.length) {
       return apiHub.circleApi.getPostById(postId);
     } else {
@@ -142,10 +143,11 @@ export default class index extends Component<any, IState> {
   private getUserInfo = async () => {
     let userId = localConfig.getUserId();
     // userId = '1'; // TODO
+    console.log("userId", userId);
     if (userId && userId.length) {
       return apiHub.userApi.getUserInfo(userId)
     } else {
-      throw this.NOT_FIND_POST_ERROR
+      throw this.NOT_FIND_USER_ID_ERROR;
     }
   };
 

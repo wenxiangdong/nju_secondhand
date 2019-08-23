@@ -1,5 +1,8 @@
 import Taro from "@tarojs/taro";
 import configApi, {ConfigItem} from "./Config";
+import {userApi} from "./UserApi";
+import localConfig from "../utils/local-config";
+import {use} from "ast-types";
 
 export interface MessageVO {
   _id: string;
@@ -142,27 +145,51 @@ class MockSocket {
 
 class Socket {
   private wechatSocket: Taro.SocketTask;
+  private timerId;
   constructor() {
     this.init();
   }
-  init() {
+  async init() {
     const url = configApi.getConfig(ConfigItem.SOCKET_ADDRESS);
-    Taro.connectSocket({url})
-      .then(res => this.wechatSocket = res)
-      .catch(console.error);
+    const userID = localConfig.getUserId();
+    if (!url || !userID) {
+      console.log("未登陆，不能连接");
+      this.timerId = setTimeout(() => {
+        this.init();
+      }, 10 * 1000);
+      return ;
+    }
+    try {
+      this.wechatSocket = await Taro.connectSocket({url: `${url}/${userID}`})
+    } catch (e) {
+      console.error(e);
+      this.timerId = setTimeout(() => {
+        this.init();
+      }, 30 * 1000);
+    }
   }
   onMessage(onParam) {
-    this.wechatSocket && this.wechatSocket.onMessage(onParam);
+    if (!this.wechatSocket) {
+      clearTimeout(this.timerId);
+      this.init().then(() => this.wechatSocket.onMessage(onParam)).catch(console.error);
+    } else {
+      this.wechatSocket.onMessage(onParam);
+    }
   }
   send(msg) {
-    this.wechatSocket && this.wechatSocket.send(msg);
+    if (!this.wechatSocket) {
+      clearTimeout(this.timerId);
+      this.init().then(() => this.wechatSocket.send(msg)).catch(console.error);
+    } else {
+      this.wechatSocket.send(msg);
+    }
   }
 }
 
 let messageHub: MessageHub;
 let websocket;
 // 由于这个socket要在程序一开始就调用， 云环境未初始完成，所以不要引用 api hub中的mock，会引发其他云函数的调用
-const mock = true;
+const mock = false;
 if (mock) {
   websocket = new MockSocket();
 } else {
