@@ -1,0 +1,23 @@
+@keyframes fly-in {
+  0% {
+    transform: translateY(60px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.generate-columns(15);
+
+.generate-columns(@n, @i: 1) when (@i =< @n) {
+  .fly-in-@{i} {
+    opacity: 0;
+    animation: fly-in .5s (@i*0.1s) cubic-bezier(0, 0, 0, 1);
+    animation-fill-mode: forwards;
+  }
+  .generate-columns(@n, (@i + 1));
+}
+
+

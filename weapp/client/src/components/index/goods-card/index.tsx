@@ -1,0 +1,113 @@
+import Taro from '@tarojs/taro'
+import {View, Text, Image} from '@tarojs/components'
+import {GoodsWithSellerVO} from "../../../apis/GoodsApi";
+import localConfig from "../../../utils/local-config";
+import {AtAvatar, AtDivider} from "taro-ui";
+import {createSimpleErrorHandler} from "../../../utils/function-factory";
+import {CSSProperties} from "react";
+import {goodsInfoUrlConfig} from "../../../utils/url-list";
+
+import "taro-ui/dist/style/components/flex.scss";
+import {StyleHelper} from "../../../styles/style-helper";
+
+interface IProp {
+  goodsWithSeller: GoodsWithSellerVO
+}
+
+function createStyles() {
+  const margin = 5;
+  const padding = 5;
+  const borderWidth = 1;
+  const width = Math.floor(localConfig.getSystemSysInfo().windowWidth / 4 - margin - padding - borderWidth) * 2;
+  const imageBorderRadius = 4;
+
+  const numberToPxStr = StyleHelper.numberToPxStr;
+  const widthAndHeightPx = numberToPxStr(width);
+  const marginPx = numberToPxStr(margin);
+  const paddingPx = numberToPxStr(padding);
+  const imageBorderRadiusPx = numberToPxStr(imageBorderRadius);
+
+  const goodsCardViewStyle: CSSProperties = {
+    width: widthAndHeightPx,
+    margin: marginPx,
+    padding: paddingPx,
+    border: StyleHelper.NORMAL_BORDER,
+    display: 'inline-block'
+  };
+
+  const imageStyle: CSSProperties = {
+    width: widthAndHeightPx,
+    height: widthAndHeightPx,
+    // TODO 优先级 低
+    // 检查样式
+    border: 'thin solid transparent',
+    borderRadius: imageBorderRadiusPx
+  };
+
+  const dividerHeight = 36;
+
+  const goodsNameStyle: CSSProperties = {
+    width: '100%',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    display: 'block'
+  };
+
+  return {
+    goodsCardViewStyle,
+    imageStyle,
+    dividerHeight,
+    goodsNameStyle
+  };
+}
+
+const styles = createStyles();
+
+/**
+ * GoodsCard
+ * @author 张李承
+ * @create 2019/7/27 10:02
+ */
+function GoodsCard(props: IProp) {
+  const {goodsWithSeller} = props;
+  let card:any = null;
+  if (goodsWithSeller) {
+    const {goods, seller} = props.goodsWithSeller;
+
+    const picturesCount = goods.pictures.length;
+    const goodsPictureSrc = picturesCount ? goods.pictures[0] : '';
+    const sellerImage = seller.avatar;
+    const sellerName = seller.nickname;
+    const goodsName = goods.name;
+    const goodsPrice = goods.price;
+
+    const onError = createSimpleErrorHandler('GoodsCard', undefined);
+
+    const onClick = function () {
+      Taro.navigateTo({
+        url: goodsInfoUrlConfig.createUrl(goods._id)
+      }).catch(onError);
+    };
+
+    card = (
+      <View onClick={onClick} style={styles.goodsCardViewStyle}>
+        <Image style={styles.imageStyle} src={goodsPictureSrc}/>
+        <Text style={styles.goodsNameStyle}>{goodsName}</Text>
+        <Text space={'nbsp'}>￥ {goodsPrice}</Text>
+        <AtDivider height={styles.dividerHeight}/>
+        <View className='at-row at-row__align--center'>
+          <View className='at-col at-col-3'>
+            <AtAvatar circle size={'small'} image={sellerImage}/>
+          </View>
+          <View className='at-col at-col__offset-1 at-col-8 at-col--wrap'>
+            <Text>{sellerName}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+  return card;
+}
+
+export default GoodsCard;

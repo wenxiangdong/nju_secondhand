@@ -1,27 +1,26 @@
-// @ts-ignore
-import {AtButton} from "taro-ui";
 import Taro from '@tarojs/taro';
-import {View} from "@tarojs/components";
-import NjuTabBar from "../../components/nju-tab-bar";
-import WhiteSpace from "../../components/white-space";
+import {View, Text, Button} from "@tarojs/components";
+import './index.scss'
+import "@tarojs/async-await";
+import urlList, {complaintFormUrlConfig, resultUrlConfig, sendPostUrlConfig} from "../../utils/url-list";
+import { apiHub } from '../../apis/ApiHub';
+import DeveloperFooter from '../../components/common/developer-footer';
+
 
 function Dev() {
-  const handleClick = () => {
 
+  const handleClick = async () => {
+    console.log(apiHub.configApi.getAllConfigs());
+    Taro.reLaunch({
+      url: urlList.MY
+    })
   };
+
   return (
     <View>
-      {
-        Array(30)
-          .fill(0)
-          .map((_, index) => (
-            <View  key={index}  style={{marginTop: "10px"}}>
-              <AtButton onClick={handleClick}>hello</AtButton>
-            </View>
-          ))
-      }
-      <WhiteSpace height={50}/>
-      <NjuTabBar/>
+      <Text>Dev works</Text>
+      <Button onClick={handleClick}>go</Button>
+      <DeveloperFooter />
     </View>
   )
 }

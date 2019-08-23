@@ -8,9 +8,9 @@ interface IProp<T> {
 }
 
 /**
- *
+ * 分布加载 逻辑
  * @param props
- * @returns {{data: *, setData: *, reset: *, loadData: *}}
+ * @returns {*[]}
  */
 export default function useLoadMore<T>(props: IProp<T>) {
     // utils
@@ -40,5 +40,5 @@ export default function useLoadMore<T>(props: IProp<T>) {
         setData([]);
     }
 
-    return {data, loadData, reset, setData};
+    return [data, loadData, reset];
 }

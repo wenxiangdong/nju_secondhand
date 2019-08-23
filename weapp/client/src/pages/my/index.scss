@@ -1,0 +1,11 @@
+@import "./../../styles/FlyInAnimation.less";
+
+.user-bar-box {
+  opacity: 0;
+  margin: 60px 0;
+  animation-fill-mode: forwards;
+}
+
+.nav-bar-item {
+  opacity: 0;
+}

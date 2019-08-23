@@ -1,0 +1,44 @@
+$avatar-size: 48Px;
+
+.MR__row {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5em;
+
+  display: flex;
+  align-items: center;
+
+  .MR__avatar-wrapper {
+
+
+    .MR__image-avatar {
+      width: $avatar-size;
+      height: $avatar-size;
+    }
+
+    .MR__text-avatar {
+      width: $avatar-size;
+      height: $avatar-size;
+      font-size: $avatar-size - 20Px;
+      border-radius: 50%;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      color: white;
+    }
+  }
+
+  .MR__text-wrapper {
+    flex: 1;
+    padding-left: 1em;
+
+    .MR__text-title {
+    }
+
+    .MR__text-extra {
+      color:  #3F536E;
+    }
+  }
+}

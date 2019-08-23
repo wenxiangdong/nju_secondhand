@@ -1,104 +1,110 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import { View } from '@tarojs/components'
-import './index.scss';
-import Home from "../../components/index/home";
-import WhiteSpace from "../../components/white-space";
-import Add from "../../components/index/add";
-import {TabItem} from "taro-ui/@types/tab-bar";
-import {AtTabBar} from "taro-ui";
-import Me from "../../components/index/me";
+import "@tarojs/async-await";
+import Taro, {Component, Config} from '@tarojs/taro'
+import {View} from '@tarojs/components'
+import MainTabBar from "../../components/common/main-tab-bar";
+import DSwiper from "../../components/common/d-swiper";
+import {AtGrid, AtSearchBar} from "taro-ui";
+import {Item} from "taro-ui/@types/grid";
+import localConfig from '../../utils/local-config'
+import {createSimpleErrorHandler} from "../../utils/function-factory";
+import {CategoryVO} from "../../apis/GoodsApi";
+import {CommonEvent} from "@tarojs/components/types/common";
+import urlList, {indexSearchUrlConfig} from "../../utils/url-list";
+import LoadingPage from "../../components/common/loading-page";
+import {apiHub} from "../../apis/ApiHub";
+import {ConfigItem} from "../../apis/Config";
 
 interface IState {
-  currentIndex: number
+  searchValue: string,
+  swiperSrcs: Array<string>,
+  categories: Array<CategoryVO>,
+  loading: boolean,
+  errMsg?: string
 }
 
-const TAB_BAR_LIST: (TabItem & {page: any})[] = [
-  {
-    title: "首页",
-    iconType: "home",
-    page: 'Home'
-  },
-  {
-    title: "圈子",
-    iconType: "eye",
-    page: 'Home'
-  },
-  {
-    title: "发布",
-    iconType: "add-circle",
-    page: 'Home'
-  },
-  {
-    title: "消息",
-    iconType: "message",
-    page: 'Home'
-  },
-  {
-    title: "个人",
-    iconType: "user",
-    page: 'Home'
-  },
-];
+/**
+ * 首页
+ * @create 2019/7/25 11:49
+ */
+export default class index extends Component<any, IState> {
 
-export default class Index extends Component<any, IState> {
-
-  /**
-   * 指定config的类型声明为: Taro.Config
-   *
-   * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
-   * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
-   * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
-   */
   config: Config = {
     navigationBarTitleText: '首页'
   };
 
-  state = {
-    currentIndex: 0
-  };
-
-
-  // handles
-  handleClickTab = (index) => {
-    console.log(index);
-    this.setState({
-      currentIndex: index
-    })
-  };
-
-
-  render () {
-    const {currentIndex} = this.state;
-    return (
-      <View className='index'>
-        {this.renderMain()}
-
-        <WhiteSpace/>
-        <AtTabBar
-          fixed
-          current={currentIndex}
-          tabList={TAB_BAR_LIST}
-          onClick={this.handleClickTab}/>
-      </View>
-    )
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchValue: '',
+      swiperSrcs: [],
+      categories: [],
+      loading: true
+    };
   }
 
-  renderMain() {
-    const {currentIndex} = this.state;
-    console.log(currentIndex);
-    let com: any = null;
-    // 不是我傻，而是只能用 if else来写，taro sb
-    if (currentIndex == 0) {
-      com = <Home/>;
-    } else if (currentIndex == 1) {
-      com = <View>1</View>;
-    } else if (currentIndex == 2) {
-      com = <Add onCancel={()=>this.setState({currentIndex: 0})}/>;
-    } else if (currentIndex == 3) {
-      com = <View>3</View>;
-    } else if (currentIndex == 4) {
-      com = <Me/>;
+  componentWillMount() {
+    Promise.all([
+      this.getSwiperSrcs(),
+      this.getCategories()
+    ])
+      .then(value => this.setState({swiperSrcs: value[0], categories: value[1], loading: false}))
+      .catch(this.onError);
+  }
+
+  private getSwiperSrcs = async function(): Promise<string[]> {
+    //  TODO 优先级 低 获取 swiperSrcs
+    return apiHub.configApi.getConfig(ConfigItem.ACTIVITY_PICTURES);
+  };
+
+  private getCategories = async function(): Promise<CategoryVO[]> {
+    return apiHub.goodsApi.getCategories();
+  };
+
+  private transferCategoryDate = (categories: Array<CategoryVO>) => {
+    return categories.map((c) => ({image:c.icon, value: c.name}));
+  };
+
+  private onSearch = () => {
+    const { searchValue } = this.state;
+    if (searchValue) {
+      console.info('index onSearch', searchValue);
+      Taro.navigateTo({
+        url: indexSearchUrlConfig.createUrl(searchValue)
+      }).catch(this.onError);
     }
-    return com;
+  };
+
+  private onCategoryClick = (item: Item, index: number, event: CommonEvent) => {
+    console.info('index onCategoryClick', item, index, event);
+    localConfig.setGoodsCategory(this.state.categories[index]);
+    Taro.navigateTo({url: urlList.INDEX_CATEGORY_GOODS})
+      .catch(this.onError);
+  };
+
+  private onError = createSimpleErrorHandler('index', this);
+
+  render() {
+    const {searchValue, swiperSrcs, categories, loading, errMsg} = this.state;
+    const categoryData = this.transferCategoryDate(categories);
+
+    return loading || errMsg
+      ? (
+        <LoadingPage loadingMsg={errMsg}/>
+      )
+      : (
+        <View>
+          <AtSearchBar
+            placeholder='请输入关键词搜索'
+            maxLength={20}
+            value={searchValue}
+            onChange={(searchValue) => this.setState({searchValue})}
+            onActionClick={this.onSearch}
+            onConfirm={this.onSearch}
+          />
+          <DSwiper srcs={swiperSrcs}/>
+          <AtGrid customStyle={{backgroundColor: "black"}} hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>
+          <MainTabBar currentIndex={MainTabBar.HOME_INDEX}/>
+        </View>
+      );
   }
 }

@@ -2,6 +2,8 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import Index from './pages/index'
 
 import './app.scss'
+import messageHub from "./apis/MessageApi";
+
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -21,14 +23,58 @@ class App extends Component {
    */
   config: Config = {
     pages: [
+
+      // 测试页面
+      // 'pages/dev/index',
       'pages/index/index',
-      'pages/dev/index'
+
+      'pages/circle/index',
+      'pages/circle/post/index',
+      'pages/circle/send-post/index',
+
+      'pages/index/search-result/index',
+      'pages/index/category-goods/index',
+      'pages/index/goods-info/index',
+      'pages/index/location/index',
+
+      'pages/login/index',
+      'pages/login/frozen_error/index',
+
+      'pages/message/index',
+      'pages/message/system/index',
+      'pages/message/chat/index',
+
+      'pages/my/index',
+      'pages/my/my-bought/index',
+      'pages/my/my-bought/send-complaint/index',
+      'pages/my/my-publish/index',
+      'pages/my/my-sold/index',
+      'pages/my/my-visited/index',
+      'pages/my/platform-account/index',
+      'pages/my/platform-rules/index',
+      'pages/my/privacy-policy/index',
+      'pages/my/software-license-agreement/index',
+      'pages/my/user-info/index',
+      'pages/my/complaint/index',
+      'pages/my/complaint/new-complaint/index',
+      'pages/my/complaint/complaint-form/index',
+
+      'pages/register/index',
+
+      'pages/result/index',
+      'pages/publish/index',
+
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'WeChat',
+      navigationBarTitleText: '蓝鲸小书童',
       navigationBarTextStyle: 'black'
+    },
+    permission: {
+      "scope.userLocation": {
+        "desc": "你的位置信息将用于您分布的商品的参考信息"
+      }
     },
     cloud: true
   };
@@ -38,8 +84,9 @@ class App extends Component {
       Taro.cloud.init()
     }
   }
+  componentDidShow () {
 
-  componentDidShow () {}
+  }
 
   componentDidHide () {}
 

@@ -1,6 +1,11 @@
 * {
   font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
 }
+
+.page {
+  background-color: #f8f8f9;
+  min-height: 100vh;
+}
 .content-text {
   color: #515a6e;
 }
@@ -12,10 +17,9 @@
 .sub-text {
   color: #808695;
 }
-/* about App */
 .App__page {
+  width: 100vw;
   box-sizing: border-box;
-  background-color: white;
 }
 
 .App__header {
@@ -26,28 +30,6 @@
   font-size: 16px;
   font-weight: bold;
   box-shadow: rgba(0,0,0,0.05) 0 2px 5px;
-}
-
-.page {
-  box-sizing: border-box;
-  padding: 16px;
-}
-
-/* Detail Card */
-.DetailView__wrapper {
-  padding: 8px;
-  font-size: 16px;
-}
-.DetailView__item {
-  margin: 1em auto;
-}
-.DetailView__title {
-  font-weight: bold;
-}
-
-.DetailView__pictures {
-  display: flex;
-  padding: 8px;
 }
 
 

@@ -1,0 +1,22 @@
+.user-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  margin: 20px 40px;
+  border-radius: 30px;
+  box-shadow: rgba(0,0,0,.15) 0 10px 40px;
+}
+
+.user-info-text {
+  font-size: 40px;
+  font-weight: bold;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 50vw;
+}
+
+.user-data {
+  color: white;
+}
