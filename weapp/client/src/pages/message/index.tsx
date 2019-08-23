@@ -7,6 +7,7 @@ import MessageRow from '../../components/message/message-row';
 import "./index.scss";
 import { chatUrlConfig } from '../../utils/url-list';
 import {apiHub} from "../../apis/ApiHub";
+import {AtMessage} from "taro-ui";
 
 interface IState {
   conservationList: MessageVO[],
@@ -82,6 +83,7 @@ export class index extends Component<any, IState> {
           </View>
         </View>
         <MainTabBar currentIndex={MainTabBar.MESSAGE_INDEX}/>
+        <AtMessage />
       </View>
     )
   }

@@ -157,16 +157,30 @@ class Socket {
       this.timerId = setTimeout(() => {
         this.init();
       }, 10 * 1000);
-      return ;
+      throw new Error("socket连接出错");
     }
     try {
-      this.wechatSocket = await Taro.connectSocket({url: `${url}/${userID}`})
+      this.wechatSocket = await Taro.connectSocket({url: `${url}/${userID}`});
+      this.wechatSocket.onError((e) => {
+        Taro.atMessage({
+          message: `通信出错：${e.errMsg}`,
+          type: "error"
+        });
+      });
+      this.wechatSocket.onClose(() => {
+        console.log("socket 断开, 10秒后重连");
+        setTimeout(() => {
+          this.init();
+        }, 10 * 1000);
+      })
+      console.log("socket 连接成功");
     } catch (e) {
       console.error(e);
       this.timerId = setTimeout(() => {
         this.init();
       }, 30 * 1000);
     }
+
   }
   onMessage(onParam) {
     if (!this.wechatSocket) {
