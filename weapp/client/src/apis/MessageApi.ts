@@ -1,8 +1,7 @@
 import Taro from "@tarojs/taro";
 import configApi, {ConfigItem} from "./Config";
-import {userApi} from "./UserApi";
+
 import localConfig from "../utils/local-config";
-import {use} from "ast-types";
 
 export interface MessageVO {
   _id: string;
@@ -27,7 +26,7 @@ declare type Observer = (msg: MessageVO) => void;
 
 class MessageHub {
   private observers: Observer[];
-  private messageHistory: Map<string, MessageVO[]>;
+  private messageHistory: object = {};
   private STORAGE_KEY: string = "messages";
 
   constructor(private websocket: Taro.SocketTask) {
@@ -38,8 +37,12 @@ class MessageHub {
 
   private initWebsocket() {
     this.websocket.onMessage((ev: Taro.onSocketMessage.ParamParam) => {
-      // console.log("onmessage", ev);
       const vo: MessageVO = JSON.parse(ev.data);
+      console.log("收到消息", vo);
+      if (!vo.senderID) return;
+      Taro.atMessage({
+        message: `收到一条来自【${vo.senderName}】的消息`
+      });
       // store
       this.addMessageToList(vo.senderID, vo);
       // notify
@@ -68,22 +71,23 @@ class MessageHub {
    * @param vo
    */
   private addMessageToList(key: string, vo: MessageVO) {
-    let messageList = this.messageHistory.get(key);
+    console.log("add message to list", key, vo);
+    let messageList = this.messageHistory[key];
       if (!messageList) {
         messageList = [vo];
-        this.messageHistory.set(key, messageList);
+        this.messageHistory[key] = messageList;
       } else {
         messageList.push(vo);
       }
+      console.log(this.messageHistory);
       // 更新本地存储
-      Taro.setStorage({
-        key: this.STORAGE_KEY,
-        data: this.messageHistory
-      });
+      Taro.setStorageSync(this.STORAGE_KEY, this.messageHistory)
   }
 
   private initMessageHistory() {
-    this.messageHistory = Taro.getStorageSync(this.STORAGE_KEY) || new Map<string, MessageVO[]>();;
+    const data = Taro.getStorageSync(this.STORAGE_KEY);
+    console.log("initMessageHistory", data);
+    this.messageHistory = data;
   }
 
   public subscribe(observer: Observer) {
@@ -98,16 +102,16 @@ class MessageHub {
   }
 
   public getMessageHistory(): Map<string, MessageVO[]> {
-    return this.messageHistory;
+    return new Map<string, MessageVO[]>(Object.entries(this.messageHistory));
   }
 
   public getMessageListByKey(key: string): MessageVO[] {
-    return this.messageHistory.get(key) || [];
+    return this.messageHistory[key] || [];
   }
 
   public getLastMessageList(): MessageVO[] {
     const result = [] as MessageVO[];
-    for (let list of this.messageHistory.values()) {
+    for (let list of Object.values(this.messageHistory)) {
       result.push(list[list.length - 1]);
     }
     return result;
@@ -127,7 +131,6 @@ class MockSocket {
       time: +new Date(),
       read: false
     };
-    const senders = ["eric", "wang", "wen", "he", "wo"];
     setInterval(() => {
       onParam(
         // @ts-ignore
@@ -146,6 +149,7 @@ class MockSocket {
 class Socket {
   private wechatSocket: Taro.SocketTask;
   private timerId;
+  private onParam;
   constructor() {
     this.init();
   }
@@ -161,6 +165,9 @@ class Socket {
     }
     try {
       this.wechatSocket = await Taro.connectSocket({url: `${url}/${userID}`});
+      if (this.onParam) {
+        this.onMessage(this.onParam);
+      }
       this.wechatSocket.onError((e) => {
         Taro.atMessage({
           message: `通信出错：${e.errMsg}`,
@@ -172,7 +179,7 @@ class Socket {
         setTimeout(() => {
           this.init();
         }, 10 * 1000);
-      })
+      });
       console.log("socket 连接成功");
     } catch (e) {
       console.error(e);
@@ -185,7 +192,8 @@ class Socket {
   onMessage(onParam) {
     if (!this.wechatSocket) {
       clearTimeout(this.timerId);
-      this.init().then(() => this.wechatSocket.onMessage(onParam)).catch(console.error);
+      this.onParam = onParam;
+      this.init();
     } else {
       this.wechatSocket.onMessage(onParam);
     }

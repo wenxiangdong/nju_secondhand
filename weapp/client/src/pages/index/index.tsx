@@ -3,7 +3,7 @@ import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
 import DSwiper from "../../components/common/d-swiper";
-import {AtGrid, AtSearchBar} from "taro-ui";
+import {AtGrid, AtSearchBar, AtMessage} from "taro-ui";
 import {Item} from "taro-ui/@types/grid";
 import localConfig from '../../utils/local-config'
 import {createSimpleErrorHandler} from "../../utils/function-factory";
@@ -105,6 +105,7 @@ export default class index extends Component<any, IState> {
           <DSwiper srcs={swiperSrcs}/>
           <AtGrid customStyle={{backgroundColor: "black"}} hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>
           <MainTabBar currentIndex={MainTabBar.HOME_INDEX}/>
+          <AtMessage />
         </View>
       );
   }
