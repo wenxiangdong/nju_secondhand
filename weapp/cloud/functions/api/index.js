@@ -733,6 +733,7 @@ const getPostsByPageAndKeyword = async ({ keyword = '', lastIndex, size }) => {
           })
         }) : {},
     lastIndex,
+    orders: [['publishTime', 'desc']],
     size
   })
 }
