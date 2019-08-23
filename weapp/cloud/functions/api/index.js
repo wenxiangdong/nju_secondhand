@@ -435,7 +435,7 @@ exports.main = async (event, context) => {
       return
     }
 
-    await addNotification({ userID: order.sellerID, content: `您的商品 ${order.goodsName} 已被签收` })
+    await addNotification({ userID: order.sellerID, content: `您的商品【${order.goodsName}】已被签收` })
 
     ctx.body = { code: HttpCode.Success }
   })
@@ -475,6 +475,9 @@ exports.main = async (event, context) => {
     const handlers = {
       '0': async (order) => {
         await udpateOneOrder({ orderID: order._id, order: { state: OrderState.Ongoing } })
+        await updateOneGoods({ goodsID: order.goodsID, goods: { state: GoodsState.Deleted } })
+        // 通知卖家发货
+        await addNotification({ notification: { userID: order.sellerID, content: `您的商品【${order.goodsName}】已被购买，请及时发货` } })
       },
       '-1': async (order) => {
         // 删除订单
@@ -517,8 +520,6 @@ exports.main = async (event, context) => {
     const handler = handlers[result];
     try {
       await handler(order);
-      // 通知卖家发货
-      await addNotification({ notification: { userID: order.sellerID, content: `你的商品 ${order.goodsName} 已被购买，请及时发货` } })
     } catch (error) {
       console.error(error);
       ctx.body = {
