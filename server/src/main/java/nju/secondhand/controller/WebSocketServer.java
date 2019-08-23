@@ -1,5 +1,6 @@
 package nju.secondhand.controller;
 
+import lombok.extern.log4j.Log4j2;
 import nju.secondhand.dto.MessageDTO;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.util.JsonUtil;
@@ -7,12 +8,12 @@ import nju.secondhand.util.MapObjectUtil;
 import nju.secondhand.util.Pair;
 import nju.secondhand.vo.MessageVO;
 import nju.secondhand.vo.enums.ApiType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
+import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.util.List;
@@ -22,17 +23,20 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author cst
  */
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 @ServerEndpoint("/chat/{uid}")
 @Component
+@Log4j2
 public class WebSocketServer {
-    private final CloudService cloudService;
+    private static CloudService cloudService;
     private static final Map<String, WebSocketServer> WEB_SOCKET_SERVERS = new ConcurrentHashMap<>();
 
     private String uid;
     private Session session;
 
-    public WebSocketServer(CloudService cloudService) {
-        this.cloudService = cloudService;
+    @Autowired
+    public void setCloudService(CloudService cloudService) {
+        WebSocketServer.cloudService = cloudService;
     }
 
     @OnOpen
@@ -52,6 +56,11 @@ public class WebSocketServer {
     @OnClose
     public void onClose() {
         WEB_SOCKET_SERVERS.remove(this.uid);
+    }
+
+    @OnError
+    public void onError(Throwable throwable) {
+        log.error(throwable.getLocalizedMessage());
     }
 
     @OnMessage
