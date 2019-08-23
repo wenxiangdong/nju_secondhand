@@ -53,9 +53,9 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
   private handleChat = () => {
     // 预设一个 商品信息 的消息
     const {goodsWithSeller} = this.props;
-    const {goods} = goodsWithSeller;
+    const {goods, seller} = goodsWithSeller;
     const message: MessageVO = {
-      receiverID: goods._id,
+      receiverID: seller._id,
       content: `text://物品名称：${goods.name},物品价格：￥${goods.price}，物品描述：${goods.desc}`
     };
     chatUrlConfig.setPreMessage(message);
