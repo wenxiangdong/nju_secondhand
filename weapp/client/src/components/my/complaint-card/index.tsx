@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro'
-import {Swiper, SwiperItem, Text, View} from '@tarojs/components'
+import {Image, Text, View} from '@tarojs/components'
 import {ComplaintState, ComplaintVO, MockComplaintApi} from "../../../apis/ComplaintApi";
 import {StyleHelper} from "../../../styles/style-helper";
 import {CSSProperties} from "react";
@@ -58,27 +58,37 @@ function ComplaintCard(props: IProp) {
     handlingTimeString = timeToString(handling.time);
   }
 
+  let stateInfo;
+  switch (state) {
+    case ComplaintState.Handled:
+      stateInfo = '已处理';
+      break;
+    case ComplaintState.Ongoing:
+      stateInfo = '处理中';
+      break;
+    default:
+      stateInfo = '状态不明'
+  }
+
   return (
     <View style={styles.baseCardStyle}>
       <View style={styles.topRowViewStyle}>
         <Text>编号：{orderID}</Text>
-        <Text style={styles.stateInfoStyle}>{state}</Text>
+        <Text style={styles.stateInfoStyle}>{stateInfo}</Text>
       </View>
       <Text>时间：{complainTimeString}</Text>
       <Text style={StyleHelper.BREAK_ALL_TEXT}>描述：{desc}</Text>
-      {
-        (pictures && pictures.length)
-          ? (
-            <Swiper
-              indicatorColor='#999'
-              indicatorActiveColor='#333'
-              circular
-              indicatorDots>
-              {pictures.map((src, idx) => <SwiperItem key={`swiper-${idx}`} style={{backgroundImage: src}}/>)}
-            </Swiper>
-          )
-          : null
-      }
+      <View>
+        {
+          (pictures && pictures.length)
+            ? (
+              pictures.map((src, idx) => (
+                <Image key={idx} style={{width: '28vw', height: '28vw', margin: '1vw'}} src={src} />
+              ))
+            )
+            : null
+        }
+      </View>
       {
         state === ComplaintState.Handled
           ? <Text>处理时间：{handlingTimeString}</Text>

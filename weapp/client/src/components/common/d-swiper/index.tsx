@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro'
-import {Swiper, SwiperItem} from '@tarojs/components'
+import {Image, Swiper, SwiperItem} from '@tarojs/components'
 
 interface IProp {
   srcs: Array<string>
@@ -17,7 +17,13 @@ function DSwiper(props:IProp) {
       circular
       indicatorDots
       autoplay>
-      {srcs.map((src, idx) => <SwiperItem key={`swiper-${idx}`} style={{backgroundImage: src}}/>)}
+      {
+        srcs.map((src, idx) => (
+          <SwiperItem key={`swiper-${idx}`}>
+            <Image src={src} />
+          </SwiperItem>
+        ))
+      }
     </Swiper>
   )
 }
