@@ -12,7 +12,7 @@ import {CommonEvent} from "@tarojs/components/types/common";
 import urlList, {indexSearchUrlConfig} from "../../utils/url-list";
 import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
-import {ConfigItem} from "../../apis/Config";
+import configApi, {ConfigItem} from "../../apis/Config";
 
 interface IState {
   searchValue: string,
@@ -53,6 +53,7 @@ export default class index extends Component<any, IState> {
 
   private getSwiperSrcs = async function(): Promise<string[]> {
     //  TODO 优先级 低 获取 swiperSrcs
+    await configApi.syncFromCloud();
     return apiHub.configApi.getConfig(ConfigItem.ACTIVITY_PICTURES);
   };
 

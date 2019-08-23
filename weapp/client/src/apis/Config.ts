@@ -27,7 +27,7 @@ export class ConfigApi {
     /**
      * 与云端同步
      */
-    private async syncFromCloud() {
+    public async syncFromCloud() {
         const PERIOD = 60 * 1000;
         try {
             const configCollection = db.collection("config");

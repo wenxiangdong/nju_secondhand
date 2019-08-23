@@ -3,7 +3,7 @@ import {View} from '@tarojs/components'
 import {AtDivider} from "taro-ui";
 import {GoodsState, GoodsWithSellerVO, MockGoodsApi} from "../../../apis/GoodsApi";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
-import {goodsInfoUrlConfig} from "../../../utils/url-list";
+import {complaintFormUrlConfig, goodsInfoUrlConfig} from "../../../utils/url-list";
 import {apiHub} from "../../../apis/ApiHub";
 import GoodsBriefInfoCard from "../../../components/index/goods-brief-info-card";
 import LoadingPage from "../../../components/common/loading-page";
@@ -72,6 +72,13 @@ export class index extends Component<any, IState> {
     }
   };
 
+  private handleReport = () => {
+    const {goods, seller} = this.state.goodsWithSeller;
+    complaintFormUrlConfig.go({
+      desc: `举报用户【${seller.nickname}】发布的商品【${goods.name}】(编号：${goods._id})，原因：`
+    })
+  };
+
   render() {
     const {goodsWithSeller, loading, errMsg} = this.state;
     const {goods} = goodsWithSeller;
@@ -82,6 +89,16 @@ export class index extends Component<any, IState> {
       )
       : (
           <View style={{padding: '30px'}}>
+            <View
+              onClick={this.handleReport}
+              style={{
+                color: "rgba(255, 0,0,0.5)",
+                position: "absolute",
+                top: "30px",
+                right: "30px"
+              }}>
+              举报
+            </View>
             <GoodsBriefInfoCard goodsWithSeller={goodsWithSeller}/>
             <AtDivider content='商品详情'/>
             <GoodsInfoCard goods={goods}/>

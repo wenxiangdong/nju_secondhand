@@ -32,7 +32,6 @@ function createStyles() {
   };
   const topic:CSSProperties = {
     margin: '1vw 2vw',
-    fontSize: 'smaller',
     color: 'lightblue'
   };
   const desc:CSSProperties = {
@@ -272,4 +271,7 @@ export default class index extends Component<any, IState> {
   }
 
   private onError = createSimpleErrorHandler('circlePost', this);
+  config: Taro.Config = {
+    navigationBarTitleText: "详情"
+  };
 }

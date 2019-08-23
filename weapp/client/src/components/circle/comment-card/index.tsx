@@ -3,6 +3,7 @@ import {View, Text} from '@tarojs/components'
 import {Comment, MockCircleApi} from "../../../apis/CircleApi";
 import {timeToString} from "../../../utils/date-util";
 import {CSSProperties} from "react";
+import {complaintFormUrlConfig} from "../../../utils/url-list";
 
 function createStyles() {
   const baseView:CSSProperties = {
@@ -13,6 +14,7 @@ function createStyles() {
   const content:CSSProperties = {
     margin: '1vw 2vw',
     wordBreak: "break-all",
+    color: "#333"
   };
   const bottomBar:CSSProperties = {
     display: "inline-flex",
@@ -47,15 +49,27 @@ interface IProp {
 function CommentCard(props: IProp) {
   const {comment = MockCircleApi.createMockComment()} = props;
   const {nickname, commentTime, content} = comment;
+
+  const handleClickReport = () => {
+    complaintFormUrlConfig.go({
+      desc: `用户【${nickname}】恶意发布评论：${content}`
+    })
+  };
+
   return (
     <View style={styles.baseView}>
       <Text style={styles.content}>
         {content}
       </Text>
       <View style={styles.bottomBar}>
-        <Text style={{marginLeft: '2vw'}}>
+        <View style={{marginLeft: '2vw'}}>
           {nickname}
-        </Text>
+          <Text
+            onClick={handleClickReport}
+            style={{marginLeft: "1em", color: "rgba(255, 0, 0, 0.3)"}}>
+            举报
+          </Text>
+        </View>
         <Text style={{marginRight: '2vw'}}>
           {timeToString(commentTime)}
         </Text>

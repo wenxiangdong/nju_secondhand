@@ -32,7 +32,8 @@ function createStyles() {
     margin: marginPx,
     padding: paddingPx,
     border: StyleHelper.NORMAL_BORDER,
-    display: 'inline-block'
+    display: 'inline-block',
+    color: "#333"
   };
 
   const imageStyle: CSSProperties = {
@@ -51,7 +52,8 @@ function createStyles() {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
-    display: 'block'
+    display: 'block',
+    fontSize: "1.2em"
   };
 
   return {
