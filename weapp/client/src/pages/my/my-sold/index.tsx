@@ -46,8 +46,8 @@ export default class index extends Component<any, IState> {
 
   componentWillMount() {
     Promise.all([
-      apiHub.orderApi.getSellerOngoingOrders(0),
-      apiHub.orderApi.getSellerHistoryOrders(0)
+      apiHub.orderApi.getSellerOngoingOrders(0, 10),
+      apiHub.orderApi.getSellerHistoryOrders(0, 10)
     ])
       .then(([ongoingOrders, historyOrders]) => {
         this.setState({

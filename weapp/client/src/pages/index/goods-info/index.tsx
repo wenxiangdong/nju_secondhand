@@ -1,13 +1,12 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {Text, View} from '@tarojs/components'
+import {View} from '@tarojs/components'
 import {AtDivider} from "taro-ui";
 import {GoodsState, GoodsWithSellerVO, MockGoodsApi} from "../../../apis/GoodsApi";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
-import {goodsInfoUrlConfig} from "../../../utils/url-list";
+import {complaintFormUrlConfig, goodsInfoUrlConfig} from "../../../utils/url-list";
 import {apiHub} from "../../../apis/ApiHub";
 import GoodsBriefInfoCard from "../../../components/index/goods-brief-info-card";
 import LoadingPage from "../../../components/common/loading-page";
-import UserInfoCard from "../../../components/index/user-info-card";
 import GoodsInfoCard from "../../../components/index/goods-info-card";
 import GoodsInfoBottomBar from "../../../components/index/goods-info-bottom-bar";
 import localConfig from "../../../utils/local-config";
@@ -73,9 +72,16 @@ export class index extends Component<any, IState> {
     }
   };
 
+  private handleReport = () => {
+    const {goods, seller} = this.state.goodsWithSeller;
+    complaintFormUrlConfig.go({
+      desc: `举报用户【${seller.nickname}】发布的商品【${goods.name}】(编号：${goods._id})，原因：`
+    })
+  };
+
   render() {
     const {goodsWithSeller, loading, errMsg} = this.state;
-    const {seller, goods} = goodsWithSeller;
+    const {goods} = goodsWithSeller;
 
     return (loading || errMsg
       ? (
@@ -83,17 +89,19 @@ export class index extends Component<any, IState> {
       )
       : (
           <View style={{padding: '30px'}}>
+            <View
+              onClick={this.handleReport}
+              style={{
+                color: "rgba(255, 0,0,0.5)",
+                position: "absolute",
+                top: "30px",
+                right: "30px"
+              }}>
+              举报
+            </View>
             <GoodsBriefInfoCard goodsWithSeller={goodsWithSeller}/>
             <AtDivider content='商品详情'/>
             <GoodsInfoCard goods={goods}/>
-            <AtDivider content='关于卖家'/>
-            <UserInfoCard user={seller}/>
-
-            {/* TODO 优先级 低*/}
-            <AtDivider content='问题互动'/>
-            <Text>TODO 搁置</Text>
-            <AtDivider content='相似商品'/>
-            <Text>TODO 搁置</Text>
 
             <GoodsInfoBottomBar goodsWithSeller={goodsWithSeller}/>
           </View>

@@ -28,11 +28,11 @@ function createStyles() {
     height: '50px',
     alignItems: 'center',
     border: '1px solid transparent',
-    borderBottomColor: 'lightgrey'
+    // borderBottomColor: 'lightgrey'
   };
   const topic:CSSProperties = {
     margin: '1vw 2vw',
-    fontSize: 'smaller',
+    // fontSize: 'smaller',
     color: 'lightblue'
   };
   const desc:CSSProperties = {
@@ -52,7 +52,7 @@ function createStyles() {
     alignItems: 'center',
     justifyContent: 'space-between',
     border: '1px solid transparent',
-    borderTopColor: 'lightgrey',
+    // borderTopColor: 'lightgrey',
     color: 'lightgrey'
   };
   return {

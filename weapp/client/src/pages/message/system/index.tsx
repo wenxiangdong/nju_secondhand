@@ -19,7 +19,7 @@ export default class System extends Taro.Component {
 
   async componentDidMount() {
     try {
-      const vos = await apiHub.notificationApi.getNotifications(0);
+      const vos = await apiHub.notificationApi.getNotifications(0, 10);
       this.setState({
         messageList: [...vos]
       }, () => {

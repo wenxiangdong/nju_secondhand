@@ -316,11 +316,3 @@ const HttpCode = {
   Conflict: 409, // 409 冲突
   Fail: 500 // 500
 }
-
-const HttpCode = {
-  Success: 200,
-  Forbidden: 403, // 403
-  Not_Found: 404, // 404
-  Conflict: 409, // 409 冲突
-  Fail: 500 // 500
-}

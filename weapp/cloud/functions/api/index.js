@@ -168,7 +168,7 @@ exports.main = async (event, context) => {
     const goods = getOneGoods({ goodsID })
     if (goods.state === GoodsState.Paying) {
       ctx.body = {
-        code: HttpCode.Forbidden,
+        code: HttpCode.Fail,
         message: '该商品正在被购买，无法下架'
       }
       return
@@ -189,7 +189,7 @@ exports.main = async (event, context) => {
     const goods = await getOneGoods({ goodsID })
 
     if (goods.state !== GoodsState.InSale) {
-      ctx.body = { code: HttpCode.Forbidden, messsage: '该商品暂时无法购买' }
+      ctx.body = { code: HttpCode.Fail, messsage: '该商品暂时无法购买' }
     }
 
     await updateOneGoods({
@@ -377,7 +377,7 @@ exports.main = async (event, context) => {
     balance = parseFloat(balance);
     if (balance < amount) {
       ctx.body = {
-        code: HttpCode.Forbidden,
+        code: HttpCode.Fail,
         message: "账户余额不足"
       }
       return;
@@ -411,7 +411,7 @@ exports.main = async (event, context) => {
   app.router('accept', async (ctx) => {
     const {
       orderID
-    } = ctx.event;
+    } = event; // 这里cst写的是ctx.event, 改正 by eric
 
     const order = await getOneOrder({ orderID })
 
@@ -435,7 +435,7 @@ exports.main = async (event, context) => {
       return
     }
 
-    await addNotification({ userID: order.sellerID, content: `您的商品 ${order.goodsName} 已被签收` })
+    await addNotification({notification: { userID: order.sellerID, content: `您的商品【${order.goodsName}】已被签收` }})
 
     ctx.body = { code: HttpCode.Success }
   })
@@ -475,6 +475,9 @@ exports.main = async (event, context) => {
     const handlers = {
       '0': async (order) => {
         await udpateOneOrder({ orderID: order._id, order: { state: OrderState.Ongoing } })
+        await updateOneGoods({ goodsID: order.goodsID, goods: { state: GoodsState.Deleted } })
+        // 通知卖家发货
+        await addNotification({ notification: { userID: order.sellerID, content: `您的商品【${order.goodsName}】已被购买，请及时发货` } })
       },
       '-1': async (order) => {
         // 删除订单
@@ -517,8 +520,6 @@ exports.main = async (event, context) => {
     const handler = handlers[result];
     try {
       await handler(order);
-      // 通知卖家发货
-      await addNotification({ notification: { userID: order.sellerID, content: `你的商品 ${order.goodsName} 已被购买，请及时发货` } })
     } catch (error) {
       console.error(error);
       ctx.body = {
@@ -542,7 +543,8 @@ exports.main = async (event, context) => {
     message.senderName = sender.nickname
     message.receiverName = receiver.nickname
     message.read = false
-    await addMessage({ message })
+    const messageID = await addMessage({ message })
+    ctx.body = await getOneMessage({messageID})
   })
 
   app.router('readMessage', async (ctx) => {
@@ -731,6 +733,7 @@ const getPostsByPageAndKeyword = async ({ keyword = '', lastIndex, size }) => {
           })
         }) : {},
     lastIndex,
+    orders: [['publishTime', 'desc']],
     size
   })
 }
@@ -767,7 +770,7 @@ const getNotificationsByPageAndUserId = async ({ userID, lastIndex, size }) => {
 
 const addNotification = async ({ notification }) => {
   notification.time = Date.now()
-  await add({ name: notificationName, data: notification })
+  add({ name: notificationName, data: notification })
 }
 
 /** account */
@@ -824,6 +827,10 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
 /** message */
 const messageName = 'message'
 
+const getOneMessage = async({messageID}) => {
+  return await getOne({name: messageName, id: messageID})
+}
+
 const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
   const messages = await getAll({
     name: messageName,
@@ -833,7 +840,7 @@ const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
     },
   })
   const ids = messages.map(message => message._id)
-  await updateAll({ name: messageName, condition: { receiverID: command.in(ids) }, data: { read: true } })
+  await updateAll({ name: messageName, condition: { _id: command.in(ids) }, data: { read: true } })
   return messages
 }
 

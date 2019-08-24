@@ -66,7 +66,7 @@ export default class SearchResult extends Component<any, IState> {
     const lastIndex = this.state.goodsWithSeller.length;
     const word = this.state.searchValue;
     if (word) {
-      apiHub.goodsApi.searchGoodsWithSellerByKeyword(word, lastIndex)
+      apiHub.goodsApi.searchGoodsWithSellerByKeyword(word, lastIndex, 10)
         .then((goodsWithSeller) => {
           if (goodsWithSeller && goodsWithSeller.length) {
             this.setState({goodsWithSeller: this.state.goodsWithSeller.concat(goodsWithSeller), loadMoreStatus: 'more', searchDisabled: false});

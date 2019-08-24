@@ -24,7 +24,7 @@ interface IState {
 export default class index extends Component<any, IState> {
 
   config: Config = {
-    navigationBarTitleText: '订单反馈'
+    navigationBarTitleText: '反馈'
   };
 
   constructor(props) {
@@ -46,7 +46,7 @@ export default class index extends Component<any, IState> {
 
   private loadMoreHistoryComplaints = () => {
     const lastIndex = this.state.complaints.length;
-    apiHub.complaintApi.getComplaints(lastIndex)
+    apiHub.complaintApi.getComplaints(lastIndex, 10)
       .then((complaints) => {
         if (complaints && complaints.length) {
           this.setState({loading: false, complaints: this.state.complaints.concat(complaints), complaintsLoadMoreStatus: 'more'});

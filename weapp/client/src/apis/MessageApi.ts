@@ -1,6 +1,9 @@
 import Taro from "@tarojs/taro";
 import configApi, {ConfigItem} from "./Config";
 
+import localConfig from "../utils/local-config";
+import urlList from "../utils/url-list";
+
 export interface MessageVO {
   _id: string;
   senderID: string;
@@ -24,7 +27,7 @@ declare type Observer = (msg: MessageVO) => void;
 
 class MessageHub {
   private observers: Observer[];
-  private messageHistory: Map<string, MessageVO[]>;
+  private messageHistory: object = {};
   private STORAGE_KEY: string = "messages";
 
   constructor(private websocket: Taro.SocketTask) {
@@ -35,8 +38,12 @@ class MessageHub {
 
   private initWebsocket() {
     this.websocket.onMessage((ev: Taro.onSocketMessage.ParamParam) => {
-      // console.log("onmessage", ev);
       const vo: MessageVO = JSON.parse(ev.data);
+      console.log("收到消息", vo);
+      if (!vo.senderID) return;
+      Taro.atMessage({
+        message: `收到一条来自【${vo.senderName}】的消息`
+      });
       // store
       this.addMessageToList(vo.senderID, vo);
       // notify
@@ -65,22 +72,23 @@ class MessageHub {
    * @param vo
    */
   private addMessageToList(key: string, vo: MessageVO) {
-    let messageList = this.messageHistory.get(key);
+    console.log("add message to list", key, vo);
+    let messageList = this.messageHistory[key];
       if (!messageList) {
         messageList = [vo];
-        this.messageHistory.set(key, messageList);
+        this.messageHistory[key] = messageList;
       } else {
         messageList.push(vo);
       }
+      console.log(this.messageHistory);
       // 更新本地存储
-      Taro.setStorage({
-        key: this.STORAGE_KEY,
-        data: this.messageHistory
-      });
+      Taro.setStorageSync(this.STORAGE_KEY, this.messageHistory)
   }
 
   private initMessageHistory() {
-    this.messageHistory = Taro.getStorageSync(this.STORAGE_KEY) || new Map<string, MessageVO[]>();;
+    const data = Taro.getStorageSync(this.STORAGE_KEY);
+    console.log("initMessageHistory", data);
+    this.messageHistory = data ? data : {};
   }
 
   public subscribe(observer: Observer) {
@@ -95,16 +103,16 @@ class MessageHub {
   }
 
   public getMessageHistory(): Map<string, MessageVO[]> {
-    return this.messageHistory;
+    return new Map<string, MessageVO[]>(Object.entries(this.messageHistory));
   }
 
   public getMessageListByKey(key: string): MessageVO[] {
-    return this.messageHistory.get(key) || [];
+    return this.messageHistory[key] || [];
   }
 
   public getLastMessageList(): MessageVO[] {
     const result = [] as MessageVO[];
-    for (let list of this.messageHistory.values()) {
+    for (let list of Object.values(this.messageHistory)) {
       result.push(list[list.length - 1]);
     }
     return result;
@@ -124,7 +132,6 @@ class MockSocket {
       time: +new Date(),
       read: false
     };
-    const senders = ["eric", "wang", "wen", "he", "wo"];
     setInterval(() => {
       onParam(
         // @ts-ignore
@@ -142,27 +149,77 @@ class MockSocket {
 
 class Socket {
   private wechatSocket: Taro.SocketTask;
+  private timerId;
+  private onParam;
   constructor() {
     this.init();
   }
-  init() {
+  async init() {
     const url = configApi.getConfig(ConfigItem.SOCKET_ADDRESS);
-    Taro.connectSocket({url})
-      .then(res => this.wechatSocket = res)
-      .catch(console.error);
+    const userID = localConfig.getUserId();
+    if (!url) {
+      console.log("配置出错，不能连接，10秒后重连");
+      this.timerId = setTimeout(() => {
+        this.init();
+      }, 10 * 1000);
+      throw new Error("socket连接出错");
+    }
+    if (!userID) {
+      console.log("未登陆，去登陆");
+      Taro.reLaunch({
+        url: urlList.LOGIN
+      }).catch(console.error);
+      throw new Error("未登陆");
+    }
+    try {
+      this.wechatSocket = await Taro.connectSocket({url: `${url}/${userID}`});
+      if (this.onParam) {
+        this.onMessage(this.onParam);
+      }
+      this.wechatSocket.onError((e) => {
+        Taro.atMessage({
+          message: `通信出错：${e.errMsg}`,
+          type: "error"
+        });
+      });
+      this.wechatSocket.onClose(() => {
+        console.log("socket 断开, 10秒后重连");
+        setTimeout(() => {
+          this.init();
+        }, 10 * 1000);
+      });
+      console.log("socket 连接成功");
+    } catch (e) {
+      console.error(e);
+      this.timerId = setTimeout(() => {
+        this.init();
+      }, 30 * 1000);
+    }
+
   }
   onMessage(onParam) {
-    this.wechatSocket && this.wechatSocket.onMessage(onParam);
+    if (!this.wechatSocket) {
+      clearTimeout(this.timerId);
+      this.onParam = onParam;
+      this.init();
+    } else {
+      this.wechatSocket.onMessage(onParam);
+    }
   }
   send(msg) {
-    this.wechatSocket && this.wechatSocket.send(msg);
+    if (!this.wechatSocket) {
+      clearTimeout(this.timerId);
+      this.init().then(() => this.wechatSocket.send(msg)).catch(console.error);
+    } else {
+      this.wechatSocket.send(msg);
+    }
   }
 }
 
 let messageHub: MessageHub;
 let websocket;
 // 由于这个socket要在程序一开始就调用， 云环境未初始完成，所以不要引用 api hub中的mock，会引发其他云函数的调用
-const mock = true;
+const mock = false;
 if (mock) {
   websocket = new MockSocket();
 } else {

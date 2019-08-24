@@ -4,11 +4,12 @@ import LoadingPage from "../../../components/common/loading-page";
 import localConfig from "../../../utils/local-config";
 import {apiHub} from "../../../apis/ApiHub";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
-import {AtButton, AtCard} from "taro-ui";
+import {AtButton, AtCard, AtMessage} from "taro-ui";
 import {MockUserApi, UserVO} from "../../../apis/UserApi";
 import urlList from "../../../utils/url-list";
 import ConfirmModal from "../../../components/common/confirm-modal";
 import {relaunchTimeout} from "../../../utils/date-util";
+import {use} from "ast-types";
 
 interface IState {
   loading: boolean,
@@ -69,6 +70,18 @@ export class index extends Component<any, IState> {
   };
 
   private handleWithdraw = () => {
+    const {user} = this.state;
+    if (!user) {
+      this.onNotLogin();
+      return;
+    }
+    if (!parseFloat(user.account.balance)) {
+      Taro.atMessage({
+        message: "当前账户资金为0，不能提现",
+        type: "error"
+      });
+      return;
+    }
     this.setState({...this.defaultWithdrawState, isWithdrawing: true});
   };
 
@@ -163,6 +176,7 @@ export class index extends Component<any, IState> {
               : null
           }
 
+          <AtMessage/>
         </View>
       )
     ;

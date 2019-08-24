@@ -71,7 +71,7 @@ function Publish() {
       // 顺便发一条圈子
       apiHub.circleApi.publishPost({
         topic: "我有好货",
-        desc: `宝贝【${goods.name}】:${goods.desc}，只需￥${goods.price}`,
+        desc: `宝贝【${goods.name}】，${goods.desc}，只需￥${goods.price}，赶快去首页搜索购买吧`,
         pictures: goods.pictures
       });
       resultUrlConfig.go({

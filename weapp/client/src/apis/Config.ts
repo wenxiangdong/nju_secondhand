@@ -27,7 +27,7 @@ export class ConfigApi {
     /**
      * 与云端同步
      */
-    async private syncFromCloud() {
+    public async syncFromCloud() {
         const PERIOD = 60 * 1000;
         try {
             const configCollection = db.collection("config");
@@ -83,7 +83,7 @@ export const ConfigItem = {
     },
     SOCKET_ADDRESS: {
         key: "socker-address",
-        default: "http://106.13.165.249/wechat"
+        default: ""
     },// 聊天socket的连接地址
     DEVELOPER: {
         key: "developer",

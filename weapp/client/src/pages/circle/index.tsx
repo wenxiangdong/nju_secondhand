@@ -50,7 +50,9 @@ export default class index extends Component<any, IState> {
     apiHub.circleApi.searchPostsByKeyword(this.state.searchValue || '', lastIndex, 10)
       .then((posts) => {
         if (posts && posts.length) {
-          this.setState({searchDisabled: false, posts: this.state.posts.concat(posts), loadMoreStatus: 'more'});
+          // 排序，新的帖子在前面
+          const sortedPost = [...posts, ...this.state.posts].sort((p1, p2) => p2.publishTime - p1.publishTime);
+          this.setState({searchDisabled: false, posts: [...sortedPost], loadMoreStatus: 'more'});
         } else {
           this.setState({searchDisabled: false, loadMoreStatus: 'noMore'});
         }
