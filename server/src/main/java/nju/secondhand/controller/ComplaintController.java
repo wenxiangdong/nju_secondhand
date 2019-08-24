@@ -4,7 +4,9 @@ import nju.secondhand.response.HttpResponse;
 import nju.secondhand.service.ComplaintService;
 import nju.secondhand.util.LoginUtil;
 import nju.secondhand.vo.ComplaintVO;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;

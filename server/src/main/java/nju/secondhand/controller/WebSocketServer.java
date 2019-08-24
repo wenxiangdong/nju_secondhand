@@ -41,20 +41,26 @@ public class WebSocketServer {
 
     @OnOpen
     public void onOpen(Session session, @PathParam("uid") String uid) {
+        log.info("open: " + uid);
         this.uid = uid;
         this.session = session;
 
         WEB_SOCKET_SERVERS.put(uid, this);
 
-        this.session.getAsyncRemote().sendText(JsonUtil.toJson(cloudService.invokeCloudFunction(List.class,
+        // noinspection unchecked
+        List<MessageVO> messages = cloudService.invokeCloudFunction(List.class,
                 MapObjectUtil.mapObject(
                         Pair.of("$url", "getUnreadMessages"),
                         Pair.of("receiverID", uid)
-                ), ApiType.USER_API)));
+                ), ApiType.USER_API);
+        for (MessageVO message : messages) {
+            this.session.getAsyncRemote().sendText(JsonUtil.toJson(message));
+        }
     }
 
     @OnClose
     public void onClose() {
+        log.info("close: " + uid);
         WEB_SOCKET_SERVERS.remove(this.uid);
     }
 
@@ -73,9 +79,10 @@ public class WebSocketServer {
                 Pair.of("message", messageDTO)
         ), ApiType.USER_API);
 
-        WebSocketServer receiver = WEB_SOCKET_SERVERS.get(messageDTO.getReceiverID());
+        WebSocketServer receiver = WEB_SOCKET_SERVERS.getOrDefault(messageDTO.getReceiverID(), null);
         if (receiver != null) {
             receiver.session.getAsyncRemote().sendText(JsonUtil.toJson(messageVO));
+
             cloudService.invokeCloudFunction(Void.class, MapObjectUtil.mapObject(
                     Pair.of("$url", "readMessage"),
                     Pair.of("messageID", messageVO.get_id())
