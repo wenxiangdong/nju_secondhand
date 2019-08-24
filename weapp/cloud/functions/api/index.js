@@ -435,7 +435,7 @@ exports.main = async (event, context) => {
       return
     }
 
-    await addNotification({ userID: order.sellerID, content: `您的商品【${order.goodsName}】已被签收` })
+    await addNotification({notification: { userID: order.sellerID, content: `您的商品【${order.goodsName}】已被签收` }})
 
     ctx.body = { code: HttpCode.Success }
   })
