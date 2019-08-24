@@ -3,7 +3,7 @@ import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
 export interface IComplaintApi {
   complain(complaint: ComplaintDTO): Promise<void>;
 
-  getComplaints(lastIndex: number, size: number): Promise<ComplaintVO[]>;
+  getComplaints(lastIndex: number, size?: number): Promise<ComplaintVO[]>;
 }
 
 const functionName = 'api'
@@ -12,7 +12,7 @@ class ComplaintApi implements IComplaintApi {
   async complain(complaint: ComplaintDTO): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "complain", complaint });
   }
-  async getComplaints(lastIndex: number, size: number): Promise<ComplaintVO[]> {
+  async getComplaints(lastIndex: number, size: number = 10): Promise<ComplaintVO[]> {
     return await httpRequest.callFunction<ComplaintVO[]>(functionName, { $url: "getComplaints", lastIndex, size });
   }
 }

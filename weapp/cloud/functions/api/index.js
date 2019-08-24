@@ -770,7 +770,7 @@ const getNotificationsByPageAndUserId = async ({ userID, lastIndex, size }) => {
 
 const addNotification = async ({ notification }) => {
   notification.time = Date.now()
-  await add({ name: notificationName, data: notification })
+  add({ name: notificationName, data: notification })
 }
 
 /** account */
