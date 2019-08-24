@@ -240,7 +240,12 @@ export default class index extends Component<any, IState> {
           pictures && pictures.length
             ? (
               <View>
-                {pictures.map((p, idx) => <Image src={p} key={idx} style={styles.picture} mode='aspectFill' />)}
+                {pictures.map((p, idx) => (
+                  <Image
+                    onClick={() => Taro.previewImage({urls: pictures, current: p})}
+                    src={p} key={idx} style={styles.picture} mode='aspectFill'
+                  />
+                  ))}
               </View>
             )
             : null

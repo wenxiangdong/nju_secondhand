@@ -26,7 +26,7 @@ function GoodsInfoCard(props: IProp) {
         </View>
         {pictures.map((p, idx) =>
           <Image
-            onClick={() => Taro.previewImage({urls: pictures, current: idx + ''})}
+            onClick={() => Taro.previewImage({urls: pictures, current: p})}
             key={`goods-info-picture-${idx}-${p.substr(0, 20)}`}
                  className='at-article__img' src={p} mode='aspectFit' />)}
       </View>

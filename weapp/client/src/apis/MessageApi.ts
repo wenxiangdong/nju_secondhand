@@ -2,6 +2,7 @@ import Taro from "@tarojs/taro";
 import configApi, {ConfigItem} from "./Config";
 
 import localConfig from "../utils/local-config";
+import urlList from "../utils/url-list";
 
 export interface MessageVO {
   _id: string;
@@ -87,7 +88,7 @@ class MessageHub {
   private initMessageHistory() {
     const data = Taro.getStorageSync(this.STORAGE_KEY);
     console.log("initMessageHistory", data);
-    this.messageHistory = data;
+    this.messageHistory = data ? data : {};
   }
 
   public subscribe(observer: Observer) {
@@ -156,12 +157,19 @@ class Socket {
   async init() {
     const url = configApi.getConfig(ConfigItem.SOCKET_ADDRESS);
     const userID = localConfig.getUserId();
-    if (!url || !userID) {
-      console.log("未登陆，不能连接");
+    if (!url) {
+      console.log("配置出错，不能连接，10秒后重连");
       this.timerId = setTimeout(() => {
         this.init();
       }, 10 * 1000);
       throw new Error("socket连接出错");
+    }
+    if (!userID) {
+      console.log("未登陆，去登陆");
+      Taro.reLaunch({
+        url: urlList.LOGIN
+      }).catch(console.error);
+      throw new Error("未登陆");
     }
     try {
       this.wechatSocket = await Taro.connectSocket({url: `${url}/${userID}`});
