@@ -168,7 +168,7 @@ exports.main = async (event, context) => {
     const goods = getOneGoods({ goodsID })
     if (goods.state === GoodsState.Paying) {
       ctx.body = {
-        code: HttpCode.Forbidden,
+        code: HttpCode.Fail,
         message: '该商品正在被购买，无法下架'
       }
       return
@@ -189,7 +189,7 @@ exports.main = async (event, context) => {
     const goods = await getOneGoods({ goodsID })
 
     if (goods.state !== GoodsState.InSale) {
-      ctx.body = { code: HttpCode.Forbidden, messsage: '该商品暂时无法购买' }
+      ctx.body = { code: HttpCode.Fail, messsage: '该商品暂时无法购买' }
     }
 
     await updateOneGoods({
@@ -377,7 +377,7 @@ exports.main = async (event, context) => {
     balance = parseFloat(balance);
     if (balance < amount) {
       ctx.body = {
-        code: HttpCode.Forbidden,
+        code: HttpCode.Fail,
         message: "账户余额不足"
       }
       return;
