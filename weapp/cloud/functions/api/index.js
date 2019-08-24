@@ -411,7 +411,7 @@ exports.main = async (event, context) => {
   app.router('accept', async (ctx) => {
     const {
       orderID
-    } = ctx.event;
+    } = event; // 这里cst写的是ctx.event, 改正 by eric
 
     const order = await getOneOrder({ orderID })
 
