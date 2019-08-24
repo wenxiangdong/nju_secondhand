@@ -411,7 +411,7 @@ exports.main = async (event, context) => {
   app.router('accept', async (ctx) => {
     const {
       orderID
-    } = ctx.event;
+    } = event; // 这里cst写的是ctx.event, 改正 by eric
 
     const order = await getOneOrder({ orderID })
 
@@ -435,7 +435,7 @@ exports.main = async (event, context) => {
       return
     }
 
-    await addNotification({ userID: order.sellerID, content: `您的商品【${order.goodsName}】已被签收` })
+    await addNotification({notification: { userID: order.sellerID, content: `您的商品【${order.goodsName}】已被签收` }})
 
     ctx.body = { code: HttpCode.Success }
   })

@@ -24,7 +24,7 @@ interface IState {
 export default class index extends Component<any, IState> {
 
   config: Config = {
-    navigationBarTitleText: '订单反馈'
+    navigationBarTitleText: '反馈'
   };
 
   constructor(props) {

@@ -59,7 +59,7 @@ export default class CategoryGoods extends Component<any, IState> {
     const lastIndex = this.state.goodsWithSeller.length;
     if (this.state.category) {
       const { _id } = this.state.category;
-      apiHub.goodsApi.searchGoodsWithSellerByCategory(_id, lastIndex)
+      apiHub.goodsApi.searchGoodsWithSellerByCategory(_id, lastIndex, 10)
         .then((goodsWithSeller) => {
           if (goodsWithSeller && goodsWithSeller.length) {
             this.setState({goodsWithSeller: this.state.goodsWithSeller.concat(goodsWithSeller), loadMoreStatus: 'more'});

@@ -7,14 +7,16 @@ import {timeToString} from "../../../utils/date-util";
 
 function createStyles() {
   const baseCardStyle: CSSProperties = {
-    padding: '1vw 2vw',
+    boxSizing: "border-box",
+    padding: '16px',
     margin: '1vw 2vw',
     border: StyleHelper.NORMAL_BORDER,
-    width: '92vw',
+    width: '96vw',
     display: 'inline-flex',
     flexDirection: 'column',
     lineHeight: StyleHelper.numberToPxStr(20),
-    fontSize: 'small'
+    color: "#333",
+    // fontSize: 'small'
   };
 
   const topRowViewStyle: CSSProperties = {
@@ -30,7 +32,11 @@ function createStyles() {
     fontWeight: 'lighter',
   };
 
-  return {baseCardStyle, topRowViewStyle, stateInfoStyle};
+  const lineStyle: CSSProperties = {
+    marginBottom: "0.5em"
+  };
+
+  return {baseCardStyle, topRowViewStyle, stateInfoStyle, lineStyle};
 }
 
 const styles = createStyles();
@@ -72,12 +78,12 @@ function ComplaintCard(props: IProp) {
 
   return (
     <View style={styles.baseCardStyle}>
-      <View style={styles.topRowViewStyle}>
-        <Text>编号：{orderID}</Text>
+      <View style={{...styles.topRowViewStyle, ...styles.lineStyle}}>
+        <Text>时间：{complainTimeString}</Text>
         <Text style={styles.stateInfoStyle}>{stateInfo}</Text>
       </View>
-      <Text>时间：{complainTimeString}</Text>
-      <Text style={StyleHelper.BREAK_ALL_TEXT}>描述：{desc}</Text>
+      {/*<Text style={{...styles.lineStyle}}>时间：{complainTimeString}</Text>*/}
+      <Text style={{...StyleHelper.BREAK_ALL_TEXT, ...styles.lineStyle}}>描述：{desc}</Text>
       <View>
         {
           (pictures && pictures.length)

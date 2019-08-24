@@ -3,7 +3,7 @@ import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
 import DSwiper from "../../components/common/d-swiper";
-import {AtGrid, AtSearchBar} from "taro-ui";
+import {AtGrid, AtSearchBar, AtMessage} from "taro-ui";
 import {Item} from "taro-ui/@types/grid";
 import localConfig from '../../utils/local-config'
 import {createSimpleErrorHandler} from "../../utils/function-factory";
@@ -13,6 +13,7 @@ import urlList, {indexSearchUrlConfig} from "../../utils/url-list";
 import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
 import configApi, {ConfigItem} from "../../apis/Config";
+import {relaunchTimeout} from "../../utils/date-util";
 
 interface IState {
   searchValue: string,
@@ -43,6 +44,7 @@ export default class index extends Component<any, IState> {
   }
 
   componentWillMount() {
+    this.checkLogin();
     Promise.all([
       this.getSwiperSrcs(),
       this.getCategories()
@@ -60,6 +62,7 @@ export default class index extends Component<any, IState> {
   private getCategories = async function(): Promise<CategoryVO[]> {
     return apiHub.goodsApi.getCategories();
   };
+
 
   private transferCategoryDate = (categories: Array<CategoryVO>) => {
     return categories.map((c) => ({image:c.icon, value: c.name}));
@@ -81,6 +84,20 @@ export default class index extends Component<any, IState> {
     Taro.navigateTo({url: urlList.INDEX_CATEGORY_GOODS})
       .catch(this.onError);
   };
+
+  checkLogin() {
+    const userID = localConfig.getUserId();
+    if (!userID) {
+      this.onError(new Error("请先登陆"));
+      setTimeout(() => {
+        Taro.reLaunch({
+          url: urlList.LOGIN
+        }).catch(this.onError);
+      }, relaunchTimeout);
+    } else {
+      console.log("用户已登陆");
+    }
+  }
 
   private onError = createSimpleErrorHandler('index', this);
 
@@ -105,6 +122,7 @@ export default class index extends Component<any, IState> {
           <DSwiper srcs={swiperSrcs}/>
           <AtGrid customStyle={{backgroundColor: "black"}} hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>
           <MainTabBar currentIndex={MainTabBar.HOME_INDEX}/>
+          <AtMessage />
         </View>
       );
   }

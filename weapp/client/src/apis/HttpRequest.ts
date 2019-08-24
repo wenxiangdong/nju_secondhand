@@ -12,6 +12,7 @@ export { db, command };
 
 class HttpRequest implements IHttpRequest {
   async callFunction<T>(name: string, data: object = {}): Promise<T> {
+    console.log("request", name, data);
     try {
       const callResult = await Taro.cloud.callFunction({
         name,

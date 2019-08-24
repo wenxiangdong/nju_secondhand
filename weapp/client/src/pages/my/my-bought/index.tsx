@@ -122,7 +122,7 @@ export default class index extends Component<any, IState> {
 
   private loadMoreOngoingOrders = () => {
     const lastIndex = this.state.ongoingOrders.length;
-    apiHub.orderApi.getSellerOngoingOrders(lastIndex)
+    apiHub.orderApi.getSellerOngoingOrders(lastIndex, 10)
       .then((ongoingOrders) => {
         if (ongoingOrders && ongoingOrders.length) {
           this.setState({ongoingOrders: this.state.ongoingOrders.concat(ongoingOrders), ongoingOrdersLoadMoreStatus: 'more'});
