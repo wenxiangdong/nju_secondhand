@@ -415,8 +415,6 @@ exports.main = async (event, context) => {
 
     const order = await getOneOrder({ orderID })
 
-    const account = (await getOneUser({ userID: order.sellerID })).account
-
     try {
       await udpateOneOrder({ orderID, order: { state: OrderState.Finished, deliveryTime: Date.now() } })
     } catch (e) {
@@ -426,7 +424,7 @@ exports.main = async (event, context) => {
     }
 
     try {
-      await updateOneUser({ userID: order.sellerID, user: { account } })
+      await updateOneUser({ userID: order.sellerID, user: { account: { balance: command.inc(parseFloat(order.goodsPrice)) } } })
     } catch (e) {
       console.error(e)
       // 如果更新卖家消息失败，回滚订单操作，将其改为进行中状态
@@ -435,7 +433,7 @@ exports.main = async (event, context) => {
       return
     }
 
-    await addNotification({notification: { userID: order.sellerID, content: `您的商品【${order.goodsName}】已被签收` }})
+    await addNotification({ notification: { userID: order.sellerID, content: `您的商品【${order.goodsName}】已被签收` } })
 
     ctx.body = { code: HttpCode.Success }
   })
@@ -544,7 +542,7 @@ exports.main = async (event, context) => {
     message.receiverName = receiver.nickname
     message.read = false
     const messageID = await addMessage({ message })
-    ctx.body = await getOneMessage({messageID})
+    ctx.body = await getOneMessage({ messageID })
   })
 
   app.router('readMessage', async (ctx) => {
@@ -827,8 +825,8 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
 /** message */
 const messageName = 'message'
 
-const getOneMessage = async({messageID}) => {
-  return await getOne({name: messageName, id: messageID})
+const getOneMessage = async ({ messageID }) => {
+  return await getOne({ name: messageName, id: messageID })
 }
 
 const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
