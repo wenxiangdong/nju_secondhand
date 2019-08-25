@@ -150,5 +150,6 @@ export interface OrderVO extends VO {
 export enum OrderState {
   Ongoing = 0,
   Finished = 1,
-  Paying = -1
+  Paying = -1,
+  Timeout = 2
 }

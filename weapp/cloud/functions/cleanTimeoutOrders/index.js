@@ -40,11 +40,11 @@ exports.main = async (event, context) => {
 
   await Promise.all(
     [
-      expiredOrders.remove(),
+      expiredOrders.update({ state: OrderState.Timeout }),
       db.collection('goods')
-        .where({_id: command.in(goodsIDs)})
+        .where({ _id: command.in(goodsIDs) })
         .update({
-          data: {state: GoodsState.InSale}
+          data: { state: GoodsState.InSale }
         })
     ]
   )
@@ -53,7 +53,8 @@ exports.main = async (event, context) => {
 const OrderState = {
   Ongoing: 0,
   Finished: 1,
-  Paying: -1 // 正在支付中 by eric
+  Paying: -1, // 正在支付中 by eric
+  Timeout: 2
 }
 
 const GoodsState = {
