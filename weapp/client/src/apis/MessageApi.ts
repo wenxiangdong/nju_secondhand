@@ -40,7 +40,7 @@ class MessageHub {
     this.websocket.onMessage((ev: Taro.onSocketMessage.ParamParam) => {
       const vo: MessageVO = JSON.parse(ev.data);
       console.log("收到消息", vo);
-      if (!vo.senderID) return;
+      if (!vo || !vo.senderID) return;
       Taro.atMessage({
         message: `收到一条来自【${vo.senderName}】的消息`
       });

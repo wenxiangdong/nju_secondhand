@@ -15,7 +15,7 @@ export default function SystemNotification() {
   return (
     <View className={"SN__container"} onClick={handleClick}>
       <View className={"SN__card"} hoverClass={"SN__card--hover"}>
-        <MessageRow avatar={notice} name={"系统消息"}/>
+        <MessageRow avatar={notice} name={"系统消息"} />
       </View>
     </View>
   );
