@@ -9,6 +9,10 @@ import DeveloperFooter from '../../components/common/developer-footer';
 
 function Dev() {
 
+  Taro.navigateTo({
+    url: urlList.REGISTER
+  });
+
   const handleClick = async () => {
     console.log(apiHub.configApi.getAllConfigs());
     Taro.reLaunch({

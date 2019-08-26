@@ -120,7 +120,7 @@ export default class index extends Component<any, IState> {
             onConfirm={this.onSearch}
           />
           <DSwiper srcs={swiperSrcs}/>
-          <AtGrid customStyle={{backgroundColor: "black"}} hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>
+          <AtGrid customStyle={{backgroundColor: "black"}} hasBorder={true} data={categoryData} onClick={this.onCategoryClick}/>
           <MainTabBar currentIndex={MainTabBar.HOME_INDEX}/>
           <AtMessage />
         </View>
