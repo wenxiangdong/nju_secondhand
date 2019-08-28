@@ -410,10 +410,13 @@ exports.main = async (event, context) => {
   /** 订单 */
   app.router('accept', async (ctx) => {
     const {
+      /** @type {string} */
       orderID
     } = event; // 这里cst写的是ctx.event, 改正 by eric
 
     const order = await getOneOrder({ orderID })
+
+    console.log(order);
 
     try {
       await udpateOneOrder({ orderID, order: { state: OrderState.Finished, deliveryTime: Date.now() } })
@@ -424,10 +427,13 @@ exports.main = async (event, context) => {
     }
 
     try {
-      const user = await getOneUser({userID: orderID.sellerID});
+      let user = await getOneUser({userID: order.sellerID});
       console.log(user);
       if (user) {
-        const balance = parseFloat(user.account.balance) + parseFloat(order.goodsPrice);
+        const balance = parseFloat(user.account.balance) + parseFloat(order.goodsPrice) + '';
+        user.account.balance = balance;
+        delete user._id;
+        console.log(user.account.balance, order.goodsPrice, balance);
         await updateOneUser({ userID: order.sellerID, user: { account: { balance } } });
       }
     } catch (e) {
