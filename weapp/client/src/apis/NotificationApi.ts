@@ -2,7 +2,7 @@ import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
 
 export interface INotificationApi {
   // 取得通知消息
-  getNotifications(lastIndex: number, size: number): Promise<NotificationVO[]>;
+  getNotifications(lastIndex: number, size?: number): Promise<NotificationVO[]>;
 
   // 发送通知消息（供其他接口调用）
   sendNotification(notification: NotificationDTO): Promise<void>;
@@ -11,7 +11,7 @@ export interface INotificationApi {
 const functionName = 'api'
 
 class NotificationApi implements INotificationApi {
-  async getNotifications(lastIndex: number, size: number): Promise<NotificationVO[]> {
+  async getNotifications(lastIndex: number, size: number = 10): Promise<NotificationVO[]> {
     return await httpRequest.callFunction<NotificationVO[]>(functionName, { $url: "getNotifications", lastIndex, size });
   }
 
