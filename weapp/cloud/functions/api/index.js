@@ -779,6 +779,7 @@ const getNotificationsByPageAndUserId = async ({ userID, lastIndex, size }) => {
 
 const addNotification = async ({ notification }) => {
   notification.time = Date.now()
+  notification.read = false;  // 加一句 未读标记
   add({ name: notificationName, data: notification })
 }
 

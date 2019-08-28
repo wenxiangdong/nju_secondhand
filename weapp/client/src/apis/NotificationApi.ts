@@ -1,4 +1,12 @@
 import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
+import Taro from "@tarojs/taro";
+
+interface Snapshot {
+  docChanges: object[];
+  docs: object[];
+  type: string;
+  id: string;
+}
 
 export interface INotificationApi {
   // 取得通知消息
@@ -6,11 +14,35 @@ export interface INotificationApi {
 
   // 发送通知消息（供其他接口调用）
   sendNotification(notification: NotificationDTO): Promise<void>;
+
+  watchNotification();
 }
 
 const functionName = 'api'
 
 class NotificationApi implements INotificationApi {
+  private timeout = 5 * 1000;
+  watchNotification() {
+    setTimeout(async () => {
+      console.log(this.timeout);
+      try {
+        const list = await httpRequest.callFunction<NotificationVO[]>("notification");
+        if (list.length) {
+          Taro.atMessage({
+            message: "你有新的系统消息，请尽快查看"
+          });
+          this.timeout = this.timeout <= 5000 ? 5000 : this.timeout - 1000;
+        } else {
+          this.timeout = this.timeout > 15 * 1000 ? 15000 : this.timeout + 1000;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      setTimeout(() => {
+        this.watchNotification();
+      }, this.timeout);
+    }, this.timeout);
+  }
   async getNotifications(lastIndex: number, size: number = 10): Promise<NotificationVO[]> {
     return await httpRequest.callFunction<NotificationVO[]>(functionName, { $url: "getNotifications", lastIndex, size });
   }
@@ -21,6 +53,9 @@ class NotificationApi implements INotificationApi {
 }
 
 class MockNotificationApi implements INotificationApi {
+  watchNotification() {
+    throw new Error("Method not implemented.");
+  }
   async getNotifications(lastIndex: number, size: number = 10): Promise<NotificationVO[]> {
     const noti: NotificationVO = {
       _id: "",

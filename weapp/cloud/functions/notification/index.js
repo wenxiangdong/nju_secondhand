@@ -3,19 +3,20 @@ const cloud = require('wx-server-sdk');
 
 cloud.init();
 
-const userCollection = cloud.database().collection("user");
-const notiCollection = cloud.database().collection("notification");
-
 
 // 云函数入口函数
-/**
- * 轮询拿 新的 系统消息
- * @param event
- * @param context
- */
+
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
+  const userCollection = cloud.database().collection("user");
+  const notiCollection = cloud.database().collection("notification");
   const openID = wxContext.OPENID;
+  if (!openID) {
+    return {
+      code: 500,
+      message: "open id不存在"
+    }
+  }
 
   const user = (await userCollection.where({
     _openid: openID
@@ -31,9 +32,11 @@ exports.main = async (event, context) => {
     }
   }
 
+  console.log(user);
+
   const notifications = (await notiCollection.where({
     userID: user._id,
-    read: ''
+    read: false
   }).get()).data;
 
   console.log(notifications);
@@ -41,7 +44,7 @@ exports.main = async (event, context) => {
   // 异步更新 notifications
   notiCollection.where({
     userID: user._id,
-    read: undefined
+    read: false
   }).update({
     data: {
       read: true
