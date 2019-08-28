@@ -157,7 +157,7 @@ export default class My extends Component<any, IState> {
             }
           )}
         </AtList>
-        <DeveloperFooter />
+        {/*<DeveloperFooter />*/}
         <MainTabBar currentIndex={MainTabBar.MY_INDEX}/>
       </View>
     )

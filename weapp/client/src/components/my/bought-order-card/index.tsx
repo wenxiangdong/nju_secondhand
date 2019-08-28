@@ -1,11 +1,11 @@
 import Taro from '@tarojs/taro'
 import {Text, View} from '@tarojs/components'
 import {MockOrderApi, OrderState, OrderVO} from '../../../apis/OrderApi';
-import {sendComplaintUrlConfig} from '../../../utils/url-list';
+import {sendComplaintUrlConfig, userInfoUrlConfig} from '../../../utils/url-list';
 import {createSimpleErrorHandler} from '../../../utils/function-factory';
 import {StyleHelper} from '../../../styles/style-helper';
 import {CSSProperties} from 'react';
-import {AtButton} from 'taro-ui';
+import {AtIcon} from 'taro-ui';
 import {timeToString} from '../../../utils/date-util';
 import WhiteSpace from '../../common/white-space';
 
@@ -55,7 +55,7 @@ function createStyles() {
   };
 
   const subColumnStyle: CSSProperties = {
-    textAlign: 'center',
+    textAlign: 'right',
     ...columnStyle
   };
 
@@ -112,31 +112,73 @@ function BoughtOrderCard(props: IProp) {
       stateInfo = '状态不明'
   }
 
+
+  const handleClickMenu = async () => {
+    const menuList = [
+      {
+        label: "反馈",
+        onClick: () => onComplaint()
+      },
+    ];
+    if (isBuyer) {
+      menuList.unshift({
+        label: "卖家信息",
+        onClick: () => {
+          userInfoUrlConfig.go(order.sellerID);
+        }
+      });
+      if (state === OrderState.Ongoing) {
+        menuList.unshift({
+          label: "收货",
+          onClick: () => onAccept && onAccept()
+        });
+      }
+    } else if (!isBuyer) {
+      menuList.unshift({
+        label: "买家信息",
+        onClick: () => {
+          userInfoUrlConfig.go(order.buyerID);
+        }
+      })
+    }
+    try {
+      const res = await Taro.showActionSheet({
+        itemList: menuList.map(item => item.label),
+      });
+      const item = menuList[res.tapIndex];
+      item && item.onClick();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <View style={styles.baseCardStyle}>
       <View style={styles.mainColumnStyle}>
-        <Text>{goodsName}</Text>
+        <Text style={{fontSize: "1.2em"}}>{goodsName}</Text>
+        <WhiteSpace height={8}/>
         <Text>￥ {goodsPrice}</Text>
-        <WhiteSpace height={10}/>
+        <WhiteSpace height={16}/>
         <Text style={styles.dateStringStyle}>下单日期: {orderTimeString}</Text>
         <Text style={styles.dateStringStyle}>收货日期: {deliveryTimeString}</Text>
       </View>
       <View style={styles.subColumnStyle}>
         <Text style={styles.dateStringStyle}>订单状态：{stateInfo}</Text>
-        {
-          isComplaint
-            ? null
-            : (
-              <View style={styles.atButtonGroupStyle}>
-                <AtButton circle type='secondary' customStyle={styles.atButtonStyle} onClick={() => onComplaint()}>反馈</AtButton>
-                {
-                  state === OrderState.Ongoing && isBuyer && onAccept !== undefined
-                    ? <AtButton circle type='primary' customStyle={styles.atButtonStyle} onClick={() => onAccept()}>收货</AtButton>
-                    : null
-                }
-              </View>
-            )
-        }
+        <AtIcon value='menu' color='rgb(62, 207, 111)' onClick={handleClickMenu} />
+        {/*{*/}
+        {/*  isComplaint*/}
+        {/*    ? null*/}
+        {/*    : (*/}
+        {/*      <View style={styles.atButtonGroupStyle}>*/}
+        {/*        <AtButton circle type='secondary' customStyle={styles.atButtonStyle} onClick={() => onComplaint()}>反馈</AtButton>*/}
+        {/*        {*/}
+        {/*          state === OrderState.Ongoing && isBuyer && onAccept !== undefined*/}
+        {/*            ? <AtButton circle type='primary' customStyle={styles.atButtonStyle} onClick={() => onAccept()}>收货</AtButton>*/}
+        {/*            : null*/}
+        {/*        }*/}
+        {/*      </View>*/}
+        {/*    )*/}
+        {/*}*/}
       </View>
     </View>
   )

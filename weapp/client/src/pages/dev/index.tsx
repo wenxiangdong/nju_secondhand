@@ -2,29 +2,23 @@ import Taro from '@tarojs/taro';
 import {View, Text, Button} from "@tarojs/components";
 import './index.scss'
 import "@tarojs/async-await";
-import urlList, {complaintFormUrlConfig, resultUrlConfig, sendPostUrlConfig} from "../../utils/url-list";
-import { apiHub } from '../../apis/ApiHub';
-import DeveloperFooter from '../../components/common/developer-footer';
+import urlList, {
+  userInfoUrlConfig
+} from "../../utils/url-list";
 
 
 function Dev() {
-
-  Taro.navigateTo({
-    url: urlList.REGISTER
-  });
-
   const handleClick = async () => {
-    console.log(apiHub.configApi.getAllConfigs());
-    Taro.reLaunch({
-      url: urlList.MY
-    })
+    // Taro.navigateTo({
+    //   url: urlList.MY
+    // })
+    userInfoUrlConfig.go("5d262bd45d5d6c6b05f9ecf551c28984");
   };
 
   return (
     <View>
       <Text>Dev works</Text>
       <Button onClick={handleClick}>go</Button>
-      <DeveloperFooter />
     </View>
   )
 }
