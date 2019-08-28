@@ -424,9 +424,14 @@ exports.main = async (event, context) => {
     }
 
     try {
-      await updateOneUser({ userID: order.sellerID, user: { account: { balance: command.inc(parseFloat(order.goodsPrice)) } } })
+      const user = await getOneUser({userID: orderID.sellerID});
+      console.log(user);
+      if (user) {
+        const balance = parseFloat(user.account.balance) + parseFloat(order.goodsPrice);
+        await updateOneUser({ userID: order.sellerID, user: { account: { balance } } });
+      }
     } catch (e) {
-      console.error(e)
+      console.error(e);
       // 如果更新卖家消息失败，回滚订单操作，将其改为进行中状态
       await udpateOneOrder({ orderID, order: { state: OrderState.Ongoing, deliveryTime: -1 } })
       ctx.body = { code: HttpCode.Fail, message: '接受订单失败，请重试' }
