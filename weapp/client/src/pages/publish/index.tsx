@@ -1,11 +1,12 @@
 import Taro, {Config, useEffect, useState} from "@tarojs/taro";
 import {Picker, Text, View} from "@tarojs/components";
-import {AtButton, AtForm, AtImagePicker, AtInput, AtTextarea} from "taro-ui";
+import {AtButton, AtForm, AtImagePicker, AtInput, AtTextarea, AtNoticebar} from "taro-ui";
 import {CategoryVO, GoodsDTO} from "../../apis/GoodsApi";
 import {CSSProperties} from "react";
 import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
 import urlList, {resultUrlConfig} from "../../utils/url-list";
+import WhiteSpace from "../../components/common/white-space";
 
 // export interface GoodsDTO {
 //   name: string;
@@ -156,9 +157,11 @@ function Publish() {
   );
   return (
     <View>
+      <AtNoticebar>在平台发布的闲置物品卖出后，平台将收取其价格1%的费用（不足1元按1元计算）</AtNoticebar>
       {
         loading ? loadingPage : form
       }
+      <WhiteSpace height={50} />
     </View>
   );
 }
