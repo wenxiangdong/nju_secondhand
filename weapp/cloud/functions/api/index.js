@@ -165,16 +165,7 @@ exports.main = async (event, context) => {
 
   app.router('deleteGoods', async (ctx) => {
     const { goodsID } = event
-    const goods = getOneGoods({ goodsID })
-    if (goods.state === GoodsState.Paying) {
-      ctx.body = {
-        code: HttpCode.Fail,
-        message: '该商品正在被购买，无法下架'
-      }
-      return
-    }
-
-    await updateOneGoods({ goodsID: event.goodsID, goods: { state: GoodsState.Deleted } })
+    await updateOneGoods({ goodsID, goods: { state: GoodsState.Deleted } })
 
     ctx.body = {
       code: HttpCode.Success
@@ -192,9 +183,22 @@ exports.main = async (event, context) => {
       ctx.body = { code: HttpCode.Fail, messsage: '该商品暂时无法购买' }
     }
 
-    await updateOneGoods({
-      goodsID, goods: { state: GoodsState.Paying }
-    })
+    if (goods.num <= 0) {
+      ctx.body = {
+        code: HttpCode.Fail,
+        message: '该商品已无存货'
+      }
+    }
+
+    if (goods.num === 1) {
+      await updateOneGoods({
+        goodsID, goods: { num: command.inc(-1), state: OrderState.Deleted }
+      })
+    } else {
+      await updateOneGoods({
+        goodsID, goods: { num: command.inc(-1) }
+      })
+    }
 
     const order = {
       // buyer就是当前用户
@@ -222,7 +226,7 @@ exports.main = async (event, context) => {
       // 放着异步做了，无力的保证
       console.error(error);
       await updateOneGoods({
-        goodsID, goods: { state: GoodsState.InSale }
+        goodsID, goods: { state: GoodsState.InSale, num: command.inc(1) }
       })
       ctx.body = {
         code: HttpCode.Fail,
@@ -254,7 +258,7 @@ exports.main = async (event, context) => {
       console.error(error)
       await deleteOneOrder({ orderID: order._id })
       await updateOneGoods({
-        goodsID, goods: { state: GoodsState.InSale }
+        goodsID, goods: { state: GoodsState.InSale, num: command.inc(1) }
       })
       ctx.body = {
         code: HttpCode.Fail,
@@ -484,7 +488,7 @@ exports.main = async (event, context) => {
     const handlers = {
       '0': async (order) => {
         await udpateOneOrder({ orderID: order._id, order: { state: OrderState.Ongoing } })
-        await updateOneGoods({ goodsID: order.goodsID, goods: { state: GoodsState.Deleted } })
+        // await updateOneGoods({ goodsID: order.goodsID, goods: { state: GoodsState.Deleted } })
         // 通知卖家发货
         await addNotification({ notification: { userID: order.sellerID, content: `您的商品【${order.goodsName}】已被购买，请及时发货` } })
       },
@@ -494,7 +498,7 @@ exports.main = async (event, context) => {
         await deleteOneOrder({ orderID: order._id })
         // 上架商品
         // 一定要重新上架成功，否则得报错
-        await updateOneGoods({ goodsID: order.goodsID, goods: { state: GoodsState.InSale } })
+        await updateOneGoods({ goodsID: order.goodsID, goods: { state: GoodsState.InSale, num: command.inc(1) } })
       }
     };
 

@@ -44,7 +44,7 @@ exports.main = async (event, context) => {
       db.collection('goods')
         .where({ _id: command.in(goodsIDs) })
         .update({
-          data: { state: GoodsState.InSale }
+          data: { state: GoodsState.InSale, num: command.inc(1) }
         })
     ]
   )
