@@ -54,6 +54,10 @@ export default class index extends Component<any, IState> {
       .catch(this.onError);
   }
 
+  componentDidShow(): void {
+    this.checkLogin();
+  }
+
   private getSwiperSrcs = async function(): Promise<string[]> {
     //  TODO 优先级 低 获取 swiperSrcs
     await configApi.syncFromCloud();

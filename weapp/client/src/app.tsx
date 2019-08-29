@@ -96,7 +96,7 @@ class App extends Component {
 
   componentDidHide () {
     if(messageHub.socketOpen()) {
-      messageHub.closeWebsocket();
+      messageHub.closeWebsocket().catch(console.log);
     }
   }
 

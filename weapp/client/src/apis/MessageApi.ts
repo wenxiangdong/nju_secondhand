@@ -70,7 +70,7 @@ class MessageHub {
         console.error(e);
       });
       this.websocket.onClose((res) => {
-        console.log(res);
+        console.log("关闭原因", res);
         // @ts-ignore
         this.websocket = null;
       });
@@ -80,7 +80,7 @@ class MessageHub {
     }
   }
 
-  public closeWebsocket() {
+  public async closeWebsocket() {
     console.log("关闭");
     return this.websocket.close({
       code: this.closeCode,
