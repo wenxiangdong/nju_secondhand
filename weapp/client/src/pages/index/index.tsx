@@ -14,6 +14,7 @@ import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
 import configApi, {ConfigItem} from "../../apis/Config";
 import {relaunchTimeout} from "../../utils/date-util";
+import messageHub from "../../apis/MessageApi";
 
 interface IState {
   searchValue: string,
@@ -96,8 +97,21 @@ export default class index extends Component<any, IState> {
       }, relaunchTimeout);
     } else {
       console.log("用户已登陆");
+      this.initSocket(userID);
     }
   }
+
+  private initSocket = (userID) => {
+    const address = apiHub.configApi.getConfig(ConfigItem.SOCKET_ADDRESS);
+    console.log(address);
+    if (address) {
+      messageHub.initWebsocket(`${address}/${userID}`);
+    } else {
+      setTimeout(() => {
+        this.initSocket(userID);
+      }, 3000);
+    }
+  };
 
   private onError = createSimpleErrorHandler('index', this);
 

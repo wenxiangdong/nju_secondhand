@@ -2,7 +2,6 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import Index from './pages/index'
 
 import './app.scss'
-import messageHub from "./apis/MessageApi";
 
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -25,7 +24,7 @@ class App extends Component {
     pages: [
 
       // 测试页面
-      'pages/dev/index',
+      // 'pages/dev/index',
       'pages/index/index',
 
       'pages/circle/index',
