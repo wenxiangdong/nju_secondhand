@@ -296,12 +296,17 @@ exports.main = async (event, context) => {
     const { postID, content } = event
     const { self } = ctx.data
 
+    const post = await getOnePost({ postID })
+
     await updateOnePost({
       postID,
       post: {
         comments: command.push([{ nickname: self.nickname, content, commentTime: Date.now() }])
       }
     })
+
+    const maxLength = 8
+    await addNotification({ notification: { userID: post.ownerID, content: `您的帖子【${post.desc.length > maxLength ? post.desc.substr(0, maxLength) + '...' : post.desc}】被评论了，快去看看吧` } })
 
     ctx.body = { code: HttpCode.Success }
   })
@@ -388,16 +393,6 @@ exports.main = async (event, context) => {
       return;
     }
 
-    const taxes = amount.multipliedBy(0.01).toFixed(2).toNumber()
-    if (taxes < 1) {
-      taxes = 1
-    }
-    if (taxes > amount.toNumber()) {
-      taxes = amount.toNumber()
-    }
-    balance = balance.minus(amount)
-    amount = amount.minus(taxes)
-
     // 微信企业付款
     try {
       await withdraw({
@@ -414,7 +409,7 @@ exports.main = async (event, context) => {
       userID: self._id,
       user: {
         account: {
-          balance: balance.toFixed(2)
+          balance: balance.minus(amount).toFixed(2)
         }
       }
     })
@@ -445,10 +440,20 @@ exports.main = async (event, context) => {
       let user = await getOneUser({ userID: order.sellerID });
       console.log(user);
       if (user) {
-        const balance = BigNumber(user.account.balance).plus(order.goodsPrice).toFixed(2);
-        user.account.balance = balance;
-        delete user._id;
-        console.log(user.account.balance, order.goodsPrice, balance);
+        let amount = BigNumber(order.goodsPrice)
+        let tax = amount.multipliedBy(0.01)
+        const minTax = BigNumber(1)
+        if (tax < minTax) {
+          tax = minTax
+        }
+        if (tax > amount) {
+          tax = amount
+        }
+        amount = amount.minus(tax)
+        const balance = BigNumber(user.account.balance).plus(amount).toFixed(2);
+        // user.account.balance = balance;
+        // delete user._id;
+        // console.log(user.account.balance, order.goodsPrice, balance);
         await updateOneUser({ userID: order.sellerID, user: { account: { balance } } });
       }
     } catch (e) {

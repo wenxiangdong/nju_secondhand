@@ -92,4 +92,5 @@ export interface NotificationVO extends VO {
   userID: string;
   content: string;
   time: number;
+  read: boolean;
 }
