@@ -4,6 +4,7 @@ const TcbRouter = require('tcb-router')
 const fs = require("fs");
 const Tenpay = require("tenpay");
 const { LitePay, utils, Bank } = require("@sigodenjs/wechatpay");
+const BigNumber = require('bignumber.js')
 
 cloud.init()
 
@@ -377,9 +378,9 @@ exports.main = async (event, context) => {
     // 前置检查余额
     const { account = {} } = self || {};
     let { balance = 0 } = account;
-    amount = parseFloat(amount);
-    balance = parseFloat(balance);
-    if (balance < amount) {
+    amount = BigNumber(amount);
+    balance = BigNumber(balance);
+    if (balance.toNumber() < amount.toNumber()) {
       ctx.body = {
         code: HttpCode.Fail,
         message: "账户余额不足"
@@ -387,11 +388,21 @@ exports.main = async (event, context) => {
       return;
     }
 
+    const taxes = amount.multipliedBy(0.01).toFixed(2).toNumber()
+    if (taxes < 1) {
+      taxes = 1
+    }
+    if (taxes > amount.toNumber()) {
+      taxes = amount.toNumber()
+    }
+    balance = balance.minus(amount)
+    amount = amount.minus(taxes)
+
     // 微信企业付款
     try {
       await withdraw({
         openID: ctx.data.openid,
-        amount: amount
+        amount: amount.toNumber()
       });
     } catch (error) {
       ctx.body = error;
@@ -403,7 +414,7 @@ exports.main = async (event, context) => {
       userID: self._id,
       user: {
         account: {
-          balance: (balance - amount) + ''
+          balance: balance.toFixed(2)
         }
       }
     })
@@ -431,10 +442,10 @@ exports.main = async (event, context) => {
     }
 
     try {
-      let user = await getOneUser({userID: order.sellerID});
+      let user = await getOneUser({ userID: order.sellerID });
       console.log(user);
       if (user) {
-        const balance = parseFloat(user.account.balance) + parseFloat(order.goodsPrice) + '';
+        const balance = BigNumber(user.account.balance).plus(order.goodsPrice).toFixed(2);
         user.account.balance = balance;
         delete user._id;
         console.log(user.account.balance, order.goodsPrice, balance);
@@ -792,8 +803,7 @@ const withdraw = async ({ openID = "", amount = 0 }) => {
   console.log(TENPAY_CONFIG);
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
   // 转换成分
-  amount = parseFloat(amount);
-  amount = amount * 100;
+  amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
   try {
     const info = {
       // todo 转账
@@ -818,8 +828,7 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
   console.log(TENPAY_CONFIG);
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
   // 转换成分
-  payAmount = parseFloat(payAmount);
-  payAmount = parseInt(Math.round(payAmount * 100));
+  payAmount = BigNumber(payAmount).multipliedBy(100).integerValue().toNumber();
   try {
     const result = await tenpay.getPayParams({
       out_trade_no: orderID || `order${+new Date()}`,
