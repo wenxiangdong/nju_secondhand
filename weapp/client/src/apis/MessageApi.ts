@@ -1,8 +1,5 @@
 import Taro from "@tarojs/taro";
-import configApi, {ConfigItem} from "./Config";
-
-import localConfig from "../utils/local-config";
-import urlList from "../utils/url-list";
+import "@tarojs/async-await";
 
 export interface MessageVO {
   _id: string;
@@ -30,6 +27,9 @@ class MessageHub {
   private messageHistory: object = {};
   private STORAGE_KEY: string = "messages";
   private websocket: Taro.SocketTask;
+
+  private closeCode = -1024;
+  private closeReason = "force close";
 
   constructor() {
     this.observers = [];
@@ -69,13 +69,23 @@ class MessageHub {
       this.websocket.onError((e) => {
         console.error(e);
       });
-      this.websocket.onClose(() => {
-        this.initWebsocket(url);
+      this.websocket.onClose((res) => {
+        console.log(res);
+        // @ts-ignore
+        this.websocket = null;
       });
       console.log("建立socket成功");
     } catch (e) {
       this.initWebsocket(url);
     }
+  }
+
+  public closeWebsocket() {
+    console.log("关闭");
+    return this.websocket.close({
+      code: this.closeCode,
+      reason: this.closeReason
+    });
   }
 
   public sendMessage(vo: MessageVO) {

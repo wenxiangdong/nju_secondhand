@@ -2,6 +2,11 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import Index from './pages/index'
 
 import './app.scss'
+import messageHub from "./apis/MessageApi";
+import {apiHub} from "./apis/ApiHub";
+import {ConfigItem} from "./apis/Config";
+import localConfig from "./utils/local-config";
+import urlList from "./utils/url-list";
 
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -89,7 +94,11 @@ class App extends Component {
 
   }
 
-  componentDidHide () {}
+  componentDidHide () {
+    if(messageHub.socketOpen()) {
+      messageHub.closeWebsocket();
+    }
+  }
 
   componentDidCatchError () {}
 

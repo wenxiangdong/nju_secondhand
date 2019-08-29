@@ -97,7 +97,9 @@ export default class index extends Component<any, IState> {
       }, relaunchTimeout);
     } else {
       console.log("用户已登陆");
-      this.initSocket(userID);
+      if (!messageHub.socketOpen()) {
+        this.initSocket(userID);
+      }
     }
   }
 
