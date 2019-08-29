@@ -114,7 +114,10 @@ export default class index extends Component<any, IState> {
     const that = this;
     if (this.validRegister()) {
       this.setState({registerLoading: true}, function () {
-        apiHub.userApi.signUp(that.state.registerInfo)
+        apiHub.userApi.signUp({
+          ...that.state.registerInfo,
+          email: that.state.registerInfo.email + "@smail.nju.edu.cn"
+        })
           .then(function () {
             const sucMsg = '注册成功';
             apiHub.userApi.login()
