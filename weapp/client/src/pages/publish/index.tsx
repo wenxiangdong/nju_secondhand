@@ -1,6 +1,6 @@
 import Taro, {Config, useEffect, useState} from "@tarojs/taro";
 import {Picker, Text, View} from "@tarojs/components";
-import {AtButton, AtForm, AtImagePicker, AtInput, AtTextarea, AtNoticebar} from "taro-ui";
+import {AtButton, AtForm, AtImagePicker, AtInput, AtTextarea, AtNoticebar, AtInputNumber} from "taro-ui";
 import {CategoryVO, GoodsDTO} from "../../apis/GoodsApi";
 import {CSSProperties} from "react";
 import LoadingPage from "../../components/common/loading-page";
@@ -18,7 +18,7 @@ import WhiteSpace from "../../components/common/white-space";
 
 function Publish() {
   // states
-  const [goods, setGoods] = useState({} as GoodsDTO);
+  const [goods, setGoods] = useState({num: 1} as GoodsDTO);
   const [categories, setCategories] = useState([] as CategoryVO[]);
   const [selectedCateName, setCateName] = useState("");
   const [pictures, setPictures] = useState([]);
@@ -138,6 +138,17 @@ function Publish() {
         value={goods.price}
         onChange={value => handleChangeForm("price", value)}
       />
+      {/*<AtInputNumber*/}
+      {/*  type='number'*/}
+      {/*  value={goods.num}*/}
+      {/*  onChange={value => handleChangeForm("num", value)} />*/}
+      <AtInput
+        customStyle={{...commonStyles}}
+        title='库存'
+        type='number'
+        name={"num"}
+        value={goods.num}
+        onChange={value => handleChangeForm("num", value)} />
       <View style={{...commonStyles}}>图片</View>
       <AtImagePicker
         files={pictures}

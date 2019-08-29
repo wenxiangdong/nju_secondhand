@@ -9,10 +9,10 @@ import urlList, {
 
 function Dev() {
   const handleClick = async () => {
-    // Taro.navigateTo({
-    //   url: urlList.MY
-    // })
-    userInfoUrlConfig.go("5d262bd45d5d6c6b05f9ecf551c28984");
+    Taro.navigateTo({
+      url: urlList.PUBLISH_GOODS
+    })
+    // userInfoUrlConfig.go("5d262bd45d5d6c6b05f9ecf551c28984");
   };
 
   return (
