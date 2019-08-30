@@ -14,6 +14,7 @@ import ConfirmModal from "../../common/confirm-modal";
 import {relaunchTimeout} from "../../../utils/date-util";
 
 import "@tarojs/async-await";
+import {MessageVO} from "../../../apis/MessageApi";
 
 interface IProp {
   goodsWithSeller: GoodsWithSellerVO
