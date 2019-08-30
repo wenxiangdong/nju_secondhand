@@ -5,13 +5,6 @@ import localConfig from "../../utils/local-config";
 
 
 function Dev() {
-  useEffect(() => {
-    console.log("start");
-    const ob = (key, value) => {
-      console.log(key, "changed", value);
-    };
-    localConfig.subscribe(ob);
-  }, []);
   const handleClick = () => {
     // Taro.navigateTo({
     //   url: urlList.PUBLISH_GOODS
