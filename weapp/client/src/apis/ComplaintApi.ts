@@ -1,4 +1,5 @@
 import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
+const regeneratorRuntime = require("../lib/async");
 
 export interface IComplaintApi {
   complain(complaint: ComplaintDTO): Promise<void>;

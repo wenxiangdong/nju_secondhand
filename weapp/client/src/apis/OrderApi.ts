@@ -1,6 +1,7 @@
 import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
 import {Location, MockUserApi} from "./UserApi";
 import {createRandomNumberStr} from "./Util";
+const regeneratorRuntime = require("../lib/async");
 
 export interface IOrderApi {
   getBuyerOngoingOrders(lastIndex: number, size?: number): Promise<OrderVO[]>;

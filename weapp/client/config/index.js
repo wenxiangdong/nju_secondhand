@@ -14,7 +14,8 @@ const config = {
       sourceMap: true,
       presets: [
         ['env', {
-          modules: false
+          modules: false,
+          debug: true
         }]
       ],
       plugins: [

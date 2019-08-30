@@ -1,5 +1,6 @@
 import Taro from "@tarojs/taro";
-import "@tarojs/async-await";
+// import "@tarojs/async-await";
+const regeneratorRuntime = require("../lib/async");
 
 export interface MessageVO {
   _id: string;

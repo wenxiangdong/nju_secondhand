@@ -1,5 +1,6 @@
 import {VO, httpRequest, mockHttpRequest} from "./HttpRequest";
 import Taro from "@tarojs/taro";
+const regeneratorRuntime = require("../lib/async");
 
 interface Snapshot {
   docChanges: object[];
@@ -23,25 +24,35 @@ const functionName = 'api'
 class NotificationApi implements INotificationApi {
   private timeout = 5 * 1000;
   watchNotification() {
-    setTimeout(async () => {
-      console.log(this.timeout);
-      try {
-        const list = await httpRequest.callFunction<NotificationVO[]>("notification");
-        if (list.length) {
-          Taro.atMessage({
-            message: "你有新的系统消息，请尽快查看"
-          });
-          this.timeout = this.timeout <= 5000 ? 5000 : this.timeout - 1000;
-        } else {
-          this.timeout = this.timeout > 15 * 1000 ? 15000 : this.timeout + 1000;
-        }
-      } catch (error) {
-        console.log(error);
-      }
-      setTimeout(() => {
-        this.watchNotification();
-      }, this.timeout);
-    }, this.timeout);
+    Taro.cloud.database()
+      .collection("notification")
+      .where({read: false})
+      // @ts-ignore
+      .watch({
+        onChange: (res) => {
+          console.log(res);
+        },
+        onError: console.log
+      })
+    // setTimeout(async () => {
+    //   console.log(this.timeout);
+    //   try {
+    //     const list = await httpRequest.callFunction<NotificationVO[]>("notification");
+    //     if (list.length) {
+    //       Taro.atMessage({
+    //         message: "你有新的系统消息，请尽快查看"
+    //       });
+    //       this.timeout = this.timeout <= 5000 ? 5000 : this.timeout - 1000;
+    //     } else {
+    //       this.timeout = this.timeout > 15 * 1000 ? 15000 : this.timeout + 1000;
+    //     }
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    //   setTimeout(() => {
+    //     this.watchNotification();
+    //   }, this.timeout);
+    // }, this.timeout);
   }
   async getNotifications(lastIndex: number, size: number = 10): Promise<NotificationVO[]> {
     return await httpRequest.callFunction<NotificationVO[]>(functionName, { $url: "getNotifications", lastIndex, size });

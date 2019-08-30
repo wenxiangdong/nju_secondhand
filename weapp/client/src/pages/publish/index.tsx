@@ -7,6 +7,7 @@ import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
 import urlList, {resultUrlConfig} from "../../utils/url-list";
 import WhiteSpace from "../../components/common/white-space";
+const regeneratorRuntime = require("../../lib/async");
 
 // export interface GoodsDTO {
 //   name: string;

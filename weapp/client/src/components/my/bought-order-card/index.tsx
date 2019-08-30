@@ -8,6 +8,7 @@ import {CSSProperties} from 'react';
 import {AtIcon} from 'taro-ui';
 import {timeToString} from '../../../utils/date-util';
 import WhiteSpace from '../../common/white-space';
+const regeneratorRuntime = require("../../../lib/async");
 
 function createStyles() {
   const numberToPxStr = StyleHelper.numberToPxStr;

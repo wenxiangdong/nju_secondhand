@@ -14,6 +14,8 @@ import ConfirmModal from "../../common/confirm-modal";
 import {relaunchTimeout} from "../../../utils/date-util";
 
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../../../lib/async");
+
 import {MessageVO} from "../../../apis/MessageApi";
 
 interface IProp {

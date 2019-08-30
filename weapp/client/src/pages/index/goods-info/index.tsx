@@ -10,6 +10,7 @@ import LoadingPage from "../../../components/common/loading-page";
 import GoodsInfoCard from "../../../components/index/goods-info-card";
 import GoodsInfoBottomBar from "../../../components/index/goods-info-bottom-bar";
 import localConfig from "../../../utils/local-config";
+const regeneratorRuntime = require("../../../lib/async");
 
 interface IState {
   loading: boolean,

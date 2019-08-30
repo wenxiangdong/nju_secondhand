@@ -4,6 +4,7 @@ import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import {locationUrlConfig} from "../../../utils/url-list";
 import DLocation from "../../../components/common/d-location/DLocation";
 import LoadingPage from "../../../components/common/loading-page";
+const regeneratorRuntime = require("../../../lib/async");
 
 interface IState {
   loading: boolean,

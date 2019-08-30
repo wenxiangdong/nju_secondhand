@@ -8,6 +8,8 @@ import {indexSearchUrlConfig} from "../../../utils/url-list";
 import {apiHub} from "../../../apis/ApiHub";
 import GoodsCard from "../../../components/index/goods-card";
 import {StyleHelper} from "../../../styles/style-helper";
+import "@tarojs/async-await";
+const regeneratorRuntime = require("../../../lib/async");
 
 interface IState {
   searchValue: string,

@@ -9,6 +9,7 @@ import "@tarojs/async-await";
 import {apiHub} from "../../apis/ApiHub";
 import {UserVO} from "../../apis/UserApi";
 import DLocation from "../../components/common/d-location/DLocation";
+const regeneratorRuntime = require("../../lib/async");
 
 export default function UserInfo() {
   const [user, setUser] = useState({} as UserVO);

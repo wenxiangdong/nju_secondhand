@@ -1,5 +1,6 @@
 import { mockHttpRequest } from "./HttpRequest";
 import * as Taro from "@tarojs/taro";
+const regeneratorRuntime = require("../lib/async");
 import UploadFileResult = Taro.cloud.ICloud.UploadFileResult;
 import DeleteFileResult = Taro.cloud.ICloud.DeleteFileResult;
 import DeleteFileResultItem = Taro.cloud.ICloud.DeleteFileResultItem;
