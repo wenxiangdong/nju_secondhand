@@ -103,16 +103,13 @@ class LocalConfig {
   /**
    * 增加一个 监听
    */
-  private readonly observers = [];
-  public subscribe(ob: (keyOfChangeItem) => void) {
+  private readonly observers = new Set();
+  public subscribe(ob: Observer) {
     // @ts-ignore
-    this.observers.push(ob);
+    this.observers.add(ob);
   }
   public unsubscribe(ob: Observer) {
-    this.observers.splice(
-      this.observers.findIndex((item) => item === ob),
-      1
-    );
+    this.observers.delete(ob);
   }
   private notify(key, value) {
     this.observers.forEach((ob: Observer) => {

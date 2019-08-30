@@ -1,9 +1,17 @@
-import Taro from '@tarojs/taro';
+import Taro, {useEffect} from '@tarojs/taro';
 import {View, Text, Button} from "@tarojs/components";
 import './index.scss'
+import localConfig from "../../utils/local-config";
 
 
 function Dev() {
+  useEffect(() => {
+    console.log("start");
+    const ob = (key, value) => {
+      console.log(key, "changed", value);
+    };
+    localConfig.subscribe(ob);
+  }, []);
   const handleClick = () => {
     // Taro.navigateTo({
     //   url: urlList.PUBLISH_GOODS
@@ -11,18 +19,7 @@ function Dev() {
     // userInfoUrlConfig.go("5d262bd45d5d6c6b05f9ecf551c28984");
     // @ts-ignore
     // eslint-disable-next-line no-undef
-    wx.cloud.database()
-      .collection("notification")
-      .where({})
-      // @ts-ignore
-      .watch({
-        onChange: (res) => {
-          console.log(res);
-        },
-        onError: (e) => {
-          console.log(e)
-        }
-      })
+    localConfig.setWithdrawTime(Date.now());
   };
 
   return (
