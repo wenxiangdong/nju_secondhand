@@ -1,4 +1,6 @@
 import Taro from "@tarojs/taro";
+import localConfig from "../utils/local-config";
+import MessageQueue from "../utils/message-queue";
 // import "@tarojs/async-await";
 const regeneratorRuntime = require("../lib/async");
 
@@ -27,10 +29,8 @@ class MessageHub {
   private observers: Observer[];
   private messageHistory: object = {};
   private STORAGE_KEY: string = "messages";
-  private websocket: Taro.SocketTask;
 
-  private closeCode = -1024;
-  private closeReason = "force close";
+  private messageIdReadQueue: string[] = [];
 
   constructor() {
     this.observers = [];
@@ -38,77 +38,58 @@ class MessageHub {
     this.initMessageHistory();
   }
 
-  public socketOpen(): boolean {
-    return !!this.websocket;
-  }
-
-  public async initWebsocket(url) {
-    console.log(url);
-    try {
-      this.websocket = await Taro.connectSocket({
-        url
-      });
-      this.websocket.onMessage((ev: Taro.onSocketMessage.ParamParam) => {
-        const vo: MessageVO = JSON.parse(ev.data);
-        console.log("收到消息", vo);
-        if (!vo || !vo.senderID) return;
-        // store
-        this.addMessageToList(vo.senderID, vo);
-        try {
-          Taro.atMessage({
-            message: `收到一条来自【${vo.senderName}】的消息`
-          });
-        } catch (e) {
-          console.log(e);
-          Taro.showToast({
-            title: `收到一条来自【${vo.senderName}】的消息`,
-            icon: "none"
-          })
-        }
-
-        // notify
-        this.observers.forEach(ob => {
-          try {
-            ob(vo)
-          } catch (e) {
-            if (e.message && e.message.indexOf('.atMessage is not a function') < 0)
-              console.error("监听消息出错", e, ob);
-          }
-        });
-      })
-      this.websocket.onError((e) => {
-        console.error(e);
-      });
-      this.websocket.onClose((res) => {
-        console.log("关闭原因", res);
+  public startWatch() {
+    const messageQueue = MessageQueue.getInstance();
+    const ob = (key, value) => {
+      if (key === localConfig.USER_ID) {
+        watch(value);
+        localConfig.unsubscribe(ob);
+      }
+    };
+    const watch = (userID) => {
+      console.log("开始监听消息");
+      Taro.cloud.database()
+        .collection("message")
+        .where({
+          receiverID: userID,
+          read: false
+        })
         // @ts-ignore
-        this.websocket = null;
-        console.log("3秒后重连");
-        setTimeout(() => {
-          this.initWebsocket(url);
-        }, 3000);
-      });
-      console.log("建立socket成功");
-    } catch (e) {
-      // this.initWebsocket(url);
-    }
-  }
+        .watch({
+          onChange: (res) => {
+            console.log("消息", res);
+            const {docChanges = []} = res;
+            const messageList: MessageVO[] = docChanges
+              .filter(item => ["init", 'add'].indexOf(item.dataType) >= 0)
+              .map(item => item.doc);
 
-  public async closeWebsocket() {
-    console.log("关闭");
-    this.websocket.close({
-      code: this.closeCode,
-      reason: this.closeReason
-    });
-    this.websocket = null;
+            // 加入本地
+            messageList.forEach(vo => {
+              this.addMessageToLocalList(vo.senderID, vo);
+            });
+            // 界面通知
+            messageQueue.add(...messageList.map(vo => `【${vo.senderName}】发来一条消息`));
+            // 已读队列
+            this.addToQueue(...messageList.map(vo => vo._id));
+          },
+          onError: e => {
+            console.log(e);
+          }
+        })
+    };
+    const userID = localConfig.getUserId();
+    if (userID) {
+      watch(userID);
+    } else {
+      localConfig.subscribe(ob);
+    }
   }
 
   public sendMessage(vo: MessageVO) {
     const {receiverID, content} = vo;
-    this.websocket.send({
-      data: JSON.stringify({receiverID, content})
-    });
-    this.addMessageToList(receiverID, vo);
+    // TODO 调用云函数发送消息
+    console.log("发送", vo);
+    this.addMessageToLocalList(receiverID, vo);
   }
 
   /**
@@ -116,7 +97,7 @@ class MessageHub {
    * @param key 往记录里加消息
    * @param vo
    */
-  private addMessageToList(key: string, vo: MessageVO) {
+  private addMessageToLocalList(key: string, vo: MessageVO) {
     console.log("add message to list", key, vo);
     let messageList = this.messageHistory[key];
       if (!messageList) {
@@ -134,6 +115,19 @@ class MessageHub {
     const data = Taro.getStorageSync(this.STORAGE_KEY);
     console.log("initMessageHistory", data);
     this.messageHistory = data ? data : {};
+  }
+
+  private addToQueue(...ids) {
+    this.messageIdReadQueue.push(...ids);
+    if (this.messageIdReadQueue.length > 10) {
+      this.read(this.messageIdReadQueue);
+      this.messageIdReadQueue = [];
+    }
+  }
+
+  private read(ids: string[]) {
+    // TODO 调用云函数让其 已读
+    console.log("read", ids);
   }
 
   public subscribe(observer: Observer) {

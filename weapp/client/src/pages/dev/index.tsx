@@ -2,6 +2,7 @@ import Taro, {useEffect} from '@tarojs/taro';
 import {View, Text, Button} from "@tarojs/components";
 import './index.scss'
 import localConfig from "../../utils/local-config";
+import urlList from "../../utils/url-list";
 
 
 function Dev() {
@@ -12,7 +13,9 @@ function Dev() {
     // userInfoUrlConfig.go("5d262bd45d5d6c6b05f9ecf551c28984");
     // @ts-ignore
     // eslint-disable-next-line no-undef
-    localConfig.setWithdrawTime(Date.now());
+    Taro.navigateTo({
+      url: urlList.MESSAGE
+    })
   };
 
   return (

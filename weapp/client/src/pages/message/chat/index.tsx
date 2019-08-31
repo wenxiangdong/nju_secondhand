@@ -54,12 +54,12 @@ export default class index extends Component<any, IState> {
   }
 
   async componentWillMount() {
-    if (!messageHub.socketOpen()) {
-      resultUrlConfig.go({
-        status: "warn",
-        title: "聊天服务器还未连上，请稍等重试"
-      });
-    }
+    // if (!messageHub.socketOpen()) {
+    //   resultUrlConfig.go({
+    //     status: "warn",
+    //     title: "聊天服务器还未连上，请稍等重试"
+    //   });
+    // }
     const sellerId = chatUrlConfig.getUserId(this);
     try {
       if (sellerId && sellerId.length) {

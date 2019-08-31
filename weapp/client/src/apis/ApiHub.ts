@@ -9,6 +9,7 @@ import { INotificationApi, notificationApi, mockNotificationApi } from "./Notifi
 import { IOrderApi, orderApi, mockOrderApi } from "./OrderApi";
 import { IUserApi, userApi, mockUserApi } from "./UserApi";
 import configApi, {ConfigApi, ConfigItem} from "./Config";
+import messageHub from "./MessageApi";
 export interface IApiHub {
   accountApi: IAccountApi;
   circleApi: ICircleApi;
@@ -48,6 +49,7 @@ class MockApiHub implements IApiHub {
 export const mock = false;
 
 notificationApi.watchNotification();
+messageHub.startWatch();
 
 let apiHub: IApiHub = mock ? new MockApiHub() : new ApiHub();
 export { apiHub };
