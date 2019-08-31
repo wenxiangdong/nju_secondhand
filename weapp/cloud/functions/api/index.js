@@ -4,6 +4,7 @@ const TcbRouter = require('tcb-router')
 const fs = require("fs");
 const Tenpay = require("tenpay");
 const { LitePay, utils, Bank } = require("@sigodenjs/wechatpay");
+const BigNumber = require('bignumber.js')
 
 cloud.init()
 
@@ -295,12 +296,17 @@ exports.main = async (event, context) => {
     const { postID, content } = event
     const { self } = ctx.data
 
+    const post = await getOnePost({ postID })
+
     await updateOnePost({
       postID,
       post: {
         comments: command.push([{ nickname: self.nickname, content, commentTime: Date.now() }])
       }
     })
+
+    const maxLength = 8
+    await addNotification({ notification: { userID: post.ownerID, content: `您的帖子【${post.desc.length > maxLength ? post.desc.substr(0, maxLength) + '...' : post.desc}】被评论了，快去看看吧` } })
 
     ctx.body = { code: HttpCode.Success }
   })
@@ -369,6 +375,11 @@ exports.main = async (event, context) => {
     ctx.body = { code: HttpCode.Success }
   })
 
+  app.router('readNotifications', async (ctx) => {
+    const { notificationIDs } = event
+    await readNotifications({ notificationIDs })
+  })
+
   /** 账户 */
   app.router('withdraw', async (ctx) => {
     const { self } = ctx.data;
@@ -377,9 +388,9 @@ exports.main = async (event, context) => {
     // 前置检查余额
     const { account = {} } = self || {};
     let { balance = 0 } = account;
-    amount = parseFloat(amount);
-    balance = parseFloat(balance);
-    if (balance < amount) {
+    amount = BigNumber(amount);
+    balance = BigNumber(balance);
+    if (balance.toNumber() < amount.toNumber()) {
       ctx.body = {
         code: HttpCode.Fail,
         message: "账户余额不足"
@@ -391,7 +402,7 @@ exports.main = async (event, context) => {
     try {
       await withdraw({
         openID: ctx.data.openid,
-        amount: amount
+        amount: amount.toNumber()
       });
     } catch (error) {
       ctx.body = error;
@@ -403,7 +414,7 @@ exports.main = async (event, context) => {
       userID: self._id,
       user: {
         account: {
-          balance: (balance - amount) + ''
+          balance: balance.minus(amount).toFixed(2)
         }
       }
     })
@@ -431,13 +442,23 @@ exports.main = async (event, context) => {
     }
 
     try {
-      let user = await getOneUser({userID: order.sellerID});
+      let user = await getOneUser({ userID: order.sellerID });
       console.log(user);
       if (user) {
-        const balance = parseFloat(user.account.balance) + parseFloat(order.goodsPrice) + '';
-        user.account.balance = balance;
-        delete user._id;
-        console.log(user.account.balance, order.goodsPrice, balance);
+        let amount = BigNumber(order.goodsPrice)
+        let tax = amount.multipliedBy(0.01)
+        const minTax = BigNumber(1)
+        if (tax < minTax) {
+          tax = minTax
+        }
+        if (tax > amount) {
+          tax = amount
+        }
+        amount = amount.minus(tax)
+        const balance = BigNumber(user.account.balance).plus(amount).toFixed(2);
+        // user.account.balance = balance;
+        // delete user._id;
+        // console.log(user.account.balance, order.goodsPrice, balance);
         await updateOneUser({ userID: order.sellerID, user: { account: { balance } } });
       }
     } catch (e) {
@@ -548,26 +569,21 @@ exports.main = async (event, context) => {
   })
 
   /** 消息 */
-  app.router('addMessage', async (ctx) => {
+  app.router('sendMessage', async (ctx) => {
+    // 这里的 message 应该是 MessageDTO 类型
     const { message } = event
+    message.sendID = ctx.data.self._id
     const sender = await getOneUser({ userID: message.senderID })
     const receiver = await getOneUser({ userID: message.receiverID })
 
     message.senderName = sender.nickname
     message.receiverName = receiver.nickname
-    message.read = false
-    const messageID = await addMessage({ message })
-    ctx.body = await getOneMessage({ messageID })
+    await addMessage({ message })
   })
 
-  app.router('readMessage', async (ctx) => {
-    const { messageID } = event
-    await updateOneMessage({ messageID, message: { read: true } })
-  })
-
-  app.router('getUnreadMessages', async (ctx) => {
-    const { receiverID } = event
-    ctx.body = await getMessagesByReceiverIdAndRead({ receiverID })
+  app.router('readMessages', async (ctx) => {
+    const { messageIDs } = event
+    await readMessages({ messageIDs })
   })
 
   return app.serve()
@@ -665,10 +681,6 @@ const getGoodsByUserIdAndState = async ({ userID, state }) => {
 const addGoods = async ({ goods }) => {
   goods.publishTime = Date.now()
   return await add({ name: goodsName, data: goods })
-}
-
-const deleteOneGoods = async ({ goodsID }) => {
-  await removeOne({ name: goodsName, id: goodsID })
 }
 
 const updateOneGoods = async ({ goodsID, goods }) => {
@@ -787,13 +799,16 @@ const addNotification = async ({ notification }) => {
   add({ name: notificationName, data: notification })
 }
 
+const readNotifications = async ({ notificationIDs }) => {
+  await updateAll({ name: notificationName, condition: { _id: command.in(notificationIDs) }, data: { read: true } })
+}
+
 /** account */
 const withdraw = async ({ openID = "", amount = 0 }) => {
   console.log(TENPAY_CONFIG);
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
   // 转换成分
-  amount = parseFloat(amount);
-  amount = amount * 100;
+  amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
   try {
     const info = {
       // todo 转账
@@ -818,8 +833,7 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
   console.log(TENPAY_CONFIG);
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
   // 转换成分
-  payAmount = parseFloat(payAmount);
-  payAmount = parseInt(Math.round(payAmount * 100));
+  payAmount = BigNumber(payAmount).multipliedBy(100).integerValue().toNumber();
   try {
     const result = await tenpay.getPayParams({
       out_trade_no: orderID || `order${+new Date()}`,
@@ -841,35 +855,15 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
 /** message */
 const messageName = 'message'
 
-const getOneMessage = async ({ messageID }) => {
-  return await getOne({ name: messageName, id: messageID })
-}
-
-const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
-  const messages = await getAll({
-    name: messageName,
-    condition: {
-      receiverID,
-      read
-    },
-  })
-  const ids = messages.map(message => message._id)
-  await updateAll({ name: messageName, condition: { _id: command.in(ids) }, data: { read: true } })
-  return messages
-}
-
 const addMessage = async ({ message }) => {
+  message.read = false
   message.time = Date.now()
 
   return await add({ name: messageName, data: message })
 }
 
-const updateOneMessage = async ({ messageID, message }) => {
-  await updateOne({
-    name: messageName,
-    id: messageID,
-    data: message
-  })
+const readMessages = async ({ messageIDs }) => {
+  await updateAll({ name: messageName, condition: { _id: command.in(messageIDs) }, data: { read: true } })
 }
 
 // 数据库操作方法（dao）
