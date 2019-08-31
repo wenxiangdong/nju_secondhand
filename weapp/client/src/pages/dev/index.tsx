@@ -14,7 +14,7 @@ function Dev() {
     // @ts-ignore
     // eslint-disable-next-line no-undef
     Taro.navigateTo({
-      url: urlList.MESSAGE
+      url: urlList.INDEX
     })
   };
 

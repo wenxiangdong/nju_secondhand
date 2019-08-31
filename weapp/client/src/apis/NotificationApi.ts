@@ -38,7 +38,7 @@ class NotificationApi implements INotificationApi {
         // @ts-ignore
         .watch({
           onChange: (res) => {
-            console.log(res);
+            console.log("系统消息监听", res);
             const {docChanges = []} = res;
             const notifications: NotificationVO[] = docChanges
               .filter((item) => ["init", 'add'].indexOf(item.dataType) >= 0)
@@ -49,7 +49,7 @@ class NotificationApi implements INotificationApi {
             messageQueue.add(
               ...notifications.map(doc => `您有一条新的系统消息${
                 doc.content 
-                  ? "：" + doc.content.substring(0, 4) + "..."
+                  ? "：" + doc.content
                   : ""
               }`)
             );
@@ -86,9 +86,12 @@ class NotificationApi implements INotificationApi {
   }
 
   private readNotification(ids: string[]) {
-    // TODO 调用云函数让通知已读
-    console.log(ids, "已读");
-
+    ids && ids.length && httpRequest.callFunction(functionName, {
+      $url: "readNotifications",
+      notificationIDs: [...ids]
+    }).then(() => {
+      console.log(ids, "系统消息已读");
+    }).catch(console.error);
   }
 }
 

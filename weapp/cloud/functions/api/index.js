@@ -377,7 +377,17 @@ exports.main = async (event, context) => {
 
   app.router('readNotifications', async (ctx) => {
     const { notificationIDs } = event
-    await readNotifications({ notificationIDs })
+    try {
+      await readNotifications({ notificationIDs })
+      ctx.body = {
+        code: HttpCode.Success
+      }
+    } catch (e) {
+      ctx.body = {
+        code: HttpCode.Fail,
+        message: e.message
+      }
+    }
   })
 
   /** 账户 */
@@ -572,18 +582,38 @@ exports.main = async (event, context) => {
   app.router('sendMessage', async (ctx) => {
     // 这里的 message 应该是 MessageDTO 类型
     const { message } = event
-    message.sendID = ctx.data.self._id
-    const sender = await getOneUser({ userID: message.senderID })
-    const receiver = await getOneUser({ userID: message.receiverID })
+    message.senderID = ctx.data.self._id
+    try {
+      const sender = await getOneUser({ userID: message.senderID })
+      const receiver = await getOneUser({ userID: message.receiverID })
 
-    message.senderName = sender.nickname
-    message.receiverName = receiver.nickname
-    await addMessage({ message })
+      message.senderName = sender.nickname
+      message.receiverName = receiver.nickname
+      await addMessage({ message })
+      ctx.body = {
+        code: HttpCode.Success
+      }
+    } catch (e) {
+      ctx.body = {
+        code: HttpCode.Fail,
+        message: "发送消息失败：" + e.message
+      }
+    }
   })
 
   app.router('readMessages', async (ctx) => {
     const { messageIDs } = event
-    await readMessages({ messageIDs })
+    try {
+      await readMessages({ messageIDs })
+      ctx.body = {
+        code: HttpCode.Success
+      }
+    } catch (e) {
+      ctx.body = {
+        code: HttpCode.Fail,
+        message: e.message
+      }
+    }
   })
 
   return app.serve()
@@ -856,6 +886,7 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
 const messageName = 'message'
 
 const addMessage = async ({ message }) => {
+  console.log(message);
   message.read = false
   message.time = Date.now()
 

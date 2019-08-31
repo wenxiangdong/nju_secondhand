@@ -1,6 +1,7 @@
 import Taro from "@tarojs/taro";
 import localConfig from "../utils/local-config";
 import MessageQueue from "../utils/message-queue";
+import {httpRequest} from "./HttpRequest";
 // import "@tarojs/async-await";
 const regeneratorRuntime = require("../lib/async");
 
@@ -26,17 +27,26 @@ export interface MessageDTO {
 declare type Observer = (msg: MessageVO) => void;
 
 class MessageHub {
-  private observers: Observer[];
+  private observers: Set<Observer>;
   private messageHistory: object = {};
   private STORAGE_KEY: string = "messages";
 
   private messageIdReadQueue: string[] = [];
 
   constructor() {
-    this.observers = [];
+    this.observers = new Set<Observer>();
     // this.initWebsocket();
     this.initMessageHistory();
+    this.loopCheck();
   }
+
+  public loopCheck = () => {
+    console.log("循环检查已读消息队列", this.messageIdReadQueue);
+    this.read([...this.messageIdReadQueue]);
+    setTimeout(() => {
+      this.loopCheck();
+    }, 10 * 1000);
+  };
 
   public startWatch() {
     const messageQueue = MessageQueue.getInstance();
@@ -63,9 +73,14 @@ class MessageHub {
               .filter(item => ["init", 'add'].indexOf(item.dataType) >= 0)
               .map(item => item.doc);
 
-            // 加入本地
+            // 加入本地和通知所有订阅者
             messageList.forEach(vo => {
               this.addMessageToLocalList(vo.senderID, vo);
+              this.observers.forEach(item => {
+                try {
+                  item(vo);
+                } catch (e) {}
+              })
             });
             // 界面通知
             messageQueue.add(...messageList.map(vo => `【${vo.senderName}】发来一条消息`));
@@ -85,10 +100,16 @@ class MessageHub {
     }
   }
 
-  public sendMessage(vo: MessageVO) {
+  public async sendMessage(vo: MessageVO) {
     const {receiverID, content} = vo;
-    // TODO 调用云函数发送消息
     console.log("发送", vo);
+    await httpRequest.callFunction("api", {
+      $url: "sendMessage",
+      message: {
+        receiverID: vo.receiverID,
+        content: content
+      } as MessageDTO
+    });
     this.addMessageToLocalList(receiverID, vo);
   }
 
@@ -120,25 +141,26 @@ class MessageHub {
   private addToQueue(...ids) {
     this.messageIdReadQueue.push(...ids);
     if (this.messageIdReadQueue.length > 10) {
-      this.read(this.messageIdReadQueue);
+      this.read([...this.messageIdReadQueue]);
       this.messageIdReadQueue = [];
     }
   }
 
   private read(ids: string[]) {
-    // TODO 调用云函数让其 已读
-    console.log("read", ids);
+    ids && ids.length && httpRequest.callFunction("api", {
+      $url: "readMessages",
+      messageIDs: [...ids]
+    }).then(() => {
+      console.log("read", ids);
+    }).catch(console.error);
   }
 
   public subscribe(observer: Observer) {
-    this.observers.push(observer);
+    this.observers.add(observer);
   }
 
   public unsubscribe(observer: Observer) {
-    this.observers.splice(
-      this.observers.findIndex(ob => ob === observer),
-      1
-    );
+    this.observers.delete(observer);
   }
 
   public getMessageHistory(): Map<string, MessageVO[]> {

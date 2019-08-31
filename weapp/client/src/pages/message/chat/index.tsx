@@ -54,12 +54,6 @@ export default class index extends Component<any, IState> {
   }
 
   async componentWillMount() {
-    // if (!messageHub.socketOpen()) {
-    //   resultUrlConfig.go({
-    //     status: "warn",
-    //     title: "聊天服务器还未连上，请稍等重试"
-    //   });
-    // }
     const sellerId = chatUrlConfig.getUserId(this);
     try {
       if (sellerId && sellerId.length) {
@@ -217,10 +211,25 @@ export default class index extends Component<any, IState> {
   private sendMessage = (vo: MessageVO) => {
     console.log("发送消息", vo);
     vo.time = +new Date();
-    messageHub.sendMessage(vo);
-    this.setState(pre => ({
-      messageList: [...pre.messageList, vo],
-      lastId: `id-${pre.messageList.length}`
-    }));
+    Taro.showLoading({
+      title: "发送中"
+    });
+    messageHub
+      .sendMessage(vo)
+      .then(() => {
+        this.setState(pre => ({
+          messageList: [...pre.messageList, vo],
+          lastId: `id-${pre.messageList.length}`,
+        }));
+        Taro.hideLoading();
+      })
+      .catch(e => {
+        console.error(e);
+        Taro.hideLoading();
+        Taro.showToast({
+          title: "消息发送失败：" + e.message,
+          icon: "none"
+        });
+      })
   }
 }

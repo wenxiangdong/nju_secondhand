@@ -1,6 +1,6 @@
 import Taro, {Component} from '@tarojs/taro'
 import {View, Text, Image} from '@tarojs/components'
-import {AtAvatar, AtButton, AtForm, AtTextarea} from "taro-ui";
+import {AtAvatar, AtButton, AtForm, AtTextarea, AtMessage} from "taro-ui";
 import {CSSProperties} from "react";
 import {Comment, MockCircleApi, PostVO} from "../../../apis/CircleApi";
 import {MockUserApi, UserVO} from "../../../apis/UserApi";
@@ -272,6 +272,8 @@ export default class index extends Component<any, IState> {
         <View style={styles.comments}>
           {comments.map((c, idx) => <CommentCard comment={c} key={idx}/>)}
         </View>
+
+        <AtMessage />
       </View>
     )
   }

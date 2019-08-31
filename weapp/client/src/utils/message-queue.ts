@@ -24,7 +24,7 @@ class MessageQueue {
 
   private loop() {
     const message = this.queue.shift();
-    console.log("拿到消息", message);
+    console.log("拿到要显示的消息", message);
     if (message) {
       this.busy = true;
       try {

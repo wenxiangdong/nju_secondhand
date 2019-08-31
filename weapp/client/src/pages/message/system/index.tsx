@@ -22,7 +22,7 @@ export default class System extends Taro.Component {
     try {
       const vos = await apiHub.notificationApi.getNotifications(0, 10);
       this.setState({
-        messageList: [...vos]
+        messageList: [...vos.sort((a, b) => a.time - b.time)]
       }, () => {
         Taro.pageScrollTo({
           scrollTop: Number.MAX_SAFE_INTEGER

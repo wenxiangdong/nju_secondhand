@@ -24,7 +24,7 @@ class App extends Component {
     pages: [
 
       // 测试页面
-      'pages/dev/index',
+      // 'pages/dev/index',
       'pages/index/index',
 
       'pages/circle/index',
