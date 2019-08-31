@@ -11,7 +11,6 @@ import localConfig from "../../utils/local-config";
 import {apiHub} from "../../apis/ApiHub";
 import {relaunchTimeout} from "../../utils/date-util";
 import LoadingPage from "../../components/common/loading-page";
-import DeveloperFooter from '../../components/common/developer-footer';
 
 interface IState {
   loading: boolean,

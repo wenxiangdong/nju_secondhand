@@ -1,4 +1,5 @@
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../../lib/async");
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
@@ -52,6 +53,7 @@ export default class index extends Component<any, IState> {
     ])
       .then(value => this.setState({swiperSrcs: value[0], categories: value[1], loading: false}))
       .catch(this.onError);
+
   }
 
   componentDidShow(): void {
@@ -113,6 +115,7 @@ export default class index extends Component<any, IState> {
     if (address) {
       messageHub.initWebsocket(`${address}/${userID}`);
     } else {
+      console.log("3s后重新连接socket");
       setTimeout(() => {
         this.initSocket(userID);
       }, 3000);

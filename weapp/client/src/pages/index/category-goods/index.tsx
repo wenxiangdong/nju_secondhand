@@ -1,4 +1,4 @@
-import "@tarojs/async-await";
+const regeneratorRuntime = require("../../../lib/async");
 import Taro, {Component} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import {CategoryVO, GoodsWithSellerVO} from "../../../apis/GoodsApi";

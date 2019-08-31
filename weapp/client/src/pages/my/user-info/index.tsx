@@ -1,4 +1,5 @@
 import Taro, {Component, Config} from '@tarojs/taro'
+const regeneratorRuntime = require("../../../lib/async");
 import {View} from '@tarojs/components'
 import urlList from "../../../utils/url-list";
 import {relaunchTimeout} from "../../../utils/date-util";

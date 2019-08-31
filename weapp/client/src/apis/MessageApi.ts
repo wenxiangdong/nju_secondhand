@@ -1,5 +1,6 @@
 import Taro from "@tarojs/taro";
-import "@tarojs/async-await";
+// import "@tarojs/async-await";
+const regeneratorRuntime = require("../lib/async");
 
 export interface MessageVO {
   _id: string;
@@ -51,11 +52,20 @@ class MessageHub {
         const vo: MessageVO = JSON.parse(ev.data);
         console.log("收到消息", vo);
         if (!vo || !vo.senderID) return;
-        Taro.atMessage({
-          message: `收到一条来自【${vo.senderName}】的消息`
-        });
         // store
         this.addMessageToList(vo.senderID, vo);
+        try {
+          Taro.atMessage({
+            message: `收到一条来自【${vo.senderName}】的消息`
+          });
+        } catch (e) {
+          console.log(e);
+          Taro.showToast({
+            title: `收到一条来自【${vo.senderName}】的消息`,
+            icon: "none"
+          })
+        }
+
         // notify
         this.observers.forEach(ob => {
           try {
@@ -73,19 +83,24 @@ class MessageHub {
         console.log("关闭原因", res);
         // @ts-ignore
         this.websocket = null;
+        console.log("3秒后重连");
+        setTimeout(() => {
+          this.initWebsocket(url);
+        }, 3000);
       });
       console.log("建立socket成功");
     } catch (e) {
-      this.initWebsocket(url);
+      // this.initWebsocket(url);
     }
   }
 
   public async closeWebsocket() {
     console.log("关闭");
-    return this.websocket.close({
+    this.websocket.close({
       code: this.closeCode,
       reason: this.closeReason
     });
+    this.websocket = null;
   }
 
   public sendMessage(vo: MessageVO) {

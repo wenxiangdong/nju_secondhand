@@ -7,6 +7,7 @@ import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
 import messageHub, { MessageVO } from '../../../apis/MessageApi';
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../../../lib/async");
 import MessageLeft from '../../../components/message/message-left';
 import MessageRight from '../../../components/message/message-right';
 import "./index.scss";

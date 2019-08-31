@@ -1,4 +1,5 @@
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../lib/async");
 import { IGoodsApi, goodsApi, mockGoodsApi } from "./GoodsApi";
 import { IFileApi, fileApi, mockFileApi } from "./FileApi";
 import { IAccountApi, accountApi, mockAccountApi } from "./AccountApi";

@@ -1,5 +1,6 @@
 import { db } from "./HttpRequest";
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../lib/async");
 
 /**
  * 全局小程序内容的配置
