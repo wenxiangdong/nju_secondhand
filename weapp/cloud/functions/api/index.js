@@ -375,6 +375,11 @@ exports.main = async (event, context) => {
     ctx.body = { code: HttpCode.Success }
   })
 
+  app.router('readNotifications', async (ctx) => {
+    const { notificationIDs } = event
+    await readNotifications({ notificationIDs })
+  })
+
   /** 账户 */
   app.router('withdraw', async (ctx) => {
     const { self } = ctx.data;
@@ -564,26 +569,21 @@ exports.main = async (event, context) => {
   })
 
   /** 消息 */
-  app.router('addMessage', async (ctx) => {
+  app.router('sendMessage', async (ctx) => {
+    // 这里的 message 应该是 MessageDTO 类型
     const { message } = event
+    message.sendID = ctx.data.self._id
     const sender = await getOneUser({ userID: message.senderID })
     const receiver = await getOneUser({ userID: message.receiverID })
 
     message.senderName = sender.nickname
     message.receiverName = receiver.nickname
-    message.read = false
-    const messageID = await addMessage({ message })
-    ctx.body = await getOneMessage({ messageID })
+    await addMessage({ message })
   })
 
-  app.router('readMessage', async (ctx) => {
-    const { messageID } = event
-    await updateOneMessage({ messageID, message: { read: true } })
-  })
-
-  app.router('getUnreadMessages', async (ctx) => {
-    const { receiverID } = event
-    ctx.body = await getMessagesByReceiverIdAndRead({ receiverID })
+  app.router('readMessages', async (ctx) => {
+    const { messageIDs } = event
+    await readMessages({ messageIDs })
   })
 
   return app.serve()
@@ -681,10 +681,6 @@ const getGoodsByUserIdAndState = async ({ userID, state }) => {
 const addGoods = async ({ goods }) => {
   goods.publishTime = Date.now()
   return await add({ name: goodsName, data: goods })
-}
-
-const deleteOneGoods = async ({ goodsID }) => {
-  await removeOne({ name: goodsName, id: goodsID })
 }
 
 const updateOneGoods = async ({ goodsID, goods }) => {
@@ -803,6 +799,10 @@ const addNotification = async ({ notification }) => {
   add({ name: notificationName, data: notification })
 }
 
+const readNotifications = async ({ notificationIDs }) => {
+  await updateAll({ name: notificationName, condition: { _id: command.in(notificationIDs) }, data: { read: true } })
+}
+
 /** account */
 const withdraw = async ({ openID = "", amount = 0 }) => {
   console.log(TENPAY_CONFIG);
@@ -855,35 +855,15 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
 /** message */
 const messageName = 'message'
 
-const getOneMessage = async ({ messageID }) => {
-  return await getOne({ name: messageName, id: messageID })
-}
-
-const getMessagesByReceiverIdAndRead = async ({ receiverID, read = false }) => {
-  const messages = await getAll({
-    name: messageName,
-    condition: {
-      receiverID,
-      read
-    },
-  })
-  const ids = messages.map(message => message._id)
-  await updateAll({ name: messageName, condition: { _id: command.in(ids) }, data: { read: true } })
-  return messages
-}
-
 const addMessage = async ({ message }) => {
+  message.read = false
   message.time = Date.now()
 
   return await add({ name: messageName, data: message })
 }
 
-const updateOneMessage = async ({ messageID, message }) => {
-  await updateOne({
-    name: messageName,
-    id: messageID,
-    data: message
-  })
+const readMessages = async ({ messageIDs }) => {
+  await updateAll({ name: messageName, condition: { _id: command.in(messageIDs) }, data: { read: true } })
 }
 
 // 数据库操作方法（dao）
