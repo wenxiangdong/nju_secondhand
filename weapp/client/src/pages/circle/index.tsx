@@ -41,8 +41,8 @@ export default class index extends Component<any, IState> {
     };
   }
 
-  componentWillMount() {
-    this.loadMorePosts();
+  componentDidShow() {
+    this.setState({ posts: [] }, this.loadMorePosts);
   }
 
   private loadMorePosts = () => {
