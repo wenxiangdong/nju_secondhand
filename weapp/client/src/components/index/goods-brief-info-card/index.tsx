@@ -20,7 +20,7 @@ function GoodsBriefInfoCard(props: IProp) {
   const {goodsWithSeller = MockGoodsApi.createMockGoodsWithSeller()} = props;
   const {seller, goods} = goodsWithSeller;
   const {address} = seller;
-  const {price, name} = goods;
+  const {price, name, num} = goods;
   return (
     <View className={'goods-card'}>
       <View>
@@ -31,6 +31,9 @@ function GoodsBriefInfoCard(props: IProp) {
       </View>
       <View>
         <Text space={'nbsp'}>￥ {price}</Text>
+      </View>
+      <View>
+        <Text space={'nbsp'}>库存 {num} 件</Text>
       </View>
       <View>
         <AddressShowBar address={address}/>
