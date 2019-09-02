@@ -10,6 +10,7 @@ interface IProp {
 function DSwiper(props:IProp) {
   const {srcs = []} = props;
 
+  const height = "500rpx";
   return (
     <Swiper
       indicatorColor='#999'
@@ -17,10 +18,10 @@ function DSwiper(props:IProp) {
       circular
       indicatorDots
       autoplay
-    style={{height: "300rpx"}}>
+      style={{height}}>
       {srcs.map((src, idx) => (
         <SwiperItem key={`swiper-${idx}`}>
-        <Image src={src} style={{width: "100%", height: "300rpx", margin: "auto"}} mode="aspectFill"/>
+        <Image src={src} style={{width: "100%", height, margin: "auto"}} mode="aspectFill"/>
       </SwiperItem>))}
     </Swiper>
   )
