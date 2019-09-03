@@ -6,6 +6,7 @@ import nju.secondhand.util.LoginUtil;
 import nju.secondhand.vo.ComplaintVO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -23,7 +24,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/getComplaints")
-    public HttpResponse<List<ComplaintVO>> getComplaints(String keyword, int lastIndex, int size, HttpSession session) {
+    public HttpResponse<List<ComplaintVO>> getComplaints(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "0") int lastIndex, @RequestParam(defaultValue = "10") int size, HttpSession session) {
         LoginUtil.checkLogin(session);
         return new HttpResponse<>(complaintService.getComplaints(keyword, lastIndex, size));
     }

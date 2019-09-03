@@ -7,6 +7,7 @@ import nju.secondhand.vo.CategoryVO;
 import nju.secondhand.vo.GoodsVO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -30,7 +31,7 @@ public class GoodsController {
     }
 
     @GetMapping("/getGoodsByKeyword")
-    public HttpResponse<List<GoodsVO>> getGoodsByKeyword(String keyword, int lastIndex, int size, HttpSession session) {
+    public HttpResponse<List<GoodsVO>> getGoodsByKeyword(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "0") int lastIndex, @RequestParam(defaultValue = "10") int size, HttpSession session) {
         LoginUtil.checkLogin(session);
         return new HttpResponse<>(goodsService.getGoodsByKeyword(keyword, lastIndex, size));
     }

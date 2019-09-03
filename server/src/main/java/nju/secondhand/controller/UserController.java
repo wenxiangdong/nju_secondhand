@@ -6,6 +6,7 @@ import nju.secondhand.util.LoginUtil;
 import nju.secondhand.vo.UserVO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping("/getNormalUsers")
-    public HttpResponse<List<UserVO>> getNormalUsers(String keyword, int lastIndex, int size, HttpSession session) {
+    public HttpResponse<List<UserVO>> getNormalUsers(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "0") int lastIndex, @RequestParam(defaultValue = "10") int size, HttpSession session) {
         LoginUtil.checkLogin(session);
         return new HttpResponse<>(userService.getNormalUsers(keyword, lastIndex, size));
     }
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/getFrozenUsers")
-    public HttpResponse<List<UserVO>> getFrozenUsers(String keyword, int lastIndex, int size, HttpSession session) {
+    public HttpResponse<List<UserVO>> getFrozenUsers(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "0") int lastIndex, @RequestParam(defaultValue = "10") int size, HttpSession session) {
         LoginUtil.checkLogin(session);
         return new HttpResponse<>(userService.getFrozenUsers(keyword, lastIndex, size));
     }

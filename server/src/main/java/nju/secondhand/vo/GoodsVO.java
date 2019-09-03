@@ -15,6 +15,7 @@ public class GoodsVO extends VO {
     String name;
     String desc;
     String price;
+    Integer num;
     List<String> pictures;
     CategoryVO categoryVO;
 
