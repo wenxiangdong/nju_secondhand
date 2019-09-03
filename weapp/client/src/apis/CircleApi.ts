@@ -1,4 +1,5 @@
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../lib/async");
 import {VO, httpRequest, db, mockHttpRequest} from "./HttpRequest";
 import { copy } from "./Util";
 

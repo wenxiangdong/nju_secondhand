@@ -1,4 +1,5 @@
 import "@tarojs/async-await"
+const regeneratorRuntime = require("../lib/async");
 import { httpRequest, mockHttpRequest, VO, db} from "./HttpRequest";
 import { MockUserApi, UserVO } from "./UserApi";
 import {createRandomNumberStr} from "./Util";
@@ -221,6 +222,7 @@ class MockGoodsApi implements IGoodsApi {
       sellerID: '',
       name: 'name',
       desc: 'desc',
+      num: 1,
       pictures: [
         'http://img1.imgtn.bdimg.com/it/u=2565994761,3746514896&fm=26&gp=0.jpg', 
         'http://img1.imgtn.bdimg.com/it/u=2565994761,3746514896&fm=26&gp=0.jpg'],
@@ -257,6 +259,7 @@ export interface GoodsDTO {
   name: string;
   desc: string;
   price: string;
+  num: number;
   pictures: Array<string>;
   categoryID: string; // -> Category._id
 }
@@ -267,6 +270,7 @@ export interface GoodsVO extends VO {
   name: string;
   desc: string;
   price: string;
+  num: number;
   pictures: Array<string>;
   category: CategoryVO;
 

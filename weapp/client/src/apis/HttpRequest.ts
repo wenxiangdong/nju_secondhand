@@ -1,4 +1,5 @@
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../lib/async");
 import * as Taro from "@tarojs/taro";
 
 export interface IHttpRequest {

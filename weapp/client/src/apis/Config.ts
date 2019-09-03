@@ -1,5 +1,6 @@
 import { db } from "./HttpRequest";
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../lib/async");
 
 /**
  * 全局小程序内容的配置
@@ -9,7 +10,9 @@ export class ConfigApi {
     private config: {[key: string]: any} = {};
     constructor() {
         this.initToDefault();
-        this.syncFromCloud();
+        setTimeout(() => {
+          this.syncFromCloud();
+        }, 3000);
     }
 
     /**

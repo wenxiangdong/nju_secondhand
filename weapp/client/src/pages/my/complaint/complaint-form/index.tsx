@@ -5,6 +5,8 @@ import {AtButton, AtForm, AtImagePicker, AtTextarea} from "taro-ui";
 import {CSSProperties} from "react";
 import {apiHub} from "../../../../apis/ApiHub";
 import urlList, {complaintFormUrlConfig, resultUrlConfig} from "../../../../utils/url-list";
+const regeneratorRuntime = require("../../../../lib/async");
+
 
 export default function ComplaintForm() {
   // states

@@ -1,11 +1,11 @@
-import "@tarojs/async-await";
+const regeneratorRuntime = require("../../../lib/async");
 import Taro, {Component} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import {CategoryVO, GoodsWithSellerVO} from "../../../apis/GoodsApi";
 import localConfig from "../../../utils/local-config";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
-import {AtLoadMore} from "taro-ui";
+import {AtLoadMore, AtMessage} from "taro-ui";
 import {apiHub} from "../../../apis/ApiHub";
 import GoodsCard from "../../../components/index/goods-card";
 import {StyleHelper} from "../../../styles/style-helper";
@@ -98,6 +98,7 @@ export default class CategoryGoods extends Component<any, IState> {
             onClick={this.onLoadMore}
             status={loadMoreStatus}
           />
+          <AtMessage />
         </View>
       );
   }

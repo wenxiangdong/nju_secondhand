@@ -38,6 +38,7 @@ const urlList = {
   REGISTER: '/pages/register/index',
   PUBLISH_GOODS: '/pages/publish/index',
   RESULT: '/pages/result/index',
+  USER_INFO: "/pages/user-info/index",
   ERROR: '',
 };
 
@@ -99,6 +100,14 @@ class ChatUrlConfig {
   private readonly USER_ID = 'user_id';
 
   private preMessage: MessageVO | undefined;
+
+  public go({id, preMessage = undefined}: {id: string, preMessage?: undefined | MessageVO}) {
+    const url = this.createUrl(id);
+    preMessage && this.setPreMessage(preMessage);
+    return Taro.navigateTo({
+      url
+    });
+  }
 
   public createUrl(id): string {
     return encodeURI(`${urlList.MESSAGE_CHAT}?${this.USER_ID}=${id}`);
@@ -219,6 +228,20 @@ class CirclePostUrlConfig {
 
 const circlePostUrlConfig = new CirclePostUrlConfig();
 
+class UserInfoUrlConfig {
+  public go(userId) {
+    const url = `${urlList.USER_INFO}?userId=${userId}`;
+    return Taro.navigateTo({
+      url
+    });
+  }
+
+  public getUserId(ctx) {
+    return ctx.$router.params.userId;
+  }
+}
+const userInfoUrlConfig = new UserInfoUrlConfig();
+
 export default urlList;
 export {
   indexSearchUrlConfig,
@@ -230,4 +253,5 @@ export {
   complaintFormUrlConfig,
   sendPostUrlConfig,
   circlePostUrlConfig,
+  userInfoUrlConfig,
 };

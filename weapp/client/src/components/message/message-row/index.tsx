@@ -12,7 +12,7 @@ const COLORS = [
   "#84B1ED"
 ];
 
-export default function MessageRow({avatar = "", name = "", extra = "", onClick = undefined}) {
+export default function MessageRow({avatar = "", name = "", extra = "", onClick = () => null}) {
   const color = COLORS[Math.floor( Math.random() * COLORS.length)];
   const avatarSection = avatar
     ? (<Image className='MR__image-avatar' src={avatar} />)

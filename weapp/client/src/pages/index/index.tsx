@@ -1,4 +1,5 @@
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../../lib/async");
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View} from '@tarojs/components'
 import MainTabBar from "../../components/common/main-tab-bar";
@@ -14,6 +15,7 @@ import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
 import configApi, {ConfigItem} from "../../apis/Config";
 import {relaunchTimeout} from "../../utils/date-util";
+import messageHub from "../../apis/MessageApi";
 
 interface IState {
   searchValue: string,
@@ -51,6 +53,11 @@ export default class index extends Component<any, IState> {
     ])
       .then(value => this.setState({swiperSrcs: value[0], categories: value[1], loading: false}))
       .catch(this.onError);
+
+  }
+
+  componentDidShow(): void {
+    this.checkLogin();
   }
 
   private getSwiperSrcs = async function(): Promise<string[]> {
@@ -96,8 +103,24 @@ export default class index extends Component<any, IState> {
       }, relaunchTimeout);
     } else {
       console.log("用户已登陆");
+      if (!messageHub.socketOpen()) {
+        this.initSocket(userID);
+      }
     }
   }
+
+  private initSocket = (userID) => {
+    const address = apiHub.configApi.getConfig(ConfigItem.SOCKET_ADDRESS);
+    console.log(address);
+    if (address) {
+      messageHub.initWebsocket(`${address}/${userID}`);
+    } else {
+      console.log("3s后重新连接socket");
+      setTimeout(() => {
+        this.initSocket(userID);
+      }, 3000);
+    }
+  };
 
   private onError = createSimpleErrorHandler('index', this);
 
@@ -120,7 +143,7 @@ export default class index extends Component<any, IState> {
             onConfirm={this.onSearch}
           />
           <DSwiper srcs={swiperSrcs}/>
-          <AtGrid customStyle={{backgroundColor: "black"}} hasBorder={false} data={categoryData} onClick={this.onCategoryClick}/>
+          <AtGrid customStyle={{backgroundColor: "black"}} hasBorder={true} data={categoryData} onClick={this.onCategoryClick}/>
           <MainTabBar currentIndex={MainTabBar.HOME_INDEX}/>
           <AtMessage />
         </View>

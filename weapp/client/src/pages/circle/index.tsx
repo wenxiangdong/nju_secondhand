@@ -4,7 +4,7 @@ import {createSimpleErrorHandler} from "../../utils/function-factory";
 import LoadingPage from "../../components/common/loading-page";
 import {PostVO} from "../../apis/CircleApi";
 import {apiHub} from "../../apis/ApiHub";
-import {AtLoadMore, AtFab, AtIcon, AtSearchBar} from "taro-ui";
+import {AtLoadMore, AtFab, AtIcon, AtSearchBar, AtMessage} from "taro-ui";
 import {StyleHelper} from "../../styles/style-helper";
 import PostCard from "../../components/circle/post-card/PostCard";
 import urlList from "../../utils/url-list";
@@ -114,6 +114,7 @@ export default class index extends Component<any, IState> {
           </AtFab>
         </View>
         <MainTabBar currentIndex={1} />
+        <AtMessage />
       </View>
     )
   }

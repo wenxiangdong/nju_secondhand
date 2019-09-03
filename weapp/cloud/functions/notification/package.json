@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "notification",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,11 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sigodenjs/wechatpay": "^2.1.1",
-    "bignumber.js": "^9.0.0",
-    "tcb-router": "latest",
-    "tenpay": "^2.1.18",
-    "wechat-jssdk": "^5.0.2",
     "wx-server-sdk": "latest"
+  },
+  "devDependencies": {
+    "@types/wx-server-sdk": "^0.8.0"
   }
 }

@@ -25,7 +25,7 @@ class App extends Component {
     pages: [
 
       // 测试页面
-      // 'pages/dev/index',
+      'pages/dev/index',
       'pages/index/index',
 
       'pages/circle/index',
@@ -64,6 +64,8 @@ class App extends Component {
       'pages/result/index',
       'pages/publish/index',
 
+      'pages/user-info/index',
+
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -88,7 +90,11 @@ class App extends Component {
 
   }
 
-  componentDidHide () {}
+  componentDidHide () {
+    if(messageHub.socketOpen()) {
+      messageHub.closeWebsocket().catch(console.log);
+    }
+  }
 
   componentDidCatchError () {}
 

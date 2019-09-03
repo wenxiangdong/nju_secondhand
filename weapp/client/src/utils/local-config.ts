@@ -11,23 +11,23 @@ interface WindowSize {
    */
   windowHeight: number
 }
-
+type Observer = (key: string, value: any) => void;
 class LocalConfig {
-  private readonly KEY = 'nju.weapp.help_config';
-  private readonly SYS_INFO = 'nju.weapp.sys_info';
-  private readonly CATEGORY = 'nju.weapp.category';
-  private readonly USER_ID = 'nju.weapp.user_id';
-  private readonly WITHDRAW_TIME = 'nju.weapp.withdraw_time';
+  public readonly KEY = 'nju.weapp.help_config';
+  public readonly SYS_INFO = 'nju.weapp.sys_info';
+  public readonly CATEGORY = 'nju.weapp.category';
+  public readonly USER_ID = 'nju.weapp.user_id';
+  public readonly WITHDRAW_TIME = 'nju.weapp.withdraw_time';
 
-  private readonly VISITED_GOODS_WITH_SELLER = 'nju.weapp.visited_goods_with_seller';
-  private readonly VISITED_SIZE = 100;
+  public readonly VISITED_GOODS_WITH_SELLER = 'nju.weapp.visited_goods_with_seller';
+  public readonly VISITED_SIZE = 100;
 
   public isFirstUse(): boolean {
     return !Taro.getStorageSync(this.KEY);
   }
 
   public recordFinishHelp(): void {
-    Taro.setStorageSync(this.KEY, true);
+    this.setStorageSync(this.KEY, true);
   }
 
   public getSystemSysInfo(): WindowSize {
@@ -41,7 +41,7 @@ class LocalConfig {
   }
 
   public setGoodsCategory(category): void {
-    Taro.setStorageSync(this.CATEGORY, category);
+    this.setStorageSync(this.CATEGORY, category);
   }
 
   public getGoodsCategory(): CategoryVO {
@@ -49,7 +49,7 @@ class LocalConfig {
   }
 
   public setUserId(userId: string): void {
-    Taro.setStorageSync(this.USER_ID, userId);
+    this.setStorageSync(this.USER_ID, userId);
   }
 
   public getUserId(): string {
@@ -57,7 +57,7 @@ class LocalConfig {
   }
 
   public setWithdrawTime(time: number): void {
-    Taro.setStorageSync(this.WITHDRAW_TIME, time);
+    this.setStorageSync(this.WITHDRAW_TIME, time);
   }
 
   public getWithdrawTime(): number {
@@ -97,7 +97,38 @@ class LocalConfig {
   }
 
   private setVisitedGoodsWithSeller(goodsWithSellerArray: GoodsWithSellerVO[]): void {
-    Taro.setStorageSync(this.VISITED_GOODS_WITH_SELLER, goodsWithSellerArray);
+    this.setStorageSync(this.VISITED_GOODS_WITH_SELLER, goodsWithSellerArray);
+  }
+
+  /**
+   * 增加一个 监听
+   */
+  private readonly observers = new Set();
+  public subscribe(ob: Observer) {
+    // @ts-ignore
+    this.observers.add(ob);
+  }
+  public unsubscribe(ob: Observer) {
+    this.observers.delete(ob);
+  }
+  private notify(key, value) {
+    this.observers.forEach((ob: Observer) => {
+      try {
+        ob(key, value);
+      } catch (e) {
+        console.error(e);
+      }
+    })
+  }
+
+  /**
+   * 封装 Taro的接口
+   * @param key
+   * @param value
+   */
+  private setStorageSync(key, value) {
+    Taro.setStorageSync(key, value);
+    this.notify(key, value);
   }
 }
 

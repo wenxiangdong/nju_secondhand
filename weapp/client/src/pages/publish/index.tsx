@@ -1,11 +1,13 @@
 import Taro, {Config, useEffect, useState} from "@tarojs/taro";
 import {Picker, Text, View} from "@tarojs/components";
-import {AtButton, AtForm, AtImagePicker, AtInput, AtTextarea} from "taro-ui";
+import {AtButton, AtForm, AtImagePicker, AtInput, AtTextarea, AtNoticebar, AtInputNumber} from "taro-ui";
 import {CategoryVO, GoodsDTO} from "../../apis/GoodsApi";
 import {CSSProperties} from "react";
 import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
 import urlList, {resultUrlConfig} from "../../utils/url-list";
+import WhiteSpace from "../../components/common/white-space";
+const regeneratorRuntime = require("../../lib/async");
 
 // export interface GoodsDTO {
 //   name: string;
@@ -17,7 +19,7 @@ import urlList, {resultUrlConfig} from "../../utils/url-list";
 
 function Publish() {
   // states
-  const [goods, setGoods] = useState({} as GoodsDTO);
+  const [goods, setGoods] = useState({num: 1} as GoodsDTO);
   const [categories, setCategories] = useState([] as CategoryVO[]);
   const [selectedCateName, setCateName] = useState("");
   const [pictures, setPictures] = useState([]);
@@ -137,6 +139,17 @@ function Publish() {
         value={goods.price}
         onChange={value => handleChangeForm("price", value)}
       />
+      {/*<AtInputNumber*/}
+      {/*  type='number'*/}
+      {/*  value={goods.num}*/}
+      {/*  onChange={value => handleChangeForm("num", value)} />*/}
+      <AtInput
+        customStyle={{...commonStyles}}
+        title='库存'
+        type='number'
+        name={"num"}
+        value={goods.num}
+        onChange={value => handleChangeForm("num", value)} />
       <View style={{...commonStyles}}>图片</View>
       <AtImagePicker
         files={pictures}
@@ -156,9 +169,11 @@ function Publish() {
   );
   return (
     <View>
+      <AtNoticebar>在平台发布的闲置物品卖出后，平台将收取其价格1%的费用（不足1元按1元计算）</AtNoticebar>
       {
         loading ? loadingPage : form
       }
+      <WhiteSpace height={50} />
     </View>
   );
 }

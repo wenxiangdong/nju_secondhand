@@ -1,5 +1,5 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View} from '@tarojs/components'
+import {View, Text} from '@tarojs/components'
 import {Location, MockUserApi, UserDTO} from "../../apis/UserApi";
 import {apiHub} from "../../apis/ApiHub";
 import urlList from "../../utils/url-list";
@@ -114,7 +114,10 @@ export default class index extends Component<any, IState> {
     const that = this;
     if (this.validRegister()) {
       this.setState({registerLoading: true}, function () {
-        apiHub.userApi.signUp(that.state.registerInfo)
+        apiHub.userApi.signUp({
+          ...that.state.registerInfo,
+          email: that.state.registerInfo.email + "@smail.nju.edu.cn"
+        })
           .then(function () {
             const sucMsg = '注册成功';
             apiHub.userApi.login()
@@ -126,7 +129,7 @@ export default class index extends Component<any, IState> {
                     Taro.reLaunch({
                       url: urlList.INDEX
                     }).then(() => {
-                      that.initWebsocket();
+                      // that.initWebsocket();
                     }).catch(that.onError);
                   }, relaunchTimeout);
                 } else {
@@ -149,13 +152,13 @@ export default class index extends Component<any, IState> {
       email
     };
     this.setState({registerInfo});
-    return email
+    return email ? email.trim() : email;
   };
 
   private checkEmailValid = () => {
     const {email} = this.state.registerInfo;
-    let invalidEmail = !!(email && isInvalidEmail(email));
-    this.setState({invalidEmail});
+    // let invalidEmail = !!(email && isInvalidEmail(email));
+    this.setState({invalidEmail: !email || !email.trim()});
   };
 
   private handlePhoneChange = (phone) => {
@@ -266,22 +269,24 @@ export default class index extends Component<any, IState> {
           <AtInput
             customStyle={styles.inputStyle}
             name='value'
-            title='邮件'
+            // title='邮件'
             type='email'
-            placeholder={'请使用学校邮箱'}
+            placeholder={'学校邮箱'}
             value={registerInfo.email}
             onChange={this.handleEmailChange}
             onBlur={this.checkEmailValid}
             error={invalidEmail}
             clear
-          />
+          >
+            <Text>@smail.nju.edu.cn</Text>
+          </AtInput>
 
           <AtInput
             customStyle={styles.inputStyle}
             name='value'
-            title='电话'
+            // title='电话'
             type='phone'
-            placeholder={'请输入您的电话'}
+            placeholder={'电话'}
             value={registerInfo.phone}
             onChange={this.handlePhoneChange}
             onBlur={this.checkPhoneValid}
@@ -303,20 +308,23 @@ export default class index extends Component<any, IState> {
         }
 
         <WhiteSpace height={80}/>
+        <View className="at-article__info"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center"
+              }}>
+          <View style={{textAlign: "justify"}}>
+            学校邮箱是为了验证南大师生身份的，请如实填写。
+            学校邮箱的格式为{" "}<Text style={{fontWeight: "bold"}}>学号@smail.nju.edu.cn</Text>
+            {" "}。
+            手机号码为方便联系所用，我们承诺不会用于他处。
+          </View>
+        </View>
 
       </View>
     )
   }
-
-  initWebsocket(){
-    console.log("init socket")
-    // 记得在要有消息通知的页面，引用  <AtMessage />
-    // messageHub.subscribe((vo) => {
-    //   Taro.atMessage({
-    //     message: `收到一条来自 ${vo.senderName} 的消息`
-    //   })
-    // });
-  };
 
   private onError = createSimpleErrorHandler('userInfo', this);
 }

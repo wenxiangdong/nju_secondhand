@@ -1,4 +1,5 @@
 import Taro, {Config} from "@tarojs/taro";
+const regeneratorRuntime = require("../../../lib/async");
 import LoadingPage from "../../../components/common/loading-page";
 import {View} from "@tarojs/components";
 import {NotificationVO} from "../../../apis/NotificationApi";

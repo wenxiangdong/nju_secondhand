@@ -12,6 +12,7 @@ import LoadingPage from "../../../components/common/loading-page";
 import ConfirmModal from "../../../components/common/confirm-modal";
 import CommentCard from "../../../components/circle/comment-card";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
+const regeneratorRuntime = require("../../../lib/async");
 
 function createStyles() {
   const baseView:CSSProperties = {

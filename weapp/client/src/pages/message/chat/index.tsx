@@ -1,12 +1,13 @@
 import Taro, {Component, Config} from '@tarojs/taro'
 import {View, Text, ScrollView, Input} from '@tarojs/components'
-import {chatUrlConfig} from "../../../utils/url-list";
+import {chatUrlConfig, resultUrlConfig} from "../../../utils/url-list";
 import {apiHub} from "../../../apis/ApiHub";
 import {UserVO} from "../../../apis/UserApi";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import LoadingPage from "../../../components/common/loading-page";
 import messageHub, { MessageVO } from '../../../apis/MessageApi';
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../../../lib/async");
 import MessageLeft from '../../../components/message/message-left';
 import MessageRight from '../../../components/message/message-right';
 import "./index.scss";
@@ -53,6 +54,12 @@ export default class index extends Component<any, IState> {
   }
 
   async componentWillMount() {
+    if (!messageHub.socketOpen()) {
+      resultUrlConfig.go({
+        status: "warn",
+        title: "聊天服务器还未连上，请稍等重试"
+      });
+    }
     const sellerId = chatUrlConfig.getUserId(this);
     try {
       if (sellerId && sellerId.length) {

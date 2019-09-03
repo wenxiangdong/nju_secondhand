@@ -4,6 +4,7 @@ import {AtImagePicker, AtTextarea, AtInput, AtButton} from "taro-ui";
 import {PostDTO} from "../../../apis/CircleApi";
 import urlList, {resultUrlConfig, sendPostUrlConfig} from "../../../utils/url-list";
 import {apiHub} from "../../../apis/ApiHub";
+const regeneratorRuntime = require("../../../lib/async");
 
 const TOPIC_LIST = ["买家秀", "好货在身边", "我想...", "前排求一个XXX"];
 

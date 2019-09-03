@@ -1,5 +1,6 @@
 import Taro, {Component, Config} from '@tarojs/taro'
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../../../../lib/async");
 import {View} from '@tarojs/components'
 import {MockOrderApi, OrderVO} from "../../../../apis/OrderApi";
 import {apiHub} from "../../../../apis/ApiHub";

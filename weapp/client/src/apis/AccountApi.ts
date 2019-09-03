@@ -1,4 +1,5 @@
 import "@tarojs/async-await";
+const regeneratorRuntime = require("../lib/async");
 import {httpRequest, mockHttpRequest} from "./HttpRequest";
 import {createRandomNumberStr} from "./Util";
 
