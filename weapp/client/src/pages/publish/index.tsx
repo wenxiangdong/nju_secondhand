@@ -69,6 +69,10 @@ function Publish() {
       const paths = await Promise.all(uploadFiles(pictures));
       console.log("上传文件成功", paths);
       goods.pictures = [...paths];
+      
+      // 数字类型转换
+      goods.num = parseInt(goods.num);
+
       await apiHub.goodsApi.publishGoods(goods);
       // 顺便发一条圈子
       apiHub.circleApi.publishPost({

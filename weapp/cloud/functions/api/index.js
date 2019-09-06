@@ -710,6 +710,10 @@ const getGoodsByUserIdAndState = async ({ userID, state }) => {
 
 const addGoods = async ({ goods }) => {
   goods.publishTime = Date.now()
+  if (typeof goods.num === "string") {
+    console.log(goods.num, typeof goods.num);
+    goods.num = parseInt(goods.num);
+  }
   return await add({ name: goodsName, data: goods })
 }
 
