@@ -194,7 +194,7 @@ exports.main = async (event, context) => {
     console.log(goods);
     if (goods.num === 1) {
       await updateOneGoods({
-        goodsID, goods: { num: command.inc(-1), state: OrderState.Deleted }
+        goodsID, goods: { num: command.inc(-1), state: GoodsState.Deleted }
       })
     } else {
       await updateOneGoods({
