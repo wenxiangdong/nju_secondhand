@@ -181,7 +181,7 @@ exports.main = async (event, context) => {
     const goods = await getOneGoods({ goodsID })
 
     if (goods.state !== GoodsState.InSale) {
-      ctx.body = { code: HttpCode.Fail, messsage: '该商品暂时无法购买' }
+      ctx.body = { code: HttpCode.Fail, message: '该商品暂时无法购买' }
     }
 
     if (goods.num <= 0) {
@@ -191,6 +191,7 @@ exports.main = async (event, context) => {
       }
     }
 
+    console.log(goods);
     if (goods.num === 1) {
       await updateOneGoods({
         goodsID, goods: { num: command.inc(-1), state: OrderState.Deleted }
@@ -219,6 +220,7 @@ exports.main = async (event, context) => {
 
       state: OrderState.Paying
     };
+    console.log(order);
     // 这里插失败都要回滚，将商品的信息改回来 
     try {
       order._id = await addOrder({ order })
@@ -465,7 +467,7 @@ exports.main = async (event, context) => {
           tax = amount
         }
         amount = amount.minus(tax)
-        const balance = BigNumber(user.account.balance).plus(amount).toFixed(2);
+        const balance = BigpNumber(user.account.balance).plus(amount).toFixed(2);
         // user.account.balance = balance;
         // delete user._id;
         // console.log(user.account.balance, order.goodsPrice, balance);
@@ -963,6 +965,7 @@ const updateAll = async ({ name, condition = {}, data }) => {
 }
 
 const updateOne = async ({ name, id, data }) => {
+  console.log("update", name, id, data);
   await db.collection(name)
     .doc(id)
     .update({
