@@ -27,18 +27,23 @@ class MessageQueue {
     console.log("拿到要显示的消息", message);
     if (message) {
       this.busy = true;
-      try {
-        Taro.atMessage({
-          message,
-          duration: this.DURATION
-        });
-      } catch (e) {
-        Taro.showToast({
-          title: message,
-          icon: "none",
-          duration: this.DURATION
-        });
-      }
+      Taro.showToast({
+        title: message,
+        icon: "none",
+        duration: this.DURATION
+      });
+      // try {
+      //   Taro.atMessage({
+      //     message,
+      //     duration: this.DURATION
+      //   });
+      // } catch (e) {
+      //   Taro.showToast({
+      //     title: message,
+      //     icon: "none",
+      //     duration: this.DURATION
+      //   });
+      // }
       // 开启下次循环
       setTimeout(() => {
         this.loop();

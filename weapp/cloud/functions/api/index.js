@@ -467,7 +467,7 @@ exports.main = async (event, context) => {
           tax = amount
         }
         amount = amount.minus(tax)
-        const balance = BigpNumber(user.account.balance).plus(amount).toFixed(2);
+        const balance = BigNumber(user.account.balance).plus(amount).toFixed(2);
         // user.account.balance = balance;
         // delete user._id;
         // console.log(user.account.balance, order.goodsPrice, balance);

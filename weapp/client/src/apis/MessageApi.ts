@@ -43,6 +43,7 @@ class MessageHub {
   public loopCheck = () => {
     console.log("循环检查已读消息队列", this.messageIdReadQueue);
     this.read([...this.messageIdReadQueue]);
+    this.messageIdReadQueue = [];
     setTimeout(() => {
       this.loopCheck();
     }, 10 * 1000);
