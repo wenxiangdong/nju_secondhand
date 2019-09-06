@@ -40,7 +40,7 @@ exports.main = async (event, context) => {
 
   await Promise.all(
     [
-      expiredOrders.update({ state: OrderState.Timeout }),
+      expiredOrders.update({ data: { state: OrderState.Timeout } }),
       db.collection('goods')
         .where({ _id: command.in(goodsIDs) })
         .update({
@@ -60,12 +60,4 @@ const OrderState = {
 const GoodsState = {
   InSale: 0,
   Deleted: 1
-}
-
-const HttpCode = {
-  Success: 200,
-  Forbidden: 403, // 403
-  Not_Found: 404, // 404
-  Conflict: 409, // 409 冲突
-  Fail: 500 // 500
 }

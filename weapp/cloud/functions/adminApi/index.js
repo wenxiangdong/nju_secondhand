@@ -10,7 +10,6 @@ const command = db.command
 const adminName = 'admin'
 const userName = 'user'
 const goodsName = 'goods'
-const categoryName = 'category'
 const orderName = 'order'
 const complaintName = 'complaint'
 const userApi = 'api'
@@ -27,17 +26,27 @@ exports.main = async (event, context) => {
   })
 
   app.router('getComplaints', async (ctx) => {
-    const { lastIndex, size } = event
+    const { keyword, lastIndex, size } = event
     ctx.body = await getPage({
       name: complaintName,
       condition:
         command.and(
-          keyword ? {
-            desc: db.RegExp({
-              regexp: keyword,
-              options: 'i'
-            })
-          } : {},
+          keyword ? command.or(
+            // 匹配描述
+            {
+              desc: db.RegExp({
+                regexp: keyword,
+                options: 'i'
+              })
+            },
+            // 匹配_id
+            {
+              _id: db.RegExp({
+                regexp: keyword,
+                options: 'i'
+              })
+            }) : {},
+          // 进行中
           {
             state: ComplaintState.Ongoing
           }),
@@ -76,12 +85,20 @@ exports.main = async (event, context) => {
     ctx.body = await getPage({
       name: orderName,
       ccondition: command.and(
-        keyword ? {
-          goodsName: db.RegExp({
-            regexp: keyword,
-            options: 'i'
-          })
-        } : {}),
+        keyword ? command.or(
+          {
+            goodsName: db.RegExp({
+              regexp: keyword,
+              options: 'i'
+            })
+          },
+          // 匹配_id
+          {
+            _id: db.RegExp({
+              regexp: keyword,
+              options: 'i'
+            })
+          }) : {}),
       lastIndex,
       size,
     })
@@ -105,25 +122,37 @@ exports.main = async (event, context) => {
   })
 
   app.router('searchGoodsByKeyword', async (ctx) => {
-    const { $url, keyword, lastIndex, size } = event
+    const { keyword, lastIndex, size } = event
 
-    const res = await cloud.callFunction({
-      name: userApi,
-      data: {
-        $url,
-        keyword,
-        lastIndex,
-        size
-      }
+    ctx.body = await getPage({
+      name: goodsName,
+      condition: command.and(
+        keyword ? command.or(
+          {
+            name: db.RegExp({
+              regexp: keyword,
+              options: 'i',
+            })
+          },
+          {
+            category: {
+              name: db.RegExp({
+                regexp: keyword,
+                options: 'i'
+              })
+            }
+          },
+          // 匹配_id
+          {
+            _id: db.RegExp({
+              regexp: keyword,
+              options: 'i'
+            })
+          }) : {},
+        { state: GoodsState.InSale }),
+      lastIndex,
+      size
     })
-
-    const { code, data } = res.result
-
-    if (code !== HttpCode.Success) {
-      throw res.result
-    }
-
-    ctx.body = data
   })
 
   app.router('searchGoodsByCategory', async (ctx) => {
@@ -168,13 +197,20 @@ exports.main = async (event, context) => {
     ctx.body = await getPage({
       name: userName,
       condition: command.and(
-        keyword ?
+        keyword ? command.or(
           {
             nickname: db.RegExp({
               regexp: keyword,
               options: 'i'
             })
-          } : {},
+          },
+          // 匹配_id
+          {
+            _id: db.RegExp({
+              regexp: keyword,
+              options: 'i'
+            })
+          }) : {},
         {
           state
         }),
