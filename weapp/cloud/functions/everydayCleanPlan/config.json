@@ -1,0 +1,9 @@
+{
+    "triggers": [
+      {
+        "name": "everydayCleanPlan",
+        "type": "timer",
+        "config": "0 0 * * * * *"
+      }
+    ]
+  }

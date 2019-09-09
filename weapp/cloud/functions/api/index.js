@@ -281,7 +281,9 @@ exports.main = async (event, context) => {
 
     post.comments = []
 
-    await addPost({ post });
+    const id = await addPost({ post });
+    // 异步将其加入删除计划
+    addToDeletePlan("post", id);
 
     ctx.body = { code: HttpCode.Success }
   })
@@ -721,6 +723,10 @@ const addGoods = async ({ goods }) => {
 
 const updateOneGoods = async ({ goodsID, goods }) => {
   await updateOne({ name: goodsName, id: goodsID, data: goods })
+  // 变成删除状态时，加入清理队列
+  if (goods.state === GoodsState.Deleted) {
+    addToDeletePlan(goodsName, goodsID);
+  }
 }
 
 /** order */
@@ -902,6 +908,23 @@ const addMessage = async ({ message }) => {
 const readMessages = async ({ messageIDs }) => {
   await updateAll({ name: messageName, condition: { _id: command.in(messageIDs) }, data: { read: true } })
 }
+
+/**
+ * 加入清理计划
+ * @param {string} collectionName 
+ * @param {string} id 
+ */
+const addToDeletePlan = async (collectionName, id) => {
+  try {
+    const result = await cloud.callFunction("addToDeleteQueue", {
+      collectionName,
+      id
+    });
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // 数据库操作方法（dao）
 const getAll = async ({ name, condition = {}, orders = [], field = {} }) => {
