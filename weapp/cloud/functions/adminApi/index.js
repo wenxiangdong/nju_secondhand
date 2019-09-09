@@ -181,7 +181,7 @@ exports.main = async (event, context) => {
     const { goodsID } = event
     const goods = await getOne({ name: goodsName, id: goodsID })
 
-    await updateOne({ name: goodsName, id: goodsID, data: { state: Deleted } });
+    await updateOne({ name: goodsName, id: goodsID, data: { state: GoodsState.Deleted } });
     await cloud.callFunction({
       name: userApi,
       data: {
@@ -190,6 +190,8 @@ exports.main = async (event, context) => {
         content: `您的商品 ${goods.goodsName} 已被下架，如有疑问请联系管理员`
       }
     })
+    // 加入清理计划
+    addToDeletePlan(goodsName, goodsID);
   })
 
   app.router('getUsers', async (ctx) => {
@@ -352,3 +354,20 @@ const HttpCode = {
   Conflict: 409, // 409 冲突
   Fail: 500 // 500
 }
+
+/**
+ * 加入清理计划
+ * @param {string} collectionName 
+ * @param {string} id 
+ */
+const addToDeletePlan = async (collectionName, id) => {
+  try {
+    const result = await cloud.callFunction("addToDeleteQueue", {
+      collectionName,
+      id
+    });
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+};
