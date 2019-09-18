@@ -18,9 +18,6 @@ export interface INotificationApi {
   // 发送通知消息（供其他接口调用）
   sendNotification(notification: NotificationDTO): Promise<void>;
 
-  // read
-  readNotification(id: string);
-
   watchNotification();
 }
 
@@ -41,24 +38,24 @@ class NotificationApi implements INotificationApi {
         // @ts-ignore
         .watch({
           onChange: (res) => {
-            console.log(res);
+            console.log("系统消息监听", res);
             const {docChanges = []} = res;
-            const docs: NotificationVO[] = docChanges
+            const notifications: NotificationVO[] = docChanges
               .filter((item) => ["init", 'add'].indexOf(item.dataType) >= 0)
               .map(item => item.doc);
-            console.log(docs);
+            console.log(notifications);
+
             // 加入全局消息队列
             messageQueue.add(
-              ...docs.map(doc => `您有一条新的系统消息${
+              ...notifications.map(doc => `您有一条新的系统消息${
                 doc.content 
-                  ? "：" + doc.content.substring(0, 4) + "..."
+                  ? "：" + doc.content
                   : ""
               }`)
             );
+
             // 告知已读
-            docs.forEach(doc => {
-              this.readNotification(doc._id);
-            })
+            this.readNotification(notifications.map(no => no._id));
           },
           onError: (e) => {
             console.error("监听通知出错" , e);
@@ -70,11 +67,14 @@ class NotificationApi implements INotificationApi {
     if (userID) {
       watch(userID);
     } else {
-      localConfig.subscribe((key, value) => {
+      const ob = (key, value) => {
         if (key === localConfig.USER_ID && value) {
           watch(value);
+          // 一旦有就解除监听
+          localConfig.unsubscribe(ob);
         }
-      })
+      };
+      localConfig.subscribe(ob);
     }
   }
   async getNotifications(lastIndex: number, size: number = 10): Promise<NotificationVO[]> {
@@ -85,9 +85,13 @@ class NotificationApi implements INotificationApi {
     return await httpRequest.callFunction<void>(functionName, { $url: "sendNotification", notification });
   }
 
-  readNotification(id: string) {
-    // TODO 调用云函数让通知已读
-    console.log(id, "已读");
+  private readNotification(ids: string[]) {
+    ids && ids.length && httpRequest.callFunction(functionName, {
+      $url: "readNotifications",
+      notificationIDs: [...ids]
+    }).then(() => {
+      console.log(ids, "系统消息已读");
+    }).catch(console.error);
   }
 }
 
@@ -114,9 +118,6 @@ class MockNotificationApi implements INotificationApi {
   }
   sendNotification(notification: NotificationDTO): Promise<void> {
     throw new Error("Method not implemented.");
-  }
-
-  readNotification(id: string) {
   }
 
 }

@@ -79,7 +79,7 @@ function SoldGoodsCard(props: IProp) {
   const {goods = MockGoodsApi.createMockGoods(), onDeleteGoods} = props;
 
   const picSrc = goods.pictures[0];
-  const {name, publishTime, price} = goods;
+  const {name, publishTime, price, num} = goods;
 
   const publishTimeString = timeToString(publishTime);
 
@@ -88,7 +88,8 @@ function SoldGoodsCard(props: IProp) {
       <Image src={picSrc} style={styles.picStyle} />
       <View style={styles.mainColumnStyle}>
         <Text>{name}</Text>
-        <Text>￥ {price}</Text>
+        <Text space={'nbsp'}>￥ {price}</Text>
+        <Text space={'nbsp'}>库存 {num} 件</Text>
       </View>
       <View style={styles.subColumnStyle}>
         <Text style={styles.dateStringStyle}>{publishTimeString}</Text>

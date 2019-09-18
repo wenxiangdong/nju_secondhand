@@ -181,7 +181,7 @@ exports.main = async (event, context) => {
     const goods = await getOneGoods({ goodsID })
 
     if (goods.state !== GoodsState.InSale) {
-      ctx.body = { code: HttpCode.Fail, messsage: '该商品暂时无法购买' }
+      ctx.body = { code: HttpCode.Fail, message: '该商品暂时无法购买' }
     }
 
     if (goods.num <= 0) {
@@ -191,9 +191,10 @@ exports.main = async (event, context) => {
       }
     }
 
+    console.log(goods);
     if (goods.num === 1) {
       await updateOneGoods({
-        goodsID, goods: { num: command.inc(-1), state: OrderState.Deleted }
+        goodsID, goods: { num: command.inc(-1), state: GoodsState.Deleted }
       })
     } else {
       await updateOneGoods({
@@ -219,6 +220,7 @@ exports.main = async (event, context) => {
 
       state: OrderState.Paying
     };
+    console.log(order);
     // 这里插失败都要回滚，将商品的信息改回来 
     try {
       order._id = await addOrder({ order })
@@ -279,7 +281,9 @@ exports.main = async (event, context) => {
 
     post.comments = []
 
-    await addPost({ post });
+    const id = await addPost({ post });
+    // 异步将其加入删除计划
+    addToDeletePlan("post", id);
 
     ctx.body = { code: HttpCode.Success }
   })
@@ -377,7 +381,17 @@ exports.main = async (event, context) => {
 
   app.router('readNotifications', async (ctx) => {
     const { notificationIDs } = event
-    await readNotifications({ notificationIDs })
+    try {
+      await readNotifications({ notificationIDs })
+      ctx.body = {
+        code: HttpCode.Success
+      }
+    } catch (e) {
+      ctx.body = {
+        code: HttpCode.Fail,
+        message: e.message
+      }
+    }
   })
 
   /** 账户 */
@@ -572,18 +586,38 @@ exports.main = async (event, context) => {
   app.router('sendMessage', async (ctx) => {
     // 这里的 message 应该是 MessageDTO 类型
     const { message } = event
-    message.sendID = ctx.data.self._id
-    const sender = await getOneUser({ userID: message.senderID })
-    const receiver = await getOneUser({ userID: message.receiverID })
+    message.senderID = ctx.data.self._id
+    try {
+      const sender = await getOneUser({ userID: message.senderID })
+      const receiver = await getOneUser({ userID: message.receiverID })
 
-    message.senderName = sender.nickname
-    message.receiverName = receiver.nickname
-    await addMessage({ message })
+      message.senderName = sender.nickname
+      message.receiverName = receiver.nickname
+      await addMessage({ message })
+      ctx.body = {
+        code: HttpCode.Success
+      }
+    } catch (e) {
+      ctx.body = {
+        code: HttpCode.Fail,
+        message: "发送消息失败：" + e.message
+      }
+    }
   })
 
   app.router('readMessages', async (ctx) => {
     const { messageIDs } = event
-    await readMessages({ messageIDs })
+    try {
+      await readMessages({ messageIDs })
+      ctx.body = {
+        code: HttpCode.Success
+      }
+    } catch (e) {
+      ctx.body = {
+        code: HttpCode.Fail,
+        message: e.message
+      }
+    }
   })
 
   return app.serve()
@@ -680,11 +714,19 @@ const getGoodsByUserIdAndState = async ({ userID, state }) => {
 
 const addGoods = async ({ goods }) => {
   goods.publishTime = Date.now()
+  if (typeof goods.num === "string") {
+    console.log(goods.num, typeof goods.num);
+    goods.num = parseInt(goods.num);
+  }
   return await add({ name: goodsName, data: goods })
 }
 
 const updateOneGoods = async ({ goodsID, goods }) => {
   await updateOne({ name: goodsName, id: goodsID, data: goods })
+  // 变成删除状态时，加入清理队列
+  if (goods.state === GoodsState.Deleted) {
+    addToDeletePlan(goodsName, goodsID);
+  }
 }
 
 /** order */
@@ -856,6 +898,7 @@ const pay = async ({ openID, payTitle = "南大小书童闲置物品", payAmount
 const messageName = 'message'
 
 const addMessage = async ({ message }) => {
+  console.log(message);
   message.read = false
   message.time = Date.now()
 
@@ -865,6 +908,23 @@ const addMessage = async ({ message }) => {
 const readMessages = async ({ messageIDs }) => {
   await updateAll({ name: messageName, condition: { _id: command.in(messageIDs) }, data: { read: true } })
 }
+
+/**
+ * 加入清理计划
+ * @param {string} collectionName 
+ * @param {string} id 
+ */
+const addToDeletePlan = async (collectionName, id) => {
+  try {
+    const result = await cloud.callFunction("addToDeleteQueue", {
+      collectionName,
+      id
+    });
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // 数据库操作方法（dao）
 const getAll = async ({ name, condition = {}, orders = [], field = {} }) => {
@@ -928,6 +988,7 @@ const updateAll = async ({ name, condition = {}, data }) => {
 }
 
 const updateOne = async ({ name, id, data }) => {
+  console.log("update", name, id, data);
   await db.collection(name)
     .doc(id)
     .update({
