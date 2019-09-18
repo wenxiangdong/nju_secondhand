@@ -63,7 +63,7 @@ function Order() {
         },
         {
             title: "订单状态",
-            render: (vo: OrderVO) => vo.state
+            render: (vo: OrderVO) => ['进行中', '已结束'][vo.state]
         }
 
     ];

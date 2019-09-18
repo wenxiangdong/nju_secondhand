@@ -24,7 +24,7 @@ export interface GoodsVO {
 
 
 interface IGoodsApi {
-    deleteGoods(goodID: string): Promise<void>;
+    deleteGoods(goodsID: string): Promise<void>;
     searchGoodsByKeyword(keyword: string, lastIndex: number, size?: number): Promise<GoodsVO[]>;
 }
 
@@ -61,11 +61,11 @@ class MockGoodApi implements IGoodsApi {
 }
 
 class GoodApi implements IGoodsApi {
-    deleteGoods(goodID) {
-        return http.post("/deleteGoods", {goodID});
+    deleteGoods(goodsID) {
+        return http.post("/deleteGoods", {goodsID});
     }
     searchGoodsByKeyword(keyword, lastIndex, size) {
-        return http.get("/searchGoodsByKeyword", {keyword, lastIndex, size});
+        return http.get("/getGoodsByKeyword", {keyword, lastIndex, size});
     }
 }
 

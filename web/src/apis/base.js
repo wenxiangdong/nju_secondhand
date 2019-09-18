@@ -1,6 +1,7 @@
 import type {HttpResponse} from "./http-response";
 import Axios from "axios";
 import Logger from "../utils/logger";
+import {createHashHistory} from "history";
 const logger = Logger.getLogger("http");
 
 Axios.defaults.withCredentials = true;
@@ -24,7 +25,8 @@ http.handleHttpResponse = (res: HttpResponse) => {
         case 401:
             // session 过期
             // eslint-disable-next-line no-restricted-globals
-            location.href = "/login";
+            // location.href = "/login";
+            createHashHistory().replace("login");
             throw res;
         case 200:
             return res.data;
@@ -48,7 +50,9 @@ http.get = async (url, params) => {
 
 http.post = async (url, params) => {
     logger.info(url, params);
-    const res = await Axios.post(http.BASE_URL + url, params);
+    const res = await Axios.post(http.BASE_URL + url, params, {
+        params: params
+    });
     logger.info(url, res);
     const data: HttpResponse = res.data;
     // if (data.code !== 200) {

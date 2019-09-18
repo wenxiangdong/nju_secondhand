@@ -13,7 +13,7 @@ class MockFileApi implements IFileApi {
 
 class FileApi implements IFileApi {
     transferUrl(fileID) {
-        return http.post("/transferUrl", {fileID});
+        return http.get("/transferUrl", {fileID});
     }
 }
 
