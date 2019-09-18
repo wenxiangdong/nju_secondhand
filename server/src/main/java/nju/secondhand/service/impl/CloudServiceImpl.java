@@ -70,7 +70,7 @@ public class CloudServiceImpl implements CloudService {
             throw new FailException(downLoadFileResult.errmsg);
         }
 
-        return downLoadFileResult.file_list.download_url;
+        return downLoadFileResult.file_list.get(0).download_url;
     }
 
     private String getAccessToken() {
@@ -129,8 +129,9 @@ class FunctionResult extends WechatError {
 
 @Setter
 class DownLoadFileResult extends WechatError {
-    FileList file_list;
+    List<FileList> file_list;
 
+    @Setter
     static class FileList {
         String fileid;
         String download_url;

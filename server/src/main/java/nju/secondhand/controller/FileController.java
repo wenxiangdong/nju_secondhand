@@ -21,7 +21,7 @@ public class FileController {
 
     @GetMapping("/transferUrl")
     public HttpResponse<String> transferUrl(String fileID, HttpSession session) {
-        LoginUtil.checkLogin(session);
+//        LoginUtil.checkLogin(session);
         return new HttpResponse<>(fileService.transferUrl(fileID));
     }
 }
