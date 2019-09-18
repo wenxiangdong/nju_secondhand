@@ -181,7 +181,7 @@ exports.main = async (event, context) => {
     const { goodsID } = event
     const goods = await getOne({ name: goodsName, id: goodsID })
 
-    await updateOne({ name: goodsName, id: goodsID, data: { state: Deleted } });
+    await updateOne({ name: goodsName, id: goodsID, data: { state: GoodsState.Deleted } });
     await cloud.callFunction({
       name: userApi,
       data: {
