@@ -61,7 +61,8 @@ exports.main = async (event, context) => {
       name: complaintName,
       id: complaintID,
       data: {
-        handling: { time: Date.now(), result }
+        handling: { time: Date.now(), result },
+        state: ComplaintState.Handled
       }
     })
 
