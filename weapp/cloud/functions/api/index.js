@@ -847,7 +847,7 @@ const readNotifications = async ({ notificationIDs }) => {
 
 /** account */
 const withdraw = async ({ openID = "", amount = 0 }) => {
-  console.log(TENPAY_CONFIG);
+  // console.log(TENPAY_CONFIG);
   const tenpay = new Tenpay(TENPAY_CONFIG, true);
   // 转换成分
   amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
@@ -860,7 +860,7 @@ const withdraw = async ({ openID = "", amount = 0 }) => {
       amount: amount,
       desc: '南大小书童提现'
     };
-    console.log(info);
+    // console.log(info);
     await tenpay.transfers(info);
   } catch (error) {
     console.error(error);
