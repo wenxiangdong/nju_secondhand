@@ -150,6 +150,7 @@ function Complaint() {
     // handlers
     const handleHandle = async (vo: ComplaintVO) => {
       const result = prompt("请输入处理意见", "未填写");
+      if (!result) return;
       const hide = message.loading("操作中...");
       try {
           await complaintApi.handle(vo._id, result);

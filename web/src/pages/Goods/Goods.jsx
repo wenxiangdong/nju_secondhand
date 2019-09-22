@@ -115,6 +115,15 @@ function Goods() {
             render: (row) => DateUtil.format(row.publishTime)
         },
         {
+            title: '库存',
+            key: 'num',
+        },
+        {
+            title: '状态',
+            key: 'state',
+            render: (row) => row.state === 0 ? '售卖中' : '下架'
+        },
+        {
             title: "操作",
             render: (row) => {
                 return (
