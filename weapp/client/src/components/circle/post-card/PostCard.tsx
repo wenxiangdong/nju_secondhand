@@ -1,9 +1,9 @@
 import Taro from '@tarojs/taro'
 import {View, Text, Image} from '@tarojs/components'
 import {MockCircleApi, PostVO} from "../../../apis/CircleApi";
-import {circlePostUrlConfig} from "../../../utils/url-list";
+import {circlePostUrlConfig, indexSearchUrlConfig} from "../../../utils/url-list";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
-import {AtAvatar, AtIcon} from "taro-ui";
+import {AtAvatar, AtIcon, AtButton} from "taro-ui";
 import {timeToString} from "../../../utils/date-util";
 import {CSSProperties} from "react";
 
@@ -55,17 +55,32 @@ function createStyles() {
     // borderTopColor: 'lightgrey',
     color: 'lightgrey'
   };
+  const linkStyles: CSSProperties = {
+    margin: '1vw',
+    color: 'blue',
+    textAlign: 'right',
+  };
   return {
     baseView,
     headerBar,
     topic,
     desc,
     picture,
-    bottomBar
+    bottomBar,
+    linkStyles,
   }
 }
 
 const styles = createStyles();
+
+const extractGoodsName = (post) => {
+  const {topic, desc} = post;
+  const reg = /宝贝【(.*?)】/;
+  if (topic === '我有好货' && reg.test(desc)) {
+    return RegExp.$1;
+  }
+  return '';
+}
 
 /**
  * PostCard
@@ -75,9 +90,17 @@ const styles = createStyles();
 function PostCard(props: IProp) {
   const { post = MockCircleApi.createMockPost() } = props;
   const { ownerName, publishTime, topic, pictures, desc, comments = [], ownerAvatar } = post;
+  const goodsName = extractGoodsName(post);
+  const handleClickLink = (e) => {
+    console.log(e);
+    Taro.navigateTo({
+      url: indexSearchUrlConfig.createUrl(goodsName),
+    });
+  }
 
   const onError = createSimpleErrorHandler('PostCard', this);
   const navigateToPost = function () {
+    // return;
     Taro.navigateTo({
       url: circlePostUrlConfig.createUrl(post._id)
     })
@@ -107,7 +130,6 @@ function PostCard(props: IProp) {
             </Text>
           )
           : null
-
       }
       {
         pictures && pictures.length
@@ -118,6 +140,12 @@ function PostCard(props: IProp) {
           )
           : null
 
+      }
+      {
+        goodsName && (
+        <View style={styles.linkStyles}>
+          <AtButton type='secondary' size='small' onClick={handleClickLink}>去看看</AtButton>
+        </View>)
       }
       <View style={styles.bottomBar}>
         <View style={{marginLeft: '2vw'}}>
