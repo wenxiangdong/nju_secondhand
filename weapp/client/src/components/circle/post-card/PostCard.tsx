@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro'
-import {View, Text, Image} from '@tarojs/components'
+import {View, Text, Image, Button} from '@tarojs/components'
 import {MockCircleApi, PostVO} from "../../../apis/CircleApi";
 import {circlePostUrlConfig, indexSearchUrlConfig} from "../../../utils/url-list";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
@@ -93,13 +93,16 @@ function PostCard(props: IProp) {
   const goodsName = extractGoodsName(post);
   const handleClickLink = (e) => {
     console.log(e);
+    e.bubble = false;
+    e.stopPropagation();
     Taro.navigateTo({
       url: indexSearchUrlConfig.createUrl(goodsName),
     });
   }
 
   const onError = createSimpleErrorHandler('PostCard', this);
-  const navigateToPost = function () {
+  const navigateToPost = function (e) {
+    e.stopPropagation();
     // return;
     Taro.navigateTo({
       url: circlePostUrlConfig.createUrl(post._id)
@@ -144,7 +147,8 @@ function PostCard(props: IProp) {
       {
         goodsName && (
         <View style={styles.linkStyles}>
-          <AtButton type='secondary' size='small' onClick={handleClickLink}>去看看</AtButton>
+          {/* <AtButton type='secondary' size='small' onClick={handleClickLink}>去看看</AtButton> */}
+          <Button size='mini' plain style={{display: 'inline-block'}} onClick={handleClickLink}>去看看</Button>
         </View>)
       }
       <View style={styles.bottomBar}>

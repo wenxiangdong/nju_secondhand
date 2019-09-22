@@ -98,7 +98,7 @@ export const ConfigItem = {
     },// 开发者信息
     PLATFORM_RULES: {
         key: "platform-rules",
-        default: ['本平台仅为南京大学校内师生服务，谨遵诚信原则']
+        default: ['本平台仅为南京大学校内师生服务，谨遵诚信原则', '在本平台出售商品，平台将收取其价格1%（不足1元按1元计算）的费用。']
     },
     PRIVATE_POLICY: {
         key: "private-policy",
