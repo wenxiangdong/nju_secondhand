@@ -445,7 +445,7 @@ exports.main = async (event, context) => {
 
     const order = await getOneOrder({ orderID })
 
-    console.log(order);
+    // console.log(order);
 
     try {
       await udpateOneOrder({ orderID, order: { state: OrderState.Finished, deliveryTime: Date.now() } })
@@ -461,7 +461,7 @@ exports.main = async (event, context) => {
       if (user) {
         let amount = BigNumber(order.goodsPrice)
         let tax = amount.multipliedBy(0.01)
-        const minTax = BigNumber(1)
+        const minTax = BigNumber(0.01)
         if (tax < minTax) {
           tax = minTax
         }
