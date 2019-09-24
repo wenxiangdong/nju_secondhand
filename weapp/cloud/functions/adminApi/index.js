@@ -233,6 +233,48 @@ exports.main = async (event, context) => {
     })
   })
 
+  app.router('deleteOrder', async(ctx) => {
+    const {orderID} = event;
+    if (!orderID) {
+      throw new Error('orderID不能为空');
+    }
+
+    // get collections
+    const orderCollection = db.collection(orderName);
+    const goodsCollection = db.collection(goodsName);
+
+    // 查询订单
+    const orderDoc = orderCollection.doc(orderID);
+     /** @type {import('./index').OrderVO} */
+    const order = (await orderDoc.get()).data;
+    if (!order) {
+      throw new Error('未找到订单');
+    }
+    // 查询商品
+    const {goodsID, sellerID, buyerID, deliveryTime} = order;
+    // 订单送达后不能再人工删除
+    if (deliveryTime !== -1) {
+      throw new Error('订单已送达，不能删除');
+    }
+    const goodsDoc =  goodsCollection.doc(goodsID);
+    /** @type {import('./index').GoodsVO} */ 
+    const goods = (await goodsDoc.get()).data;
+    if (!goods) {
+      throw new Error('商品未找到');
+    }
+    // 删除订单
+    const removeResult = await orderDoc.remove();
+    // 更新商品
+    /** @type {import('./index').GoodsVO} */
+    const goodsUpdateData = {
+      state: GoodsState.InSale, // 记得改成在售
+      num: command.inc(1),    // 防止并发
+    };
+    const updateResult = await goodsDoc.update({
+      data: goodsUpdateData,
+    });
+  })
+
   return app.serve()
 }
 
