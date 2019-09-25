@@ -17,4 +17,11 @@ public interface OrderService {
      * @return {@link OrderVO}
      */
     List<OrderVO> getOrders(String keyword, int lastIndex, int size);
+
+    /**
+     * 删除订单
+     *
+     * @param orderID 订单ID
+     */
+    void deleteOrder(String orderID);
 }

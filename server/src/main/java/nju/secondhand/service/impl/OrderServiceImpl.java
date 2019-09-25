@@ -31,4 +31,11 @@ public class OrderServiceImpl implements OrderService {
                 Pair.of("lastIndex", lastIndex),
                 Pair.of("size", size)), ApiType.ADMIN_API);
     }
+
+    @Override
+    public void deleteOrder(String orderID) {
+        cloudService.invokeCloudFunction(Void.class, MapObjectUtil.mapObject(
+                Pair.of("$url", "deleteOrder"),
+                Pair.of("orderID", orderID)), ApiType.ADMIN_API);
+    }
 }
