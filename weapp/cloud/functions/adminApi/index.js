@@ -273,6 +273,24 @@ exports.main = async (event, context) => {
     const updateResult = await goodsDoc.update({
       data: goodsUpdateData,
     });
+
+    // 发通知
+    cloud.callFunction({
+      name: userApi,
+      data: {
+        $url: 'sendNotification',
+        userID: order.sellerID,
+        content: `您的订单(编号：${order._id}，买家：${order.buyerName}，商品：${order.goodsName})已被取消，如有疑问请联系管理员`
+      }
+    });
+    cloud.callFunction({
+      name: userApi,
+      data: {
+        $url: 'sendNotification',
+        userID: order.buyerID,
+        content: `您的订单(编号：${order._id}，卖家：${order.sellerName}，商品：${order.goodsName})已被取消，如有疑问请联系管理员`
+      }
+    })
   })
 
   return app.serve()
