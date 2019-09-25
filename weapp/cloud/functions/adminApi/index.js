@@ -85,7 +85,7 @@ exports.main = async (event, context) => {
 
     ctx.body = await getPage({
       name: orderName,
-      ccondition: command.and(
+      condition: command.and(
         keyword ? command.or(
           {
             goodsName: db.RegExp({
