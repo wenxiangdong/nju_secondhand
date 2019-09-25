@@ -246,7 +246,12 @@ exports.main = async (event, context) => {
     // 查询订单
     const orderDoc = orderCollection.doc(orderID);
      /** @type {import('./index').OrderVO} */
-    const order = (await orderDoc.get()).data;
+    let order;
+    try {
+      order = (await orderDoc.get()).data;
+    } catch (error) {
+      console.log(error);
+    }
     if (!order) {
       throw new Error('未找到订单');
     }
@@ -258,7 +263,12 @@ exports.main = async (event, context) => {
     }
     const goodsDoc =  goodsCollection.doc(goodsID);
     /** @type {import('./index').GoodsVO} */ 
-    const goods = (await goodsDoc.get()).data;
+    let goods;
+    try {
+      goods = (await goodsDoc.get()).data;
+    } catch (error) {
+      console.log(error);
+    }
     if (!goods) {
       throw new Error('商品未找到');
     }

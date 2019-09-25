@@ -173,7 +173,7 @@ function Publish() {
   );
   return (
     <View>
-      <AtNoticebar>在平台发布的闲置物品卖出后，平台将收取其价格1%的费用（不足1元按1元计算）</AtNoticebar>
+      <AtNoticebar>在平台发布的闲置物品卖出后，平台将收取其价格1%的费用（不足1分按1分计算）</AtNoticebar>
       {
         loading ? loadingPage : form
       }
