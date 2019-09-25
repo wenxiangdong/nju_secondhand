@@ -32,10 +32,23 @@ exports.main = async (event, context) => {
       condition:
         command.and(
           keyword ? command.or(
-            // 匹配描述
+            // 投诉人ID匹配
             {
-              desc: db.RegExp({
+              complainantID: db.RegExp({
                 regexp: keyword,
+                options: 'i'
+              })
+            },
+            // 投诉人昵称匹配
+            {
+              complainantName: db.RegExp({
+                regexp: keyword,
+                options: 'i'
+              })
+            },
+            //描述匹配
+            {
+              desc: db.RegExp({regexp: keyword,
                 options: 'i'
               })
             },
@@ -88,7 +101,13 @@ exports.main = async (event, context) => {
       condition: command.and(
         keyword ? command.or(
           {
-            goodsName: db.RegExp({
+            sellerName: db.RegExp({
+              regexp: keyword,
+              options: 'i'
+            })
+          },
+          {
+            buyerName: db.RegExp({
               regexp: keyword,
               options: 'i'
             })
