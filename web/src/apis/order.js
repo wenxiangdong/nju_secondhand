@@ -24,6 +24,7 @@ export interface OrderVO {
 interface IOrderApi {
     // 订单管理
     getOrders(keyword: string, lastIndex: number, size: number): OrderVO[];
+    deleteOrder(orderID: string): any;
 }
 
 class MockOrderApi implements IOrderApi {
@@ -60,12 +61,20 @@ class MockOrderApi implements IOrderApi {
                 }
             });
     }
+    async deleteOrder(orderID: string) {
+        await httpMock();
+    }
 }
 
 class OrderApi implements IOrderApi {
     getOrders(keyword, lastIndex, size) {
         return http.get("/getOrders", {
             keyword, lastIndex, size
+        });
+    }
+    deleteOrder(orderID: string) {
+        return http.post("/deleteOrder", {
+            orderID
         });
     }
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import useLoadMoreWithKeyword from "../../hooks/use-load-more-with-keyword";
 import orderApi from "../../apis/order";
-import {BackTop, message} from "antd";
+import {BackTop, message, Modal} from "antd";
 import Logger from "../../utils/logger";
 import type {ColumnItem} from "../../components/DTable/DTable";
 import {DateUtil} from "../../utils/date";
@@ -18,7 +18,7 @@ const dataSource = async (index, offset, keyword) => orderApi.getOrders(keyword,
 function Order() {
 
     // states
-    const {data, loadData, setKeyword} = useLoadMoreWithKeyword({
+    const {data, loadData, setKeyword, setData} = useLoadMoreWithKeyword({
         dataSource,
         onError: (e) => {
             message.error("加载数据出错，请重试");
@@ -27,6 +27,25 @@ function Order() {
             logger.info(res);
         }
     });
+
+    const handleClickCancle = (order: OrderVO) => {
+        if (order.state !== 0) {
+            alert("不能取消已经送达的订单");
+        } else {
+            Modal.warn({
+                title: '取消订单',
+                content: `你确定要取消订单【${order._id}】?`,
+                maskClosable: true,
+                onOk: async () => {
+                    await orderApi.deleteOrder(order._id);
+                    const idx = data.findIndex(item => item._id == order._id);
+                    idx !== -1 && data.splice(idx, 1);
+                    setData([...data]);
+                    message.success("取消订单成功");
+                }
+            })
+        }
+    }
 
     const cols: ColumnItem[] = [
         {
@@ -64,6 +83,14 @@ function Order() {
         {
             title: "订单状态",
             render: (vo: OrderVO) => ['进行中', '已结束'][vo.state]
+        },
+        {
+            title: "操作",
+            render: (row: OrderVO) => {
+                return (
+                    <a onClick={() => handleClickCancle(row)}>取消</a>
+                );
+            }
         }
 
     ];
