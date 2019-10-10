@@ -39,7 +39,7 @@ export class index extends Component<any, IState> {
     };
   }
 
-  componentWillMount() {
+  componentDidShow() {
     this.refreshGoodsWithSeller();
   }
 

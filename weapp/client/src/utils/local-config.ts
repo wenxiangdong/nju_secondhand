@@ -22,6 +22,8 @@ class LocalConfig {
   public readonly VISITED_GOODS_WITH_SELLER = 'nju.weapp.visited_goods_with_seller';
   public readonly VISITED_SIZE = 100;
 
+  private readonly READ_RULES = 'nju.weapp.read_rules';
+
   public isFirstUse(): boolean {
     return !Taro.getStorageSync(this.KEY);
   }
@@ -84,6 +86,13 @@ class LocalConfig {
 
   public getVisitedGoodsWithSeller(): GoodsWithSellerVO[] {
     return Taro.getStorageSync(this.VISITED_GOODS_WITH_SELLER) || [];
+  }
+
+  public hasReadRules(): boolean {
+    return !!Taro.getStorageSync(this.READ_RULES);
+  }
+  public setReadRules(readOrNot) {
+    this.setStorageSync(this.READ_RULES, readOrNot);
   }
 
   private removeGoodsWithSellerFronVisited(obj: GoodsWithSellerVO, arr: GoodsWithSellerVO[]): GoodsWithSellerVO[] {

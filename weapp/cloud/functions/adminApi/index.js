@@ -32,10 +32,23 @@ exports.main = async (event, context) => {
       condition:
         command.and(
           keyword ? command.or(
-            // 匹配描述
+            // 投诉人ID匹配
             {
-              desc: db.RegExp({
+              complainantID: db.RegExp({
                 regexp: keyword,
+                options: 'i'
+              })
+            },
+            // 投诉人昵称匹配
+            {
+              complainantName: db.RegExp({
+                regexp: keyword,
+                options: 'i'
+              })
+            },
+            //描述匹配
+            {
+              desc: db.RegExp({regexp: keyword,
                 options: 'i'
               })
             },
@@ -61,7 +74,8 @@ exports.main = async (event, context) => {
       name: complaintName,
       id: complaintID,
       data: {
-        handling: { time: Date.now(), result }
+        handling: { time: Date.now(), result },
+        state: ComplaintState.Handled
       }
     })
 
@@ -84,10 +98,16 @@ exports.main = async (event, context) => {
 
     ctx.body = await getPage({
       name: orderName,
-      ccondition: command.and(
+      condition: command.and(
         keyword ? command.or(
           {
-            goodsName: db.RegExp({
+            sellerName: db.RegExp({
+              regexp: keyword,
+              options: 'i'
+            })
+          },
+          {
+            buyerName: db.RegExp({
               regexp: keyword,
               options: 'i'
             })
@@ -181,7 +201,7 @@ exports.main = async (event, context) => {
     const { goodsID } = event
     const goods = await getOne({ name: goodsName, id: goodsID })
 
-    await updateOne({ name: goodsName, id: goodsID, data: { state: Deleted } });
+    await updateOne({ name: goodsName, id: goodsID, data: { state: GoodsState.Deleted } });
     await cloud.callFunction({
       name: userApi,
       data: {
@@ -190,6 +210,8 @@ exports.main = async (event, context) => {
         content: `您的商品 ${goods.goodsName} 已被下架，如有疑问请联系管理员`
       }
     })
+    // 加入清理计划
+    addToDeletePlan(goodsName, goodsID);
   })
 
   app.router('getUsers', async (ctx) => {
@@ -227,6 +249,76 @@ exports.main = async (event, context) => {
       name: goodsName,
       condition: { sellerID: userID, state: state === UserState.Frozen ? GoodsState.InSale : GoodsState.Frozen },
       data: { state: state === UserState.Frozen ? GoodsState.Frozen : GoodsState.InSale }
+    })
+  })
+
+  app.router('deleteOrder', async(ctx) => {
+    const {orderID} = event;
+    if (!orderID) {
+      throw new Error('orderID不能为空');
+    }
+
+    // get collections
+    const orderCollection = db.collection(orderName);
+    const goodsCollection = db.collection(goodsName);
+
+    // 查询订单
+    const orderDoc = orderCollection.doc(orderID);
+     /** @type {import('./index').OrderVO} */
+    let order;
+    try {
+      order = (await orderDoc.get()).data;
+    } catch (error) {
+      console.log(error);
+    }
+    if (!order) {
+      throw new Error('未找到订单');
+    }
+    // 查询商品
+    const {goodsID, sellerID, buyerID, deliveryTime} = order;
+    // 订单送达后不能再人工删除
+    if (deliveryTime !== -1) {
+      throw new Error('订单已送达，不能删除');
+    }
+    const goodsDoc =  goodsCollection.doc(goodsID);
+    /** @type {import('./index').GoodsVO} */ 
+    let goods;
+    try {
+      goods = (await goodsDoc.get()).data;
+    } catch (error) {
+      console.log(error);
+    }
+    if (!goods) {
+      throw new Error('商品未找到');
+    }
+    // 删除订单
+    const removeResult = await orderDoc.remove();
+    // 更新商品
+    /** @type {import('./index').GoodsVO} */
+    const goodsUpdateData = {
+      state: GoodsState.InSale, // 记得改成在售
+      num: command.inc(1),    // 防止并发
+    };
+    const updateResult = await goodsDoc.update({
+      data: goodsUpdateData,
+    });
+
+    // 发通知
+    cloud.callFunction({
+      name: userApi,
+      data: {
+        $url: 'sendNotification',
+        userID: order.sellerID,
+        content: `您的订单(编号：${order._id}，买家：${order.buyerName}，商品：${order.goodsName})已被取消，如有疑问请联系管理员`
+      }
+    });
+    cloud.callFunction({
+      name: userApi,
+      data: {
+        $url: 'sendNotification',
+        userID: order.buyerID,
+        content: `您的订单(编号：${order._id}，卖家：${order.sellerName}，商品：${order.goodsName})已被取消，如有疑问请联系管理员`
+      }
     })
   })
 
@@ -352,3 +444,20 @@ const HttpCode = {
   Conflict: 409, // 409 冲突
   Fail: 500 // 500
 }
+
+/**
+ * 加入清理计划
+ * @param {string} collectionName 
+ * @param {string} id 
+ */
+const addToDeletePlan = async (collectionName, id) => {
+  try {
+    const result = await cloud.callFunction("addToDeleteQueue", {
+      collectionName,
+      id
+    });
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+};

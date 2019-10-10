@@ -1,5 +1,5 @@
 import Taro, {Component} from '@tarojs/taro'
-import {View} from '@tarojs/components'
+import {Block, View} from '@tarojs/components'
 import {GoodsWithSellerVO, MockGoodsApi, PurchaseResult} from "../../../apis/GoodsApi";
 import urlList, {chatUrlConfig, resultUrlConfig} from "../../../utils/url-list";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
@@ -155,7 +155,7 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
     const atModalContent = `${name}\n￥${price}`;
 
     return (
-      <View>
+      <Block>
         <WhiteSpace height={50}/>
 
         {
@@ -180,7 +180,7 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
             <AtButton circle type='primary' customStyle={atButtonStyle} onClick={this.handleChat}>聊一聊</AtButton>
           </View>
         </View>
-      </View>
+      </Block>
     )
   }
 
@@ -197,7 +197,7 @@ export default class GoodsInfoBottomBar extends Component<IProp, IState> {
       zIndex: 200,
       position: 'fixed',
       left: '0',
-      bottom: '0'
+      bottom: '0',
     };
 
     return {

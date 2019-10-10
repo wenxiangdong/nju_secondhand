@@ -103,24 +103,14 @@ export default class index extends Component<any, IState> {
       }, relaunchTimeout);
     } else {
       console.log("用户已登陆");
-      if (!messageHub.socketOpen()) {
-        this.initSocket(userID);
+      if (!localConfig.hasReadRules()) {
+        Taro.navigateTo({url: urlList.MY_PLATFORM_RULES})
+          .then(() => {
+            localConfig.setReadRules(true);
+          });
       }
     }
   }
-
-  private initSocket = (userID) => {
-    const address = apiHub.configApi.getConfig(ConfigItem.SOCKET_ADDRESS);
-    console.log(address);
-    if (address) {
-      messageHub.initWebsocket(`${address}/${userID}`);
-    } else {
-      console.log("3s后重新连接socket");
-      setTimeout(() => {
-        this.initSocket(userID);
-      }, 3000);
-    }
-  };
 
   private onError = createSimpleErrorHandler('index', this);
 

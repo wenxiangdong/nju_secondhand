@@ -8,6 +8,7 @@ import "./index.scss";
 import { chatUrlConfig } from '../../utils/url-list';
 import {apiHub} from "../../apis/ApiHub";
 import {AtMessage} from "taro-ui";
+import avatarCache from '../../utils/avatar-cache';
 
 interface IState {
   conservationList: MessageVO[],
@@ -40,17 +41,19 @@ export class index extends Component<any, IState> {
 
   loadUserInfo() {
     // 加载列表的头像信息
-    const {conservationList, avatarMap} = this.state;
+    let {conservationList, avatarMap} = this.state;
+    Object.keys(avatarCache).forEach(key => avatarMap.set(key, avatarCache[key]));
+    this.setState({avatarMap});
     conservationList.forEach((msg: MessageVO) => {
       const userID = msg.senderID || msg.receiverID;
       if (!avatarMap.get(userID)) {
         apiHub.userApi.getUserInfo(userID)
           .then(res => {
             avatarMap.set(userID, res.avatar);
-            console.log(avatarMap);
+            avatarCache[userID] = res.avatar;
             this.setState({
               avatarMap: avatarMap
-            })
+            });
           });
       }
     })
