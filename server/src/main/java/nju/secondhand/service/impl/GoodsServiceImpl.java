@@ -3,7 +3,7 @@ package nju.secondhand.service.impl;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.service.GoodsService;
 import nju.secondhand.util.MapObjectUtil;
-import nju.secondhand.util.Pair;
+import nju.secondhand.util.entity.Pair;
 import nju.secondhand.vo.CategoryVO;
 import nju.secondhand.vo.GoodsVO;
 import nju.secondhand.vo.enums.ApiType;

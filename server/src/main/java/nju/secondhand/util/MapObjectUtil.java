@@ -1,8 +1,9 @@
 package nju.secondhand.util;
 
 import com.google.common.collect.ImmutableMap;
+import lombok.*;
 import lombok.experimental.UtilityClass;
-import lombok.var;
+import nju.secondhand.util.entity.Pair;
 
 /**
  * @author cst
@@ -13,10 +14,11 @@ public class MapObjectUtil {
         var object = ImmutableMap.builder();
 
         for (Pair pair : pairs) {
-            object = object.put(pair.key, pair.value);
+            object = object.put(pair.getKey(), pair.getValue());
         }
 
         return object.build();
     }
+
 }
 

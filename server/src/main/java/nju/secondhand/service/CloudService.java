@@ -9,9 +9,10 @@ public interface CloudService {
     /**
      * 调用云函数
      *
-     * @param tClass 返回对象类
-     * @param object 参数
-     * @param <T>    对象泛型
+     * @param tClass  返回对象类
+     * @param object  参数
+     * @param apiType API类型
+     * @param <T>     对象泛型
      * @return 调用云函数结果
      */
     <T> T invokeCloudFunction(Class<T> tClass, Object object, ApiType apiType);

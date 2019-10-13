@@ -3,7 +3,7 @@ package nju.secondhand.service.impl;
 import nju.secondhand.service.AdminService;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.util.MapObjectUtil;
-import nju.secondhand.util.Pair;
+import nju.secondhand.util.entity.Pair;
 import nju.secondhand.vo.enums.ApiType;
 import org.springframework.stereotype.Service;
 
@@ -26,4 +26,5 @@ public class AdminServiceImpl implements AdminService {
                 Pair.of("password", password)
         ), ApiType.ADMIN_API);
     }
+
 }
