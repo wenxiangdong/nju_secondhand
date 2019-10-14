@@ -3,116 +3,83 @@ package nju.secondhand.util;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
-import lombok.val;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.apache.commons.lang3.StringUtils;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map.Entry;
 
 /**
  * @author cst
  */
 @UtilityClass
 public class XmlUtil {
-    private static final String TAG = "xml";
-    private static final String START = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
-    private static final int START_INDEX = START.length();
+    private static final String PREFIX_XML = "<xml>";
 
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    public String toXml(Object object) {
-        Document document = DocumentBuilderFactory
-                .newInstance()
-                .newDocumentBuilder()
-                .newDocument();
+    private static final String SUFFIX_XML = "</xml>";
 
-        Element root = document.createElement(TAG);
+    private static final String PREFIX_CDATA = "<![CDATA[";
 
-        Class objectClass = object.getClass();
+    private static final String SUFFIX_CDATA = "]]>";
 
-        Field[] fields = objectClass.getDeclaredFields();
-        for (Field field : fields) {
-            String fieldName = field.getName();
-            Element child = document.createElement(fieldName);
-            child.setTextContent(
-                    String.valueOf(field.isAccessible() ?
-                            field.get(object) : objectClass.getMethod(getFieldGetName(fieldName)).invoke(object)));
-            root.appendChild(child);
-        }
-
-        document.appendChild(root);
-
-        Transformer transformer = TransformerFactory
-                .newInstance()
-                .newTransformer();
-
-        DOMSource source = new DOMSource(document);
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        @Cleanup StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        transformer.transform(source, result);
-        String realXml = writer.getBuffer().toString();
-        return realXml.substring(START_INDEX);
-    }
-
-    @SneakyThrows
-    public <T> T fromXml(String xml, Class<T> tClass) {
-        xml = START + xml;
-
-        @Cleanup val inputStream = new ByteArrayInputStream(xml.getBytes());
-
-        Document document = DocumentBuilderFactory
-                .newInstance()
-                .newDocumentBuilder()
-                .parse(inputStream);
-
-        Map<String, Object> xmlMap = new ConcurrentHashMap<>(2);
-
-        Element root = document.getDocumentElement();
-        NodeList nodeList = root.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node child = nodeList.item(i);
-            xmlMap.put(child.getNodeName(), child.getTextContent());
-        }
-
-        Constructor<T> constructor = tClass.getConstructor();
-        T object = constructor.newInstance();
-        Field[] fields = tClass.getDeclaredFields();
-        for (Field field : fields) {
-            String fieldName = field.getName();
-            Class type = field.getType();
-            if (xmlMap.containsKey(fieldName)) {
-                Object value = xmlMap.get(fieldName);
-                if (field.isAccessible()) {
-                    field.set(object, value);
+    public String xmlFormat(Map<String, String> params, boolean isAddCDATA) {
+        StringBuilder builder = new StringBuilder(PREFIX_XML);
+        if (!params.isEmpty()) {
+            for (Entry<String, String> entry : params.entrySet()) {
+                builder.append("<").append(entry.getKey()).append(">");
+                if (isAddCDATA) {
+                    builder.append(PREFIX_CDATA);
+                    if (StringUtils.isNotEmpty(entry.getValue())) {
+                        builder.append(entry.getValue());
+                    }
+                    builder.append(SUFFIX_CDATA);
                 } else {
-                    Method setMethod = tClass.getMethod(getFieldSetName(fieldName), type);
-                    setMethod.invoke(object, value);
+                    if (StringUtils.isNotEmpty(entry.getValue())) {
+                        builder.append(entry.getValue());
+                    }
                 }
+                builder.append("</").append(entry.getKey()).append(">");
             }
         }
-        return object;
+        return builder.append(SUFFIX_XML).toString();
     }
 
-    private String getFieldSetName(String fieldName) {
-        return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    }
+    @SneakyThrows
+    public Map<String, String> xmlParse(String xml) {
+        Map<String, String> map = null;
+        if (StringUtils.isNotEmpty(xml)) {
+            @Cleanup InputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+            XmlPullParser pullParser = XmlPullParserFactory
+                    .newInstance()
+                    .newPullParser();
+            // 为xml设置要解析的xml数据
+            pullParser.setInput(inputStream, "UTF-8");
+            int eventType = pullParser.getEventType();
 
-    private String getFieldGetName(String fieldName) {
-        return "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
+                    case XmlPullParser.START_DOCUMENT:
+                        map = new HashMap<>();
+                        break;
+                    case XmlPullParser.START_TAG:
+                        String key = pullParser.getName();
+                        if ("xml".equals(key)) {
+                            break;
+                        }
+                        String value = pullParser.nextText().trim();
+                        map.put(key, value);
+                        break;
+                    case XmlPullParser.END_TAG:
+                        break;
+                    default:
+                }
+                eventType = pullParser.next();
+            }
+        }
+        return map;
     }
 }

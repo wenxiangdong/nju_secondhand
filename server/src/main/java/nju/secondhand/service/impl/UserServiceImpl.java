@@ -3,10 +3,10 @@ package nju.secondhand.service.impl;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.service.UserService;
 import nju.secondhand.util.MapObjectUtil;
-import nju.secondhand.util.entity.Pair;
 import nju.secondhand.vo.UserVO;
 import nju.secondhand.vo.enums.ApiType;
 import nju.secondhand.vo.enums.UserState;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,18 +46,18 @@ public class UserServiceImpl implements UserService {
 
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
-                Pair.of("$url", "getUsers"),
-                Pair.of("state", userState.getValue()),
-                Pair.of("keyword", keyword),
-                Pair.of("lastIndex", lastIndex),
-                Pair.of("size", size)), ApiType.ADMIN_API);
+                new BasicNameValuePair("$url", "getUsers"),
+                new BasicNameValuePair("state", String.valueOf(userState.getValue())),
+                new BasicNameValuePair("keyword", keyword),
+                new BasicNameValuePair("lastIndex", String.valueOf(lastIndex)),
+                new BasicNameValuePair("size", String.valueOf(size))), ApiType.ADMIN_API);
     }
 
     private void updateUser(UserState userState, String userID) {
         cloudService.invokeCloudFunction(Void.class, MapObjectUtil.mapObject(
-                Pair.of("$url", "updateUser"),
-                Pair.of("userID", userID),
-                Pair.of("state", userState.getValue())
+                new BasicNameValuePair("$url", "updateUser"),
+                new BasicNameValuePair("userID", userID),
+                new BasicNameValuePair("state", String.valueOf(userState.getValue()))
         ), ApiType.ADMIN_API);
     }
 }
