@@ -1,9 +1,32 @@
 .address-show-bar-view {
-  border:thin solid transparent;
-  border-bottom-color: lightgray;
   width: 90vw;
   max-width: 100%;
   padding:5px;
   margin:5px;
   font-size:small;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .left-view {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+
+    .address-name {
+      display: inline-block;
+      width: 40vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .right-view {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+  }
+
 }
