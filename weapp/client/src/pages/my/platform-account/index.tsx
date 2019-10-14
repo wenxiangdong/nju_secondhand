@@ -4,12 +4,11 @@ import LoadingPage from "../../../components/common/loading-page";
 import localConfig from "../../../utils/local-config";
 import {apiHub} from "../../../apis/ApiHub";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
-import {AtButton, AtCard, AtMessage} from "taro-ui";
+import {AtButton, AtCard, AtMessage, AtNoticebar} from "taro-ui";
 import {MockUserApi, UserVO} from "../../../apis/UserApi";
 import urlList from "../../../utils/url-list";
 import ConfirmModal from "../../../components/common/confirm-modal";
 import {relaunchTimeout} from "../../../utils/date-util";
-import {use} from "ast-types";
 
 interface IState {
   loading: boolean,
@@ -75,9 +74,10 @@ export class index extends Component<any, IState> {
       this.onNotLogin();
       return;
     }
-    if (!parseFloat(user.account.balance)) {
+    const balance = parseFloat(user.account.balance);
+    if (balance < 1) {
       Taro.atMessage({
-        message: "当前账户资金为0，不能提现",
+        message: "余额一元以上才可以提现哦",
         type: "error"
       });
       return;
@@ -94,7 +94,9 @@ export class index extends Component<any, IState> {
     this.setState({withdrawLoading: true}, function() {
       const {user} = that.state;
       if (user) {
-        apiHub.accountApi.withdraw(user.account.balance)
+        const balance = parseFloat(user.account.balance);
+        const balanceByCent = Math.ceil(100 * balance);
+        apiHub.accountApi.withdraw(String(balanceByCent))
           .then(function () {
             const sucMsg = '提现完成';
             that.setState({sucMsg, withdrawLoading: false}, function () {
@@ -137,6 +139,9 @@ export class index extends Component<any, IState> {
       )
       : (
         <View>
+          <AtNoticebar customStyle={{marginBottom: '0.5rem'}}>
+            余额在 一元 以上才可以提现哦
+          </AtNoticebar>
 
           {
             isWithdrawing
