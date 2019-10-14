@@ -61,7 +61,6 @@ export default class index extends Component<any, IState> {
   }
 
   private getSwiperSrcs = async function(): Promise<string[]> {
-    //  TODO 优先级 低 获取 swiperSrcs
     await configApi.syncFromCloud();
     return apiHub.configApi.getConfig(ConfigItem.ACTIVITY_PICTURES);
   };
@@ -104,10 +103,8 @@ export default class index extends Component<any, IState> {
     } else {
       console.log("用户已登陆");
       if (!localConfig.hasReadRules()) {
-        Taro.navigateTo({url: urlList.MY_PLATFORM_RULES})
-          .then(() => {
-            localConfig.setReadRules(true);
-          });
+        localConfig.setReadRules(true);
+        Taro.navigateTo({url: urlList.MY_PLATFORM_RULES}).catch(this.onError);
       }
     }
   }
