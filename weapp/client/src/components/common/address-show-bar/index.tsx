@@ -3,7 +3,6 @@ import {View, Text} from '@tarojs/components'
 import {Location, MockUserApi} from "../../../apis/UserApi";
 import {AtIcon} from "taro-ui";
 
-import "taro-ui/dist/style/components/flex.scss";
 import "./index.scss"
 import {locationUrlConfig} from "../../../utils/url-list";
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
@@ -31,12 +30,12 @@ function AddressShowBar(props: IProp) {
   const {name} = address;
 
   return (
-    <View className='at-row at-row__justify--between address-show-bar-view' onClick={onClick}>
-      <View className='at-col at-col-7 at-col--wrap'>
-        <AtIcon value={'map-pin'} size={30} />
-        <Text>{name}</Text>
+    <View className='address-show-bar-view' onClick={onClick}>
+      <View className='left-view'>
+        <AtIcon value='map-pin' size={30} />
+        <Text className='address-name'>{name}</Text>
       </View>
-      <View className='at-col at-col-4' style={{textAlign: 'right'}}>
+      <View className='right-view'>
         <Text>查看位置</Text>
         <AtIcon value={'chevron-right'} size={30} />
       </View>
