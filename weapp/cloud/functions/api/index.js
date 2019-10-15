@@ -874,7 +874,7 @@ const readNotifications = async ({ notificationIDs }) => {
 const withdraw = async ({ openID = "", amount = 0 }) => {
   // 转换
   // amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
-  const response = await axios.default.post('/transfer', {
+  const response = await axios.default.post('/transfers', {
     openID,
     amount,
   });
