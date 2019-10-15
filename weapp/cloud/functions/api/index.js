@@ -4,7 +4,8 @@ const TcbRouter = require('tcb-router')
 const fs = require("fs");
 const Tenpay = require("tenpay");
 const { LitePay, utils, Bank } = require("@sigodenjs/wechatpay");
-const BigNumber = require('bignumber.js')
+const BigNumber = require('bignumber.js');
+const axios = require('axios');
 
 cloud.init()
 
@@ -846,27 +847,52 @@ const readNotifications = async ({ notificationIDs }) => {
 }
 
 /** account */
+// const withdraw = async ({ openID = "", amount = 0 }) => {
+//   // console.log(TENPAY_CONFIG);
+//   const tenpay = new Tenpay(TENPAY_CONFIG, true);
+//   // 转换成分
+//   amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
+//   try {
+//     const info = {
+//       // todo 转账
+//       partner_trade_no: `${openID.substring(0, 10)}${+ new Date()}`,
+//       openid: openID,
+//       check_name: 'NO_CHECK',
+//       amount: amount,
+//       desc: '南大小书童提现'
+//     };
+//     // console.log(info);
+//     await tenpay.transfers(info);
+//   } catch (error) {
+//     console.error(error);
+//     throw {
+//       code: HttpCode.Fail,
+//       message: "提现出错，若账户出现问题，请联系客服或填写投诉单"
+//     }
+//   }
+// }
 const withdraw = async ({ openID = "", amount = 0 }) => {
-  // console.log(TENPAY_CONFIG);
-  const tenpay = new Tenpay(TENPAY_CONFIG, true);
-  // 转换成分
-  amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
-  try {
-    const info = {
-      // todo 转账
-      partner_trade_no: `${openID.substring(0, 10)}${+ new Date()}`,
-      openid: openID,
-      check_name: 'NO_CHECK',
-      amount: amount,
-      desc: '南大小书童提现'
-    };
-    // console.log(info);
-    await tenpay.transfers(info);
-  } catch (error) {
-    console.error(error);
+  // 转换
+  // amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
+  const response = await axios.default.post('/transfers', {
+    openID,
+    amount,
+  });
+  console.log(response);
+  if (response.status !== 200) {
     throw {
       code: HttpCode.Fail,
-      message: "提现出错，若账户出现问题，请联系客服或填写投诉单"
+      message: "服务器网络出错"
+    }
+  } else {
+    const {code} = response.data;
+    if (code !== HttpCode.Success) {
+      throw {
+        code: HttpCode.Fail,
+        message: "提现失败，如出现资金异常，请联系管理员",
+      }
+    } else {
+      return;
     }
   }
 }

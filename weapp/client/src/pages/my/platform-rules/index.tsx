@@ -26,8 +26,8 @@ function PlatformRules() {
       <View className='at-article__content'>
         <View className='at-article__section'>
           {
-            info.rules.map((rule) => (
-              <View className='at-article__p'>
+            info.rules.map((rule, index) => (
+              <View key={index} className='at-article__p'>
                 <Text>{rule}</Text>
               </View>
             ))

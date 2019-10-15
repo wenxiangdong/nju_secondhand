@@ -7,6 +7,8 @@ import LoadingPage from "../../../components/common/loading-page";
 import ConfirmModal from "../../../components/common/confirm-modal";
 import SoldGoodsCard from "../../../components/my/sold-goods-card";
 import {relaunchTimeout} from "../../../utils/date-util";
+import {AtLoadMore, AtTabsPane} from "taro-ui";
+import {StyleHelper} from "../../../styles/style-helper";
 
 interface IState {
   loading: boolean,
@@ -122,6 +124,11 @@ export default class index extends Component<any, IState> {
           }
 
           {goodsArr.map((g, idx) => <SoldGoodsCard key={idx} goods={g} onDeleteGoods={() => this.onDeleteGoods(idx)}/>)}
+          {
+            goodsArr.length
+              ? null
+              : (<AtLoadMore status='noMore'/>)
+          }
 
         </View>
       );
