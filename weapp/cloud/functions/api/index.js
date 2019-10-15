@@ -14,6 +14,7 @@ const command = db.command
 
 // 云函数入口函数
 exports.main = async (event, context) => {
+  console.log(event);
   const app = new TcbRouter({
     event
   })
@@ -404,7 +405,7 @@ exports.main = async (event, context) => {
     const { account = {} } = self || {};
     let { balance = 0 } = account;
     amount = BigNumber(amount);
-    balance = BigNumber(balance);
+    balance = BigNumber(balance).multipliedBy(100).integerValue();
     if (balance.toNumber() < amount.toNumber()) {
       ctx.body = {
         code: HttpCode.Fail,
@@ -420,6 +421,7 @@ exports.main = async (event, context) => {
         amount: amount.toNumber()
       });
     } catch (error) {
+      console.log(error);
       ctx.body = error;
       return;
     }
@@ -874,9 +876,14 @@ const readNotifications = async ({ notificationIDs }) => {
 const withdraw = async ({ openID = "", amount = 0 }) => {
   // 转换
   // amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
-  const response = await axios.default.post('/transfers', {
-    openID,
-    amount,
+  const response = await axios.default.request({
+    url: '/transfers',
+    baseURL: 'http://106.13.165.249/nju_secondhand_server',
+    params: {
+      openid: openID,
+      amount
+    },
+    method: 'POST',
   });
   console.log(response);
   if (response.status !== 200) {
