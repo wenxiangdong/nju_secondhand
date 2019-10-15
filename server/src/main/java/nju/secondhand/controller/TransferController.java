@@ -2,7 +2,7 @@ package nju.secondhand.controller;
 
 import nju.secondhand.response.HttpResponse;
 import nju.secondhand.service.TransferService;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -16,7 +16,7 @@ public class TransferController {
         this.transferService = transferService;
     }
 
-    @RequestMapping("/transfers")
+    @PostMapping("/transfers")
     public HttpResponse<Void> transfers(String openid, int amount) {
         transferService.transfers(openid, amount);
         return new HttpResponse<>();

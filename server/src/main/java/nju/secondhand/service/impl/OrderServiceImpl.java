@@ -5,7 +5,7 @@ import nju.secondhand.service.OrderService;
 import nju.secondhand.util.MapObjectUtil;
 import nju.secondhand.vo.OrderVO;
 import nju.secondhand.vo.enums.ApiType;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,17 +26,17 @@ public class OrderServiceImpl implements OrderService {
 
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
-                new BasicNameValuePair("$url", "getOrders"),
-                new BasicNameValuePair("keyword", keyword),
-                new BasicNameValuePair("lastIndex", String.valueOf(lastIndex)),
-                new BasicNameValuePair("size", String.valueOf(size))),
+                Pair.of("$url", "getOrders"),
+                Pair.of("keyword", keyword),
+                Pair.of("lastIndex", lastIndex),
+                Pair.of("size", size)),
                 ApiType.ADMIN_API);
     }
 
     @Override
     public void deleteOrder(String orderID) {
         cloudService.invokeCloudFunction(Void.class, MapObjectUtil.mapObject(
-                new BasicNameValuePair("$url", "deleteOrder"),
-                new BasicNameValuePair("orderID", orderID)), ApiType.ADMIN_API);
+                Pair.of("$url", "deleteOrder"),
+                Pair.of("orderID", orderID)), ApiType.ADMIN_API);
     }
 }

@@ -6,7 +6,7 @@ import nju.secondhand.util.MapObjectUtil;
 import nju.secondhand.vo.CategoryVO;
 import nju.secondhand.vo.GoodsVO;
 import nju.secondhand.vo.enums.ApiType;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,17 +26,17 @@ public class GoodsServiceImpl implements GoodsService {
     public List<CategoryVO> getCategories() {
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
-                new BasicNameValuePair("$url", "getCategories")), ApiType.ADMIN_API);
+                Pair.of("$url", "getCategories")), ApiType.ADMIN_API);
     }
 
     @Override
     public List<GoodsVO> getGoodsByKeyword(String keyword, int lastIndex, int size) {
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
-                new BasicNameValuePair("$url", "searchGoodsByKeyword"),
-                new BasicNameValuePair("keyword", keyword),
-                new BasicNameValuePair("lastIndex", String.valueOf(lastIndex)),
-                new BasicNameValuePair("size", String.valueOf(size))
+                Pair.of("$url", "searchGoodsByKeyword"),
+                Pair.of("keyword", keyword),
+                Pair.of("lastIndex", lastIndex),
+                Pair.of("size", size)
         ), ApiType.ADMIN_API);
     }
 
@@ -44,18 +44,18 @@ public class GoodsServiceImpl implements GoodsService {
     public List<GoodsVO> getGoodsByCategory(String categoryID, int lastIndex, int size) {
         //noinspection unchecked
         return cloudService.invokeCloudFunction(List.class, MapObjectUtil.mapObject(
-                new BasicNameValuePair("$url", "searchGoodsByCategory"),
-                new BasicNameValuePair("categoryID", categoryID),
-                new BasicNameValuePair("lastIndex", String.valueOf(lastIndex)),
-                new BasicNameValuePair("size", String.valueOf(size))
+                Pair.of("$url", "searchGoodsByCategory"),
+                Pair.of("categoryID", categoryID),
+                Pair.of("lastIndex", lastIndex),
+                Pair.of("size", size)
         ), ApiType.ADMIN_API);
     }
 
     @Override
     public void deleteGoods(String goodsID) {
         cloudService.invokeCloudFunction(Void.class, MapObjectUtil.mapObject(
-                new BasicNameValuePair("$url", "deleteGoods"),
-                new BasicNameValuePair("goodsID", goodsID)
+                Pair.of("$url", "deleteGoods"),
+                Pair.of("goodsID", goodsID)
         ), ApiType.ADMIN_API);
     }
 }

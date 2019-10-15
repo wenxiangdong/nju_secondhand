@@ -4,7 +4,7 @@ import nju.secondhand.service.AdminService;
 import nju.secondhand.service.CloudService;
 import nju.secondhand.util.MapObjectUtil;
 import nju.secondhand.vo.enums.ApiType;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,9 +21,9 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public boolean existsUsernameAndPassword(String username, String password) {
         return cloudService.invokeCloudFunction(Boolean.class, MapObjectUtil.mapObject(
-                new BasicNameValuePair("$url", "checkAdmin"),
-                new BasicNameValuePair("username", username),
-                new BasicNameValuePair("password", password)
+                Pair.of("$url", "checkAdmin"),
+                Pair.of("username", username),
+                Pair.of("password", password)
         ), ApiType.ADMIN_API);
     }
 
