@@ -134,5 +134,5 @@ export default class index extends Component<any, IState> {
       );
   }
 
-  private onError = createSimpleErrorHandler('mySold', this);
+  private onError = createSimpleErrorHandler('myPublish', this);
 }

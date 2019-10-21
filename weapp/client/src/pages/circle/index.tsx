@@ -9,6 +9,7 @@ import {StyleHelper} from "../../styles/style-helper";
 import PostCard from "../../components/circle/post-card/PostCard";
 import urlList from "../../utils/url-list";
 import MainTabBar from "../../components/common/main-tab-bar";
+import checkLogin from "../../utils/check-login";
 
 interface IState {
   errMsg?: string,
@@ -42,7 +43,9 @@ export default class index extends Component<any, IState> {
   }
 
   componentDidShow() {
-    this.setState({ posts: [] }, this.loadMorePosts);
+    checkLogin(this.onError, () => {
+      this.setState({ posts: [] }, this.loadMorePosts);
+    });
   }
 
   private loadMorePosts = () => {

@@ -9,6 +9,8 @@ import { chatUrlConfig } from '../../utils/url-list';
 import {apiHub} from "../../apis/ApiHub";
 import {AtMessage} from "taro-ui";
 import avatarCache from '../../utils/avatar-cache';
+import checkLogin from "../../utils/check-login";
+import {createSimpleErrorHandler} from "../../utils/function-factory";
 
 interface IState {
   conservationList: MessageVO[],
@@ -31,13 +33,17 @@ export class index extends Component<any, IState> {
   };
 
   componentDidShow() {
-    const list = messageHub.getLastMessageList();
-    this.setState({
-      conservationList: [...list]
-    }, () => {
-      this.loadUserInfo()
+    checkLogin(this.onError, () => {
+      const list = messageHub.getLastMessageList();
+      this.setState({
+        conservationList: [...list]
+      }, () => {
+        this.loadUserInfo()
+      });
     });
   }
+
+  private onError = createSimpleErrorHandler('message', this);
 
   loadUserInfo() {
     // 加载列表的头像信息
