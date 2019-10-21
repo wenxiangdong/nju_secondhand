@@ -1,0 +1,11 @@
+wechat:
+  transfersUrl: https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers
+mini-program:
+  appId: wxc4e156082fbd97ba
+  appSecret: 08c5dba9b8e3f52eded6f4c9a0ad4650
+  env: dev-mecmb
+  mchid: 1521513131
+  check_name: NO_CHECK
+  app_key: NanjingdunshudianzishangwuYXXL18
+  transfers_desc: 南大小书童提现
+  ip: 127.0.0.1

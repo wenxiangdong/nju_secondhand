@@ -4,7 +4,8 @@ const TcbRouter = require('tcb-router')
 const fs = require("fs");
 const Tenpay = require("tenpay");
 const { LitePay, utils, Bank } = require("@sigodenjs/wechatpay");
-const BigNumber = require('bignumber.js')
+const BigNumber = require('bignumber.js');
+const axios = require('axios');
 
 cloud.init()
 
@@ -13,6 +14,7 @@ const command = db.command
 
 // 云函数入口函数
 exports.main = async (event, context) => {
+  console.log(event);
   const app = new TcbRouter({
     event
   })
@@ -403,7 +405,7 @@ exports.main = async (event, context) => {
     const { account = {} } = self || {};
     let { balance = 0 } = account;
     amount = BigNumber(amount);
-    balance = BigNumber(balance);
+    balance = BigNumber(balance).multipliedBy(100).integerValue();
     if (balance.toNumber() < amount.toNumber()) {
       ctx.body = {
         code: HttpCode.Fail,
@@ -419,6 +421,7 @@ exports.main = async (event, context) => {
         amount: amount.toNumber()
       });
     } catch (error) {
+      console.log(error);
       ctx.body = error;
       return;
     }
@@ -459,16 +462,27 @@ exports.main = async (event, context) => {
       let user = await getOneUser({ userID: order.sellerID });
       console.log(user);
       if (user) {
+        // 以元为单位
         let amount = BigNumber(order.goodsPrice)
-        let tax = amount.multipliedBy(0.01)
+
+        // 税款（取1.5%，进1保留2位小数）
+        let tax = amount.multipliedBy(0.015)
+
+        tax = tax.dp(2, BigNumber.ROUND_CEIL)
+
+        // 定义最低税款
         const minTax = BigNumber(0.01)
+
         if (tax < minTax) {
           tax = minTax
         }
         if (tax > amount) {
           tax = amount
         }
+
+        // 减去税款，即为所得
         amount = amount.minus(tax)
+
         const balance = BigNumber(user.account.balance).plus(amount).toFixed(2);
         // user.account.balance = balance;
         // delete user._id;
@@ -846,27 +860,57 @@ const readNotifications = async ({ notificationIDs }) => {
 }
 
 /** account */
+// const withdraw = async ({ openID = "", amount = 0 }) => {
+//   // console.log(TENPAY_CONFIG);
+//   const tenpay = new Tenpay(TENPAY_CONFIG, true);
+//   // 转换成分
+//   amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
+//   try {
+//     const info = {
+//       // todo 转账
+//       partner_trade_no: `${openID.substring(0, 10)}${+ new Date()}`,
+//       openid: openID,
+//       check_name: 'NO_CHECK',
+//       amount: amount,
+//       desc: '南大小书童提现'
+//     };
+//     // console.log(info);
+//     await tenpay.transfers(info);
+//   } catch (error) {
+//     console.error(error);
+//     throw {
+//       code: HttpCode.Fail,
+//       message: "提现出错，若账户出现问题，请联系客服或填写投诉单"
+//     }
+//   }
+// }
 const withdraw = async ({ openID = "", amount = 0 }) => {
-  // console.log(TENPAY_CONFIG);
-  const tenpay = new Tenpay(TENPAY_CONFIG, true);
-  // 转换成分
-  amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
-  try {
-    const info = {
-      // todo 转账
-      partner_trade_no: `${openID.substring(0, 10)}${+ new Date()}`,
+  // 转换
+  // amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
+  const response = await axios.default.request({
+    url: '/transfers',
+    baseURL: 'http://106.13.165.249/nju_secondhand_server',
+    params: {
       openid: openID,
-      check_name: 'NO_CHECK',
-      amount: amount,
-      desc: '南大小书童提现'
-    };
-    // console.log(info);
-    await tenpay.transfers(info);
-  } catch (error) {
-    console.error(error);
+      amount
+    },
+    method: 'POST',
+  });
+  console.log(response);
+  if (response.status !== 200) {
     throw {
       code: HttpCode.Fail,
-      message: "提现出错，若账户出现问题，请联系客服或填写投诉单"
+      message: "服务器网络出错"
+    }
+  } else {
+    const {code} = response.data;
+    if (code !== HttpCode.Success) {
+      throw {
+        code: HttpCode.Fail,
+        message: "提现失败，如出现资金异常，请联系管理员",
+      }
+    } else {
+      return;
     }
   }
 }

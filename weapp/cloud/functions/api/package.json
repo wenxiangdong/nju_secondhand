@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@sigodenjs/wechatpay": "^2.1.1",
+    "axios": "^0.19.0",
     "bignumber.js": "^9.0.0",
     "tcb-router": "latest",
     "tenpay": "^2.1.18",
