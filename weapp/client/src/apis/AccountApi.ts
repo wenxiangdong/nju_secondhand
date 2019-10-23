@@ -5,19 +5,19 @@ import {createRandomNumberStr} from "./Util";
 
 export interface IAccountApi {
   // 取款
-  withdraw(amount: String): Promise<void>;
+  withdraw(amount: number): Promise<void>;
 }
 
 const functionName = 'api'
 
 class AccountApi implements IAccountApi {
-  async withdraw(amount: String): Promise<void> {
+  async withdraw(amount: number): Promise<void> {
     return await httpRequest.callFunction<void>(functionName, { $url: "withdraw", amount });
   }
 }
 
 class MockAccountApi implements IAccountApi {
-  withdraw(amount: String): Promise<void> {
+  withdraw(amount: number): Promise<void> {
     console.log(`withdraw success ${amount}`);
     return mockHttpRequest.success();
   }

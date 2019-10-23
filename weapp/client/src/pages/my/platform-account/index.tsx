@@ -96,7 +96,7 @@ export class index extends Component<any, IState> {
       if (user) {
         const balance = parseFloat(user.account.balance);
         const balanceByCent = Math.ceil(100 * balance);
-        apiHub.accountApi.withdraw(String(balanceByCent))
+        apiHub.accountApi.withdraw(balanceByCent)
           .then(function () {
             const sucMsg = '提现完成';
             that.setState({sucMsg, withdrawLoading: false}, function () {

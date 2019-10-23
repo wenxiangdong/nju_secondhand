@@ -876,24 +876,26 @@ const readNotifications = async ({ notificationIDs }) => {
 const withdraw = async ({ openID = "", amount = 0 }) => {
   // 转换
   // amount = BigNumber(amount).multipliedBy(100).integerValue().toNumber();
+  console.log(openID, amount);
   const response = await axios.default.request({
     url: '/transfers',
     baseURL: 'http://106.13.165.249/nju_secondhand_server',
+    withCredentials: true,
     params: {
       openid: openID,
       amount
     },
     method: 'POST',
   });
-  console.log(response);
   if (response.status !== 200) {
     throw {
       code: HttpCode.Fail,
       message: "服务器网络出错"
     }
   } else {
-    const {code} = response.data;
+    const {code, message} = response.data;
     if (code !== HttpCode.Success) {
+      console.log(message);
       throw {
         code: HttpCode.Fail,
         message: "提现失败，如出现资金异常，请联系管理员",
