@@ -14,8 +14,7 @@ import urlList, {indexSearchUrlConfig} from "../../utils/url-list";
 import LoadingPage from "../../components/common/loading-page";
 import {apiHub} from "../../apis/ApiHub";
 import configApi, {ConfigItem} from "../../apis/Config";
-import {relaunchTimeout} from "../../utils/date-util";
-import messageHub from "../../apis/MessageApi";
+import checkLogin from "../../utils/check-login";
 
 interface IState {
   searchValue: string,
@@ -46,7 +45,6 @@ export default class index extends Component<any, IState> {
   }
 
   componentWillMount() {
-    this.checkLogin();
     Promise.all([
       this.getSwiperSrcs(),
       this.getCategories()
@@ -54,10 +52,6 @@ export default class index extends Component<any, IState> {
       .then(value => this.setState({swiperSrcs: value[0], categories: value[1], loading: false}))
       .catch(this.onError);
 
-  }
-
-  componentDidShow(): void {
-    this.checkLogin();
   }
 
   private getSwiperSrcs = async function(): Promise<string[]> {
@@ -90,24 +84,6 @@ export default class index extends Component<any, IState> {
     Taro.navigateTo({url: urlList.INDEX_CATEGORY_GOODS})
       .catch(this.onError);
   };
-
-  checkLogin() {
-    const userID = localConfig.getUserId();
-    if (!userID) {
-      this.onError(new Error("请先登陆"));
-      setTimeout(() => {
-        Taro.reLaunch({
-          url: urlList.LOGIN
-        }).catch(this.onError);
-      }, relaunchTimeout);
-    } else {
-      console.log("用户已登陆");
-      if (!localConfig.hasReadRules()) {
-        localConfig.setReadRules(true);
-        Taro.navigateTo({url: urlList.MY_PLATFORM_RULES}).catch(this.onError);
-      }
-    }
-  }
 
   private onError = createSimpleErrorHandler('index', this);
 

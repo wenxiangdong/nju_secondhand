@@ -60,5 +60,5 @@ export default class index extends Component<any, IState> {
       );
   }
 
-  private onError = createSimpleErrorHandler('Buy', this);
+  private onError = createSimpleErrorHandler('Location', this);
 }

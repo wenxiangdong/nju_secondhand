@@ -19,7 +19,7 @@ interface IProp {
 function AddressShowBar(props: IProp) {
   const {address = MockUserApi.createMockLocation()} = props;
 
-  const onError = createSimpleErrorHandler('GoodsInfoBottomBar', undefined);
+  const onError = createSimpleErrorHandler('AddressShowBar', undefined);
 
   const onClick = function () {
     Taro.navigateTo({

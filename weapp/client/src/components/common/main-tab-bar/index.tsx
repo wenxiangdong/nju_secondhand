@@ -6,6 +6,7 @@ import SelectPublish from './select-publish'
 import {createSimpleErrorHandler} from "../../../utils/function-factory";
 import WhiteSpace from "../white-space";
 import urlList from "../../../utils/url-list";
+import checkLogin from "../../../utils/check-login";
 
 interface IProp {
   currentIndex: number
@@ -16,7 +17,6 @@ interface IState {
 
 /**
  * 参考 pl 代码重构的 TabBar 组件
- * TODO 优先级 低 加一个贴图把中间的发布遮住做出原型图的效果
  * @create 2019/7/25 16:39
  */
 export default class MainTabBar extends Component<IProp, IState> {
@@ -69,7 +69,9 @@ export default class MainTabBar extends Component<IProp, IState> {
     if (index !== this.props.currentIndex) {
       if (index === MainTabBar.PUBLISH_INDEX) {
         console.info('MainTabBar onTabClicked select publish');
-        this.setState({selectingPublish: true});
+        checkLogin(this.onError, () => {
+          this.setState({selectingPublish: true});
+        });
       } else {
         const url = MainTabBar.TAB_BAR_LIST[index].page;
         console.info(`MainTabBar onTabClicked index: ${index} url: `, url);

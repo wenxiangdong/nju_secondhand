@@ -10,6 +10,7 @@ import LoadingPage from "../../../components/common/loading-page";
 import GoodsInfoCard from "../../../components/index/goods-info-card";
 import GoodsInfoBottomBar from "../../../components/index/goods-info-bottom-bar";
 import localConfig from "../../../utils/local-config";
+import checkLogin from "../../../utils/check-login";
 const regeneratorRuntime = require("../../../lib/async");
 
 interface IState {
@@ -40,7 +41,7 @@ export class index extends Component<any, IState> {
   }
 
   componentDidShow() {
-    this.refreshGoodsWithSeller();
+    checkLogin(this.onError, this.refreshGoodsWithSeller);
   }
 
   private refreshGoodsWithSeller = () => {
@@ -110,5 +111,5 @@ export class index extends Component<any, IState> {
     )
   }
 
-  private onError = createSimpleErrorHandler('SearchResult', this);
+  private onError = createSimpleErrorHandler('GoodsInfo', this);
 }

@@ -326,5 +326,5 @@ export default class index extends Component<any, IState> {
     )
   }
 
-  private onError = createSimpleErrorHandler('userInfo', this);
+  private onError = createSimpleErrorHandler('Register', this);
 }

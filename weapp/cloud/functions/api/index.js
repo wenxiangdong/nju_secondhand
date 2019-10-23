@@ -462,16 +462,27 @@ exports.main = async (event, context) => {
       let user = await getOneUser({ userID: order.sellerID });
       console.log(user);
       if (user) {
+        // 以元为单位
         let amount = BigNumber(order.goodsPrice)
-        let tax = amount.multipliedBy(0.01)
+
+        // 税款（取1.5%，进1保留2位小数）
+        let tax = amount.multipliedBy(0.015)
+
+        tax = tax.dp(2, BigNumber.ROUND_CEIL)
+
+        // 定义最低税款
         const minTax = BigNumber(0.01)
+
         if (tax < minTax) {
           tax = minTax
         }
         if (tax > amount) {
           tax = amount
         }
+
+        // 减去税款，即为所得
         amount = amount.minus(tax)
+
         const balance = BigNumber(user.account.balance).plus(amount).toFixed(2);
         // user.account.balance = balance;
         // delete user._id;
