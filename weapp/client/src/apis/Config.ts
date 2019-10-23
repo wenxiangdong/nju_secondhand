@@ -98,7 +98,10 @@ export const ConfigItem = {
     },// 开发者信息
     PLATFORM_RULES: {
         key: "platform-rules",
-        default: ['本平台仅为南京大学校内师生服务，谨遵诚信原则', '在本平台出售商品，平台将收取其价格1%（不足1分按1分计算）的费用。']
+        default: ['本平台仅为南京大学校内师生服务，谨遵诚信原则',
+        '在本平台出售商品，平台将收取其价格1.5%的费用。',
+        "账户提现最低1元，最高500元。",
+        ]
     },
     PRIVATE_POLICY: {
         key: "private-policy",
