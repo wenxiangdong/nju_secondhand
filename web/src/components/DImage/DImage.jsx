@@ -63,7 +63,7 @@ function DImage({image = ""} = {}) {
             justifyContent: "center",
             alignItems: "center"
         }}>
-            <img src={url}/>
+            <img src={url} style={{maxHeight: "90vh"}} />
             <Icon
                 onClick={handleCancelFullScreen}
                 type="close-circle"
